@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bank of the Brave - Secure Private Banking</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: #333;
+    }
+    
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px 0;
+      position: sticky;
+      top: 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    
+    nav a {
+      color: white;
+      margin-left: 30px;
+      text-decoration: none;
+      transition: opacity 0.3s;
+    }
+    
+    nav a:hover {
+      opacity: 0.8;
+    }
+    
+    .auth-buttons {
+      display: flex;
+      gap: 15px;
+    }
+    
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .btn-login {
+      background: transparent;
+      color: white;
+      border: 2px solid white;
+    }
+    
+    .btn-login:hover {
+      background: white;
+      color: #667eea;
+    }
+    
+    .btn-signup {
+      background: white;
+      color: #667eea;
+    }
+    
+    .btn-signup:hover {
+      background: #f0f0f0;
+    }
+    
+    .hero {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 80px 20px;
+      text-align: center;
+    }
+    
+    .hero-content {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .hero h1 {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+    
+    .hero p {
+      font-size: 18px;
+      margin-bottom: 30px;
+      opacity: 0.9;
+    }
+    
+    .hero-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+    
+    .btn-primary {
+      background: white;
+      color: #667eea;
+      padding: 15px 40px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-block;
+    }
+    
+    .btn-primary:hover {
+      background: #f0f0f0;
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      color: white;
+      border: 2px solid white;
+      padding: 13px 38px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-block;
+    }
+    
+    .btn-secondary:hover {
+      background: white;
+      color: #667eea;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    .features {
+      padding: 80px 20px;
+      background: #f9f9f9;
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+    
+    .feature-card {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .feature-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+    
+    .feature-card h3 {
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+    
+    .feature-card p {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .section-title {
+      font-size: 36px;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    
+    .section-subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 40px;
+    }
+    
+    .security {
+      padding: 80px 20px;
+    }
+    
+    .security-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+    
+    .security-item {
+      padding: 20px;
+      border-left: 4px solid #667eea;
+      background: #f8f9ff;
+    }
+    
+    .security-item h4 {
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+    
+    .pricing {
+      padding: 80px 20px;
+      background: #f9f9f9;
+    }
+    
+    .pricing-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+    
+    .pricing-card {
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .pricing-card.featured {
+      border: 3px solid #667eea;
+      transform: scale(1.05);
+    }
+    
+    .price {
+      font-size: 36px;
+      color: #667eea;
+      margin: 20px 0;
+      font-weight: bold;
+    }
+    
+    .price-period {
+      color: #999;
+      font-size: 14px;
+    }
+    
+    .features-list {
+      list-style: none;
+      text-align: left;
+      margin: 30px 0;
+    }
+    
+    .features-list li {
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+      color: #666;
+    }
+    
+    .features-list li:before {
+      content: "✓ ";
+      color: #667eea;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    
+    footer {
+      background: #333;
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto 30px;
+      text-align: left;
+    }
+    
+    .footer-section h4 {
+      margin-bottom: 15px;
+      color: #667eea;
+    }
+    
+    .footer-section a {
+      display: block;
+      color: #ccc;
+      text-decoration: none;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    
+    .footer-section a:hover {
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="nav-container">
+      <div class="logo">🏦 Bank of the Brave</div>
+      <nav>
+        <a href="#features">Features</a>
+        <a href="#security">Security</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#support">Support</a>
+      </nav>
+      <div class="auth-buttons">
+        <button class="btn-login" onclick="window.location.href='/index.html'">Login</button>
+        <button class="btn-signup" onclick="window.location.href='/index.html?mode=signup'">Sign Up</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Secure Private Banking for HNWIs</h1>
+      <p>Access world-class banking services with enterprise-grade security, multi-currency support, and dedicated wealth management.</p>
+      <div class="hero-buttons">
+        <a href="/index.html?mode=signup" class="btn-primary">Get Started</a>
+        <a href="#features" class="btn-secondary">Learn More</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features" id="features">
+    <div class="container">
+      <h2 class="section-title">Premium Banking Features</h2>
+      <p class="section-subtitle">Everything you need for modern private banking</p>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">💰</div>
+          <h3>Multi-Currency Accounts</h3>
+          <p>Hold and manage USD, EUR, GBP, and BTC in one platform with real-time exchange rates.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">💳</div>
+          <h3>Instant Card Issuance</h3>
+          <p>Get virtual cards instantly or order physical cards. Full control over limits and security.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🌍</div>
+          <h3>International Transfers</h3>
+          <p>Send money globally via SWIFT, SEPA, or ACH with competitive rates and fast settlement.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">💵</div>
+          <h3>Loans & Credit</h3>
+          <p>Access collateralized loans, investment deposits, and revolving credit lines with flexible terms.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Portfolio Management</h3>
+          <p>Track investments, fixed deposits, and assets with real-time analytics and reporting.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">👥</div>
+          <h3>Dedicated Relationship Manager</h3>
+          <p>Direct access to your personal wealth advisor for consulting and portfolio guidance.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Security Section -->
+  <section class="security" id="security">
+    <div class="container">
+      <h2 class="section-title">Bank-Grade Security</h2>
+      <p class="section-subtitle">Your funds and data are protected by enterprise-grade security measures</p>
+      
+      <div class="security-grid">
+        <div class="security-item">
+          <h4>🔐 End-to-End Encryption</h4>
+          <p>All data encrypted with TLS 1.3 in transit and AES-256 at rest.</p>
+        </div>
+        
+        <div class="security-item">
+          <h4>🔑 Multi-Factor Authentication</h4>
+          <p>TOTP, hardware tokens, and biometric authentication options available.</p>
+        </div>
+        
+        <div class="security-item">
+          <h4>📋 KYC/AML Compliance</h4>
+          <p>Full identity verification with liveness detection and document validation.</p>
+        </div>
+        
+        <div class="security-item">
+          <h4>📊 Real-Time Monitoring</h4>
+          <p>Automated fraud detection with velocity checks and anomaly detection.</p>
+        </div>
+        
+        <div class="security-item">
+          <h4>📝 Immutable Audit Trail</h4>
+          <p>Every transaction logged with IP, timestamp, and full state tracking.</p>
+        </div>
+        
+        <div class="security-item">
+          <h4>🛡️ Compliance Ready</h4>
+          <p>SOC 2 compliant infrastructure with multi-factor admin approvals.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <h2 class="section-title">Simple, Transparent Pricing</h2>
+      <p class="section-subtitle">Choose the plan that works for you</p>
+      
+      <div class="pricing-cards">
+        <div class="pricing-card">
+          <h3>Starter</h3>
+          <div class="price">Free<span class="price-period">/month</span></div>
+          <ul class="features-list">
+            <li>1 USD account</li>
+            <li>Virtual debit card</li>
+            <li>Internal transfers</li>
+            <li>Basic support</li>
+            <li>Account statements</li>
+          </ul>
+          <button class="btn-primary" onclick="window.location.href='/index.html?mode=signup'">Get Started</button>
+        </div>
+        
+        <div class="pricing-card featured">
+          <h3>Premium</h3>
+          <div class="price">$29<span class="price-period">/month</span></div>
+          <ul class="features-list">
+            <li>Unlimited accounts</li>
+            <li>Physical + virtual cards</li>
+            <li>International transfers</li>
+            <li>Priority support</li>
+            <li>Advanced analytics</li>
+            <li>Loan products</li>
+          </ul>
+          <button class="btn-primary" onclick="window.location.href='/index.html?mode=signup'">Start Free Trial</button>
+        </div>
+        
+        <div class="pricing-card">
+          <h3>Private Banking</h3>
+          <div class="price">Custom<span class="price-period">/month</span></div>
+          <ul class="features-list">
+            <li>All Premium features</li>
+            <li>Dedicated RM</li>
+            <li>Portfolio management</li>
+            <li>Custom structuring</li>
+            <li>24/7 concierge</li>
+          </ul>
+          <button class="btn-primary" onclick="alert('Contact sales team')">Request Demo</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Support Section -->
+  <section class="security" id="support">
+    <div class="container">
+      <h2 class="section-title">Need Help?</h2>
+      <p class="section-subtitle">We're here to support you every step of the way</p>
+      
+      <div class="security-grid">
+        <div class="security-item">
+          <h4>📱 Live Chat</h4>
+          <p>Get instant help from our support team during business hours.</p>
+        </div>
+        
+        <div class="security-item">
+          <h4>📧 Email Support</h4>
+          <p>Contact our support team at support@bankofthebrave.com</p>
+        </div>
+        
+        <div class="security-item">
+          <h4>📚 Knowledge Base</h4>
+          <p>Browse our comprehensive FAQ and user guides.</p>
+        </div>
+        
+        <div class="security-item">
+          <h4>🎓 Video Tutorials</h4>
+          <p>Step-by-step video guides for all major features.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>Product</h4>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#">Mobile App</a>
+        <a href="#">API Docs</a>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Company</h4>
+        <a href="#">About Us</a>
+        <a href="#">Blog</a>
+        <a href="#">Careers</a>
+        <a href="#">Press</a>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Legal</h4>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Security</a>
+        <a href="#">Compliance</a>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Support</h4>
+        <a href="#">Help Center</a>
+        <a href="#">Contact Us</a>
+        <a href="#">Status Page</a>
+        <a href="#">Community</a>
+      </div>
+    </div>
+    
+    <div style="border-top: 1px solid #555; padding-top: 20px;">
+      <p>&copy; 2026 Bank of the Brave. All rights reserved.</p>
+      <p style="font-size: 12px; margin-top: 10px; color: #999;">
+        Bank of the Brave is a digital banking platform. All transactions are subject to compliance with applicable regulations.
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fund Your Account - Bank of the Brave</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      padding: 30px;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .header h1 {
+      color: #333;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    
+    .header p {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .info-box {
+      background: #d4edda;
+      border-left: 4px solid #28a745;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #155724;
+    }
+    
+    .deposit-methods {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .method-card {
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .method-card:hover {
+      border-color: #667eea;
+      background: #f8f9ff;
+    }
+    
+    .method-card.active {
+      border-color: #667eea;
+      background: #f8f9ff;
+    }
+    
+    .method-icon {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+    
+    .method-name {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 5px;
+    }
+    
+    .method-desc {
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+    }
+    
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .file-input-wrapper input[type=file] {
+      position: absolute;
+      left: -9999px;
+    }
+    
+    .file-label {
+      display: block;
+      padding: 20px;
+      background: #f5f5f5;
+      border: 2px dashed #667eea;
+      border-radius: 5px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .file-label:hover {
+      background: #e8e8ff;
+    }
+    
+    .file-name {
+      font-size: 12px;
+      color: #667eea;
+      margin-top: 10px;
+    }
+    
+    .error-message {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 12px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      display: none;
+    }
+    
+    .success-message {
+      background: #d4edda;
+      color: #155724;
+      padding: 12px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      display: none;
+    }
+    
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 20px;
+    }
+    
+    button:hover {
+      background: #5568d3;
+    }
+    
+    .minimum-info {
+      font-size: 12px;
+      color: #666;
+      margin-top: 10px;
+      padding: 10px;
+      background: #f9f9f9;
+      border-radius: 5px;
+    }
+    
+    .step-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <h1>Fund Your Account</h1>
+        <p>Complete your first deposit to activate your account</p>
+      </div>
+
+      <div class="info-box">
+        ✓ KYC verification submitted! We'll review your documents shortly.<br>
+        Minimum deposit required: <strong>$500</strong>
+      </div>
+
+      <div class="error-message" id="error-message"></div>
+      <div class="success-message" id="success-message"></div>
+
+      <div class="step-title">Select Deposit Method</div>
+      
+      <div class="deposit-methods">
+        <div class="method-card active" onclick="selectMethod('bank_transfer')">
+          <div class="method-icon">🏦</div>
+          <div class="method-name">Bank Transfer</div>
+          <div class="method-desc">ACH/Wire Transfer</div>
+        </div>
+        
+        <div class="method-card" onclick="selectMethod('cashapp')">
+          <div class="method-icon">💰</div>
+          <div class="method-name">CashApp</div>
+          <div class="method-desc">Direct transfer</div>
+        </div>
+        
+        <div class="method-card" onclick="selectMethod('venmo')">
+          <div class="method-icon">📱</div>
+          <div class="method-name">Venmo</div>
+          <div class="method-desc">P2P transfer</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="amount">Amount (USD)</label>
+        <input type="number" id="amount" placeholder="500" min="500" value="500" required>
+        <div class="minimum-info">Minimum: $500 • Maximum: $50,000</div>
+      </div>
+
+      <div class="form-group">
+        <label>Proof of Deposit</label>
+        <p style="font-size: 12px; color: #666; margin: 10px 0;">Upload a screenshot or receipt showing your deposit</p>
+        <div class="file-input-wrapper">
+          <input type="file" id="proofOfDeposit" accept="image/*,application/pdf" required>
+          <label for="proofOfDeposit" class="file-label">
+            <div>📸 Click to upload receipt/screenshot</div>
+            <div class="file-name" id="fileName"></div>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="depositNotes">Notes (Optional)</label>
+        <input type="text" id="depositNotes" placeholder="Reference or transaction ID">
+      </div>
+
+      <button onclick="submitDeposit()">Submit Deposit</button>
+
+      <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #666;">
+        Bank details for wire transfers will be provided after submission.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:5000/api';
+    let selectedMethod = 'bank_transfer';
+
+    function selectMethod(method) {
+      selectedMethod = method;
+      document.querySelectorAll('.method-card').forEach(card => {
+        card.classList.remove('active');
+      });
+      event.target.closest('.method-card').classList.add('active');
+    }
+
+    async function submitDeposit() {
+      const errorDiv = document.getElementById('error-message');
+      const successDiv = document.getElementById('success-message');
+      errorDiv.style.display = 'none';
+      successDiv.style.display = 'none';
+
+      const amount = parseFloat(document.getElementById('amount').value);
+      const proofFile = document.getElementById('proofOfDeposit').files[0];
+      const notes = document.getElementById('depositNotes').value;
+
+      if (!amount || amount < 500) {
+        errorDiv.textContent = 'Minimum deposit is $500';
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      if (!proofFile) {
+        errorDiv.textContent = 'Please upload proof of deposit';
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      try {
+        // For demo, we'll create a mock deposit proof URL
+        const proofUrl = URL.createObjectURL(proofFile);
+
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        // We need to get the account ID first
+        const accountsResponse = await fetch(`${API_URL}/accounts`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        const accountsData = await accountsResponse.json();
+        if (!accountsData.accounts || accountsData.accounts.length === 0) {
+          errorDiv.textContent = 'No account found';
+          errorDiv.style.display = 'block';
+          return;
+        }
+
+        const accountId = accountsData.accounts[0]._id;
+
+        // Submit deposit
+        const response = await fetch(`${API_URL}/transactions/deposit`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            accountId: accountId,
+            amount: amount,
+            depositMethod: selectedMethod,
+            proofUrl: proofUrl,
+            notes: notes
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          errorDiv.textContent = data.error || 'Deposit submission failed';
+          errorDiv.style.display = 'block';
+          return;
+        }
+
+        successDiv.textContent = 'Deposit submitted! Your account will be activated once verified. Redirecting to dashboard...';
+        successDiv.style.display = 'block';
+
+        setTimeout(() => {
+          window.location.href = '/dashboard.html';
+        }, 3000);
+      } catch (error) {
+        errorDiv.textContent = 'Error: ' + error.message;
+        errorDiv.style.display = 'block';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('proofOfDeposit').addEventListener('change', (e) => {
+        document.getElementById('fileName').textContent = e.target.files[0]?.name || '';
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KYC Verification - Bank of the Brave</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      padding: 30px;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .header h1 {
+      color: #333;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    
+    .header p {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .progress-bar {
+      background: #e0e0e0;
+      height: 8px;
+      border-radius: 10px;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+    
+    .progress {
+      background: #667eea;
+      height: 100%;
+      width: 33%;
+      transition: width 0.3s;
+    }
+    
+    .step {
+      display: none;
+    }
+    
+    .step.active {
+      display: block;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+    }
+    
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      width: 100%;
+    }
+    
+    .file-input-wrapper input[type=file] {
+      position: absolute;
+      left: -9999px;
+    }
+    
+    .file-label {
+      display: block;
+      padding: 10px;
+      background: #f5f5f5;
+      border: 2px dashed #667eea;
+      border-radius: 5px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .file-label:hover {
+      background: #e8e8ff;
+    }
+    
+    .file-name {
+      font-size: 12px;
+      color: #667eea;
+      margin-top: 5px;
+    }
+    
+    .error-message {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 12px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      display: none;
+    }
+    
+    .success-message {
+      background: #d4edda;
+      color: #155724;
+      padding: 12px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      display: none;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #5568d3;
+    }
+    
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+    
+    .btn-secondary:hover {
+      background: #d0d0d0;
+    }
+    
+    .step-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 15px;
+    }
+    
+    .info-box {
+      background: #f0f4ff;
+      border-left: 4px solid #667eea;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <h1>KYC Verification</h1>
+        <p>Complete your identity verification</p>
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress" id="progressBar"></div>
+      </div>
+
+      <div class="error-message" id="error-message"></div>
+      <div class="success-message" id="success-message"></div>
+
+      <!-- Step 1: Personal Information -->
+      <div id="step1" class="step active">
+        <div class="step-title">Step 1: Personal Information</div>
+        <div class="info-box">
+          Provide your personal details including SSN for verification purposes.
+        </div>
+        
+        <div class="form-group">
+          <label for="ssn">Social Security Number (SSN)</label>
+          <input type="password" id="ssn" placeholder="XXX-XX-XXXX" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="dateOfBirth">Date of Birth</label>
+          <input type="date" id="dateOfBirth" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="address">Address</label>
+          <input type="text" id="address" placeholder="123 Main St" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="city">City</label>
+          <input type="text" id="city" placeholder="New York" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="state">State</label>
+          <input type="text" id="state" placeholder="NY" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="zipCode">Zip Code</label>
+          <input type="text" id="zipCode" placeholder="10001" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="country">Country</label>
+          <input type="text" id="country" placeholder="United States" value="United States" required>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn-primary" onclick="nextStep()">Next</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Document Upload -->
+      <div id="step2" class="step">
+        <div class="step-title">Step 2: Upload ID Document</div>
+        <div class="info-box">
+          Upload a valid government-issued ID (Driver's License, Passport, or National ID).
+        </div>
+        
+        <div class="form-group">
+          <label for="idType">ID Type</label>
+          <select id="idType" required>
+            <option value="">Select ID Type</option>
+            <option value="drivers_license">Driver's License</option>
+            <option value="passport">Passport</option>
+            <option value="national_id">National ID</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>ID Document</label>
+          <div class="file-input-wrapper">
+            <input type="file" id="idDocument" accept="image/*,application/pdf" required>
+            <label for="idDocument" class="file-label">
+              <div>Click to upload or drag and drop</div>
+              <div class="file-name" id="idFileName"></div>
+            </label>
+          </div>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn-secondary" onclick="prevStep()">Back</button>
+          <button class="btn-primary" onclick="nextStep()">Next</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Selfie -->
+      <div id="step3" class="step">
+        <div class="step-title">Step 3: Upload Selfie</div>
+        <div class="info-box">
+          Take a clear selfie holding your ID document. Make sure your face and ID are both visible.
+        </div>
+        
+        <div class="form-group">
+          <label>Selfie with ID</label>
+          <div class="file-input-wrapper">
+            <input type="file" id="selfie" accept="image/*" required>
+            <label for="selfie" class="file-label">
+              <div>Click to upload or drag and drop</div>
+              <div class="file-name" id="selfieFileName"></div>
+            </label>
+          </div>
+        </div>
+        
+        <div class="button-group">
+          <button class="btn-secondary" onclick="prevStep()">Back</button>
+          <button class="btn-primary" onclick="submitKYC()">Submit KYC</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:5000/api';
+    let currentStep = 1;
+    const totalSteps = 3;
+
+    function updateProgress() {
+      const progress = (currentStep / totalSteps) * 100;
+      document.getElementById('progressBar').style.width = progress + '%';
+    }
+
+    function showStep(step) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      document.getElementById('step' + step).classList.add('active');
+      currentStep = step;
+      updateProgress();
+      window.scrollTo(0, 0);
+    }
+
+    function nextStep() {
+      if (validateStep(currentStep)) {
+        showStep(currentStep + 1);
+      }
+    }
+
+    function prevStep() {
+      showStep(currentStep - 1);
+    }
+
+    function validateStep(step) {
+      const errorDiv = document.getElementById('error-message');
+      errorDiv.style.display = 'none';
+
+      if (step === 1) {
+        const ssn = document.getElementById('ssn').value;
+        const dob = document.getElementById('dateOfBirth').value;
+        const address = document.getElementById('address').value;
+        const city = document.getElementById('city').value;
+        const state = document.getElementById('state').value;
+        const zipCode = document.getElementById('zipCode').value;
+        const country = document.getElementById('country').value;
+
+        if (!ssn || !dob || !address || !city || !state || !zipCode || !country) {
+          errorDiv.textContent = 'Please fill in all fields';
+          errorDiv.style.display = 'block';
+          return false;
+        }
+      } else if (step === 2) {
+        const idType = document.getElementById('idType').value;
+        const idDocument = document.getElementById('idDocument').files[0];
+
+        if (!idType) {
+          errorDiv.textContent = 'Please select an ID type';
+          errorDiv.style.display = 'block';
+          return false;
+        }
+
+        if (!idDocument) {
+          errorDiv.textContent = 'Please upload your ID document';
+          errorDiv.style.display = 'block';
+          return false;
+        }
+      } else if (step === 3) {
+        const selfie = document.getElementById('selfie').files[0];
+
+        if (!selfie) {
+          errorDiv.textContent = 'Please upload a selfie';
+          errorDiv.style.display = 'block';
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    async function submitKYC() {
+      const errorDiv = document.getElementById('error-message');
+      const successDiv = document.getElementById('success-message');
+      errorDiv.style.display = 'none';
+      successDiv.style.display = 'none';
+
+      if (!validateStep(3)) return;
+
+      const formData = new FormData();
+      formData.append('ssn', document.getElementById('ssn').value);
+      formData.append('idType', document.getElementById('idType').value);
+      formData.append('dateOfBirth', document.getElementById('dateOfBirth').value);
+      formData.append('address', document.getElementById('address').value);
+      formData.append('city', document.getElementById('city').value);
+      formData.append('state', document.getElementById('state').value);
+      formData.append('zipCode', document.getElementById('zipCode').value);
+      formData.append('country', document.getElementById('country').value);
+      formData.append('idDocument', document.getElementById('idDocument').files[0]);
+      formData.append('selfie', document.getElementById('selfie').files[0]);
+
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_URL}/kyc/submit`, {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + token },
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          errorDiv.textContent = data.error || 'KYC submission failed';
+          errorDiv.style.display = 'block';
+          return;
+        }
+
+        successDiv.textContent = 'KYC submitted successfully! Redirecting to funding...';
+        successDiv.style.display = 'block';
+
+        setTimeout(() => {
+          window.location.href = '/funding.html';
+        }, 2000);
+      } catch (error) {
+        errorDiv.textContent = 'Network error: ' + error.message;
+        errorDiv.style.display = 'block';
+      }
+    }
+
+    // File input handling
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('idDocument').addEventListener('change', (e) => {
+        document.getElementById('idFileName').textContent = e.target.files[0]?.name || '';
+      });
+
+      document.getElementById('selfie').addEventListener('change', (e) => {
+        document.getElementById('selfieFileName').textContent = e.target.files[0]?.name || '';
+      });
+    });
+  </script>
+</body>
+</html>

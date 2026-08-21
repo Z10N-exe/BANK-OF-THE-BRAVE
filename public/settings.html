@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - Bank of the Brave</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f5;
+    }
+    
+    .navbar {
+      background: #667eea;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+    
+    .settings-layout {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 30px;
+    }
+    
+    .settings-menu {
+      background: white;
+      border-radius: 10px;
+      padding: 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      height: fit-content;
+    }
+    
+    .menu-item {
+      padding: 15px 20px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      color: #666;
+      transition: all 0.3s;
+    }
+    
+    .menu-item:hover {
+      background: #f5f5f5;
+      color: #667eea;
+    }
+    
+    .menu-item.active {
+      background: #f8f9ff;
+      color: #667eea;
+      border-left: 3px solid #667eea;
+      padding-left: 17px;
+    }
+    
+    .settings-content {
+      background: white;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .content-section {
+      display: none;
+    }
+    
+    .content-section.active {
+      display: block;
+    }
+    
+    .section-title {
+      font-size: 22px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    
+    .section-desc {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+    
+    .setting-item {
+      margin-bottom: 25px;
+      padding-bottom: 25px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .setting-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    
+    .setting-label {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+    
+    .setting-desc {
+      color: #666;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+    }
+    
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #5568d3;
+    }
+    
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+    
+    .btn-secondary:hover {
+      background: #d0d0d0;
+    }
+    
+    .btn-danger {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .btn-danger:hover {
+      background: #f5c6cb;
+    }
+    
+    .success-message {
+      background: #d4edda;
+      color: #155724;
+      padding: 12px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    
+    .error-message {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 12px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    
+    .two-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    
+    .device-item {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .device-info {
+      flex: 1;
+    }
+    
+    .device-name {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    
+    .device-details {
+      font-size: 12px;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <span style="font-weight: bold; font-size: 20px;">🏦 Bank of the Brave</span>
+    <div style="display: flex; gap: 20px;">
+      <a href="/dashboard.html" style="color: white; text-decoration: none;">Dashboard</a>
+      <button onclick="logout()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 8px 16px; border-radius: 5px; cursor: pointer;">Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <h1 style="color: #333; margin-bottom: 30px;">Settings</h1>
+
+    <div class="settings-layout">
+      <!-- Settings Menu -->
+      <div class="settings-menu">
+        <div class="menu-item active" onclick="switchSection('profile')">👤 Profile</div>
+        <div class="menu-item" onclick="switchSection('security')">🔒 Security</div>
+        <div class="menu-item" onclick="switchSection('notifications')">🔔 Notifications</div>
+        <div class="menu-item" onclick="switchSection('devices')">📱 Devices</div>
+        <div class="menu-item" onclick="switchSection('preferences')">⚙️ Preferences</div>
+      </div>
+
+      <!-- Settings Content -->
+      <div class="settings-content">
+        <!-- Profile Section -->
+        <div id="profileSection" class="content-section active">
+          <h2 class="section-title">Profile Information</h2>
+          <p class="section-desc">Update your personal details and contact information</p>
+
+          <div class="success-message" id="profileSuccess">✓ Profile updated successfully</div>
+          <div class="error-message" id="profileError"></div>
+
+          <div class="two-column">
+            <div class="form-group">
+              <label>First Name</label>
+              <input type="text" id="firstName" placeholder="John">
+            </div>
+            <div class="form-group">
+              <label>Last Name</label>
+              <input type="text" id="lastName" placeholder="Doe">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="email" placeholder="john@example.com" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" id="phone" placeholder="+1234567890">
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-label">Address</div>
+            <div class="form-group">
+              <input type="text" id="address" placeholder="Street address">
+            </div>
+            <div class="two-column">
+              <div class="form-group">
+                <input type="text" id="city" placeholder="City">
+              </div>
+              <div class="form-group">
+                <input type="text" id="state" placeholder="State">
+              </div>
+            </div>
+            <div class="two-column">
+              <div class="form-group">
+                <input type="text" id="zipCode" placeholder="ZIP Code">
+              </div>
+              <div class="form-group">
+                <input type="text" id="country" placeholder="Country">
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-primary" onclick="updateProfile()">Save Changes</button>
+        </div>
+
+        <!-- Security Section -->
+        <div id="securitySection" class="content-section">
+          <h2 class="section-title">Security Settings</h2>
+          <p class="section-desc">Manage your password and security options</p>
+
+          <div class="setting-item">
+            <div class="setting-label">Change Password</div>
+            <div class="setting-desc">Update your login password</div>
+            <div class="form-group">
+              <label>Current Password</label>
+              <input type="password" id="currentPassword" placeholder="••••••••">
+            </div>
+            <div class="form-group">
+              <label>New Password</label>
+              <input type="password" id="newPassword" placeholder="••••••••">
+            </div>
+            <div class="form-group">
+              <label>Confirm Password</label>
+              <input type="password" id="confirmPassword" placeholder="••••••••">
+            </div>
+            <button class="btn-primary" onclick="changePassword()">Update Password</button>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-label">Two-Factor Authentication</div>
+            <div class="setting-desc">Add an extra layer of security to your account</div>
+            <button class="btn-primary" onclick="enableMFA()">Enable 2FA</button>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-label">Login History</div>
+            <div class="setting-desc">View your recent login activity</div>
+            <button class="btn-secondary" onclick="viewLoginHistory()">View Login History</button>
+          </div>
+        </div>
+
+        <!-- Notifications Section -->
+        <div id="notificationsSection" class="content-section">
+          <h2 class="section-title">Notification Preferences</h2>
+          <p class="section-desc">Control how you receive alerts and updates</p>
+
+          <div class="setting-item">
+            <div class="setting-label">
+              <input type="checkbox" checked> Email Notifications
+            </div>
+            <div class="setting-desc">Receive email alerts for important account activities</div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-label">
+              <input type="checkbox" checked> Transaction Alerts
+            </div>
+            <div class="setting-desc">Get notified about transfers and transactions</div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-label">
+              <input type="checkbox" checked> Security Alerts
+            </div>
+            <div class="setting-desc">Receive alerts about login attempts and security changes</div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-label">
+              <input type="checkbox"> Marketing & Promotions
+            </div>
+            <div class="setting-desc">Receive news about new features and promotions</div>
+          </div>
+
+          <button class="btn-primary" onclick="saveNotificationPreferences()">Save Preferences</button>
+        </div>
+
+        <!-- Devices Section -->
+        <div id="devicesSection" class="content-section">
+          <h2 class="section-title">Active Devices</h2>
+          <p class="section-desc">Manage devices with access to your account</p>
+
+          <div class="device-item">
+            <div class="device-info">
+              <div class="device-name">💻 Windows Desktop</div>
+              <div class="device-details">Last active: Today at 2:45 PM | IP: 192.168.1.100</div>
+            </div>
+            <button class="btn-secondary">Revoke</button>
+          </div>
+
+          <div class="device-item">
+            <div class="device-info">
+              <div class="device-name">📱 iPhone 14</div>
+              <div class="device-details">Last active: Today at 12:30 PM | IP: 203.0.113.45</div>
+            </div>
+            <button class="btn-secondary">Revoke</button>
+          </div>
+
+          <div class="device-item">
+            <div class="device-info">
+              <div class="device-name">💻 MacBook Pro</div>
+              <div class="device-details">Last active: Yesterday at 6:15 PM | IP: 198.51.100.20</div>
+            </div>
+            <button class="btn-secondary">Revoke</button>
+          </div>
+        </div>
+
+        <!-- Preferences Section -->
+        <div id="preferencesSection" class="content-section">
+          <h2 class="section-title">Preferences</h2>
+          <p class="section-desc">Customize your banking experience</p>
+
+          <div class="setting-item">
+            <div class="setting-label">Default Currency</div>
+            <div class="setting-desc">Choose your preferred currency for transactions</div>
+            <select style="max-width: 300px;">
+              <option selected>USD (US Dollar)</option>
+              <option>EUR (Euro)</option>
+              <option>GBP (British Pound)</option>
+              <option>BTC (Bitcoin)</option>
+            </select>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-label">Language</div>
+            <div class="setting-desc">Select your preferred language</div>
+            <select style="max-width: 300px;">
+              <option selected>English</option>
+              <option>Spanish</option>
+              <option>French</option>
+              <option>German</option>
+            </select>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-label">Time Zone</div>
+            <div class="setting-desc">Set your time zone for transactions and statements</div>
+            <select style="max-width: 300px;">
+              <option selected>(UTC-08:00) Pacific Time</option>
+              <option>(UTC-05:00) Eastern Time</option>
+              <option>(UTC+00:00) UTC/GMT</option>
+              <option>(UTC+01:00) Central European Time</option>
+            </select>
+          </div>
+
+          <button class="btn-primary" onclick="savePreferences()">Save Preferences</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:5000/api';
+
+    function switchSection(section) {
+      // Hide all sections
+      document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+      
+      // Show selected section
+      document.getElementById(section + 'Section').classList.add('active');
+      event.target.classList.add('active');
+
+      // Load data for section
+      if (section === 'profile') loadProfile();
+      else if (section === 'security') loadSecurityInfo();
+    }
+
+    async function loadProfile() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_URL}/users/profile`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        const data = await response.json();
+        const user = data.user;
+
+        document.getElementById('firstName').value = user.firstName;
+        document.getElementById('lastName').value = user.lastName;
+        document.getElementById('email').value = user.email;
+        document.getElementById('phone').value = user.phone || '';
+      } catch (error) {
+        console.error('Error loading profile:', error);
+      }
+    }
+
+    async function updateProfile() {
+      try {
+        const token = localStorage.getItem('token');
+        const firstName = document.getElementById('firstName').value;
+        const lastName = document.getElementById('lastName').value;
+        const phone = document.getElementById('phone').value;
+
+        const response = await fetch(`${API_URL}/users/profile`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ firstName, lastName, phone })
+        });
+
+        if (response.ok) {
+          document.getElementById('profileSuccess').style.display = 'block';
+          setTimeout(() => {
+            document.getElementById('profileSuccess').style.display = 'none';
+          }, 3000);
+        } else {
+          document.getElementById('profileError').textContent = 'Error updating profile';
+          document.getElementById('profileError').style.display = 'block';
+        }
+      } catch (error) {
+        document.getElementById('profileError').textContent = 'Error: ' + error.message;
+        document.getElementById('profileError').style.display = 'block';
+      }
+    }
+
+    async function changePassword() {
+      const current = document.getElementById('currentPassword').value;
+      const newPass = document.getElementById('newPassword').value;
+      const confirm = document.getElementById('confirmPassword').value;
+
+      if (newPass !== confirm) {
+        alert('Passwords do not match');
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_URL}/users/change-password`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            currentPassword: current,
+            newPassword: newPass
+          })
+        });
+
+        if (response.ok) {
+          alert('Password changed successfully');
+          document.getElementById('currentPassword').value = '';
+          document.getElementById('newPassword').value = '';
+          document.getElementById('confirmPassword').value = '';
+        } else {
+          const data = await response.json();
+          alert(data.error || 'Error changing password');
+        }
+      } catch (error) {
+        alert('Error: ' + error.message);
+      }
+    }
+
+    function enableMFA() {
+      alert('2FA setup coming soon');
+    }
+
+    function viewLoginHistory() {
+      alert('Login history coming soon');
+    }
+
+    function saveNotificationPreferences() {
+      alert('Preferences saved (demo)');
+    }
+
+    function savePreferences() {
+      alert('Preferences saved (demo)');
+    }
+
+    function loadSecurityInfo() {
+      // Load security info
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = '/index.html';
+    }
+
+    // Load profile on page load
+    loadProfile();
+  </script>
+</body>
+</html>

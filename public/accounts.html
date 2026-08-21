@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accounts - Bank of the Brave</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f5;
+    }
+    
+    .navbar {
+      background: #667eea;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .navbar-left {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+    
+    .navbar-right {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    
+    .logout-btn {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid white;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+    
+    .page-header {
+      margin-bottom: 30px;
+    }
+    
+    .page-header h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+    
+    .page-header p {
+      color: #666;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #5568d3;
+    }
+    
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+    
+    .btn-secondary:hover {
+      background: #d0d0d0;
+    }
+    
+    .accounts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .account-card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .account-card:hover {
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      transform: translateY(-2px);
+    }
+    
+    .account-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 15px;
+    }
+    
+    .account-type {
+      font-size: 14px;
+      color: #666;
+      background: #f0f0f0;
+      padding: 5px 10px;
+      border-radius: 3px;
+      width: fit-content;
+    }
+    
+    .account-balance {
+      font-size: 28px;
+      color: #667eea;
+      font-weight: bold;
+      margin: 15px 0;
+    }
+    
+    .account-details {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 15px;
+    }
+    
+    .account-details div {
+      margin-bottom: 5px;
+    }
+    
+    .account-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    
+    .account-actions button {
+      padding: 8px;
+      font-size: 12px;
+    }
+    
+    .transactions-section {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .section-title {
+      font-size: 20px;
+      color: #333;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+    
+    .transaction-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    .transaction-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .transaction-item:hover {
+      background: #f9f9f9;
+    }
+    
+    .transaction-info {
+      flex: 1;
+    }
+    
+    .transaction-type {
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .transaction-date {
+      font-size: 12px;
+      color: #999;
+      margin-top: 3px;
+    }
+    
+    .transaction-amount {
+      font-weight: bold;
+      font-size: 16px;
+    }
+    
+    .transaction-amount.positive {
+      color: #28a745;
+    }
+    
+    .transaction-amount.negative {
+      color: #dc3545;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #999;
+    }
+    
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="navbar-left">
+      <span style="font-weight: bold; font-size: 20px;">🏦 Bank of the Brave</span>
+      <a class="nav-link" href="/dashboard.html">Dashboard</a>
+      <a class="nav-link" href="/accounts.html">Accounts</a>
+      <a class="nav-link" href="/transfers.html">Transfers</a>
+      <a class="nav-link" href="/cards.html">Cards</a>
+    </div>
+    <div class="navbar-right">
+      <span id="userName">Welcome</span>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1>My Accounts</h1>
+      <p>Manage your multi-currency accounts and view account details</p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="btn-primary" onclick="showAddAccountModal()">+ Add New Account</button>
+      <button class="btn-secondary" onclick="downloadStatement()">📥 Download Statements</button>
+    </div>
+
+    <!-- Accounts Grid -->
+    <div class="accounts-grid" id="accountsGrid">
+      <div class="empty-state">
+        <div class="empty-state-icon">💼</div>
+        <p>Loading accounts...</p>
+      </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="transactions-section">
+      <h2 class="section-title">Recent Transactions</h2>
+      <div class="transaction-list" id="transactionsList">
+        <div class="empty-state">
+          <div class="empty-state-icon">📋</div>
+          <p>No transactions yet</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Account Modal -->
+  <div id="addAccountModal" style="display:none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+    <div style="background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 400px;">
+      <h2>Add New Account</h2>
+      
+      <div style="margin-top: 20px;">
+        <label>Account Type</label>
+        <select id="newAccountType" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 15px;">
+          <option value="checking">Checking</option>
+          <option value="savings">Savings</option>
+          <option value="investment">Investment</option>
+        </select>
+      </div>
+      
+      <div>
+        <label>Currency</label>
+        <select id="newAccountCurrency" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 15px;">
+          <option value="USD">USD (US Dollar)</option>
+          <option value="EUR">EUR (Euro)</option>
+          <option value="GBP">GBP (British Pound)</option>
+          <option value="BTC">BTC (Bitcoin)</option>
+        </select>
+      </div>
+      
+      <div style="display: flex; gap: 10px;">
+        <button class="btn-primary" onclick="createAccount()" style="flex: 1;">Create Account</button>
+        <button class="btn-secondary" onclick="document.getElementById('addAccountModal').style.display='none'" style="flex: 1;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:5000/api';
+
+    function showAddAccountModal() {
+      document.getElementById('addAccountModal').style.display = 'flex';
+    }
+
+    async function loadAccounts() {
+      try {
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        document.getElementById('userName').textContent = `Welcome, ${user.firstName}`;
+
+        const response = await fetch(`${API_URL}/accounts`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        const data = await response.json();
+        const accounts = data.accounts || [];
+
+        const grid = document.getElementById('accountsGrid');
+        
+        if (accounts.length === 0) {
+          grid.innerHTML = `
+            <div class="empty-state" style="grid-column: 1/-1;">
+              <div class="empty-state-icon">💼</div>
+              <p>No accounts yet. Create one to get started.</p>
+            </div>
+          `;
+          return;
+        }
+
+        grid.innerHTML = accounts.map(account => `
+          <div class="account-card" onclick="viewAccount('${account._id}')">
+            <div class="account-header">
+              <span class="account-type">${account.accountType.toUpperCase()}</span>
+              <span>${account.currency}</span>
+            </div>
+            <div class="account-balance">$${(account.balance || 0).toFixed(2)}</div>
+            <div class="account-details">
+              ${account.iban ? `<div>IBAN: ${account.iban}</div>` : ''}
+              ${account.accountNumber ? `<div>Account: ${account.accountNumber}</div>` : ''}
+            </div>
+            <div class="account-actions">
+              <button class="btn-primary" onclick="event.stopPropagation(); goToTransfers('${account._id}')">Send Money</button>
+              <button class="btn-secondary" onclick="event.stopPropagation(); issueCard('${account._id}')">Issue Card</button>
+            </div>
+          </div>
+        `).join('');
+
+        // Load recent transactions
+        const transResponse = await fetch(`${API_URL}/transactions`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        const transData = await transResponse.json();
+        loadTransactions(transData.transactions);
+      } catch (error) {
+        console.error('Error loading accounts:', error);
+      }
+    }
+
+    function loadTransactions(transactions) {
+      const container = document.getElementById('transactionsList');
+
+      if (!transactions || transactions.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <p>No transactions yet</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = transactions.slice(0, 10).map(trans => {
+        const date = new Date(trans.createdAt).toLocaleDateString();
+        const amount = trans.amount.toFixed(2);
+        const isPositive = trans.type === 'deposit';
+
+        return `
+          <div class="transaction-item">
+            <div class="transaction-info">
+              <div class="transaction-type">${trans.type.replace(/_/g, ' ').toUpperCase()}</div>
+              <div class="transaction-date">${date}</div>
+            </div>
+            <div class="transaction-amount ${isPositive ? 'positive' : 'negative'}">
+              ${isPositive ? '+' : '-'}$${amount}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function createAccount() {
+      try {
+        const accountType = document.getElementById('newAccountType').value;
+        const currency = document.getElementById('newAccountCurrency').value;
+        const token = localStorage.getItem('token');
+
+        const response = await fetch(`${API_URL}/accounts`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ accountType, currency })
+        });
+
+        if (response.ok) {
+          alert('Account created successfully!');
+          document.getElementById('addAccountModal').style.display = 'none';
+          loadAccounts();
+        } else {
+          alert('Error creating account');
+        }
+      } catch (error) {
+        alert('Error: ' + error.message);
+      }
+    }
+
+    function viewAccount(accountId) {
+      window.location.href = `/account-detail.html?id=${accountId}`;
+    }
+
+    function goToTransfers(accountId) {
+      window.location.href = `/transfers.html?from=${accountId}`;
+    }
+
+    function issueCard(accountId) {
+      window.location.href = `/cards.html?account=${accountId}`;
+    }
+
+    function downloadStatement() {
+      alert('Statement download feature coming soon');
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = '/index.html';
+    }
+
+    loadAccounts();
+  </script>
+</body>
+</html>

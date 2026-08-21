@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Bank of the Brave</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .dashboard-wrapper {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background-color: var(--bg-white);
+      border-right: 1px solid var(--border-gray);
+      padding: 1.5rem 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+    }
+
+    .sidebar-item {
+      margin: 0;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      color: var(--text-light);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .sidebar-link:hover,
+    .sidebar-link.active {
+      background-color: var(--light-blue);
+      color: var(--secondary-blue);
+      border-left: 4px solid var(--secondary-blue);
+      padding-left: 12px;
+    }
+
+    .sidebar-link svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .main-content {
+      background-color: var(--bg-light);
+      overflow-y: auto;
+    }
+
+    .page-header {
+      background-color: var(--bg-white);
+      border-bottom: 1px solid var(--border-gray);
+      padding: 2rem;
+    }
+
+    .page-header h1 {
+      margin-bottom: 0.5rem;
+    }
+
+    .page-header p {
+      color: var(--text-light);
+      margin-bottom: 0;
+    }
+
+    .page-content {
+      padding: 2rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background-color: var(--bg-white);
+      border: 1px solid var(--border-gray);
+      border-radius: 8px;
+      padding: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      background-color: var(--light-blue);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .stat-icon svg {
+      width: 24px;
+      height: 24px;
+      color: var(--secondary-blue);
+    }
+
+    .stat-info h4 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-light);
+      margin-bottom: 0.2rem;
+    }
+
+    .stat-info p {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary-blue);
+      margin-bottom: 0;
+    }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .action-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 1.5rem;
+      background-color: var(--bg-white);
+      border: 1px solid var(--border-gray);
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--text-dark);
+      transition: all 0.3s ease;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .action-btn:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+      border-color: var(--secondary-blue);
+    }
+
+    .action-btn svg {
+      width: 28px;
+      height: 28px;
+      color: var(--secondary-blue);
+    }
+
+    .recent-transactions {
+      background-color: var(--bg-white);
+      border: 1px solid var(--border-gray);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    .recent-transactions h3 {
+      margin-bottom: 1.5rem;
+    }
+
+    .transaction-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border-gray);
+    }
+
+    .transaction-item:last-child {
+      border-bottom: none;
+    }
+
+    .transaction-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .transaction-icon {
+      width: 40px;
+      height: 40px;
+      background-color: var(--light-blue);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .transaction-icon svg {
+      width: 20px;
+      height: 20px;
+      color: var(--secondary-blue);
+    }
+
+    .transaction-info h5 {
+      margin-bottom: 0.2rem;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    .transaction-info p {
+      margin-bottom: 0;
+      font-size: 12px;
+      color: var(--text-light);
+    }
+
+    .transaction-amount {
+      font-weight: 700;
+      color: var(--primary-blue);
+      font-size: 14px;
+    }
+
+    .transaction-amount.negative {
+      color: var(--danger-red);
+    }
+
+    @media (max-width: 768px) {
+      .dashboard-wrapper {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border-gray);
+        z-index: 50;
+        padding: 1rem 0;
+      }
+
+      .sidebar-menu {
+        display: flex;
+        overflow-x: auto;
+        gap: 0;
+        padding: 0 1rem;
+      }
+
+      .sidebar-link {
+        padding: 8px 12px;
+        white-space: nowrap;
+      }
+
+      .main-content {
+        margin-top: 60px;
+      }
+
+      .stats-grid,
+      .action-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="navbar-brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+        <path d="M2 10h20"></path>
+      </svg>
+      Bank of the Brave
+    </div>
+
+    <ul class="navbar-nav">
+      <li><a href="/dashboard.html" style="display: flex; align-items: center; gap: 6px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        Home
+      </a></li>
+      <li><a href="/accounts.html" style="display: flex; align-items: center; gap: 6px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+          <line x1="1" y1="10" x2="23" y2="10"></line>
+        </svg>
+        Accounts
+      </a></li>
+      <li><a href="/transfers.html" style="display: flex; align-items: center; gap: 6px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <polyline points="19 12 12 19 5 12"></polyline>
+        </svg>
+        Transfers
+      </a></li>
+      <li><a href="/cards.html" style="display: flex; align-items: center; gap: 6px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+          <line x1="1" y1="10" x2="23" y2="10"></line>
+        </svg>
+        Cards
+      </a></li>
+    </ul>
+
+    <div class="navbar-user">
+      <div class="user-info">
+        <div class="user-name" id="userNameDisplay">John Doe</div>
+        <div class="user-role" id="userRoleDisplay">User</div>
+      </div>
+      <button class="sign-out-btn" onclick="signOut()" style="display: flex; align-items: center; gap: 6px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+        Sign Out
+      </button>
+    </div>
+  </div>
+
+  <div class="page-header">
+    <h1>Welcome to Your Dashboard</h1>
+    <p>Manage your accounts, transfers, cards, and more</p>
+  </div>
+
+  <div class="page-content">
+    <!-- Statistics -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-info">
+          <h4>Total Balance</h4>
+          <p id="totalBalance">$0.00</p>
+        </div>
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+            <line x1="1" y1="10" x2="23" y2="10"></line>
+          </svg>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-info">
+          <h4>Accounts</h4>
+          <p id="accountCount">0</p>
+        </div>
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-info">
+          <h4>Active Cards</h4>
+          <p id="cardCount">0</p>
+        </div>
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+            <line x1="1" y1="10" x2="23" y2="10"></line>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <h3 style="margin-bottom: 1rem;">Quick Actions</h3>
+    <div class="action-grid">
+      <a href="/transfers.html" class="action-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <polyline points="19 12 12 19 5 12"></polyline>
+        </svg>
+        Send Money
+      </a>
+      <a href="/cards.html" class="action-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+          <line x1="1" y1="10" x2="23" y2="10"></line>
+        </svg>
+        Manage Cards
+      </a>
+      <a href="/funding.html" class="action-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="17 8 12 3 7 8"></polyline>
+          <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+        Deposit Funds
+      </a>
+      <a href="/settings.html" class="action-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m5.08 5.08l4.24 4.24M1 12h6m6 0h6M4.22 19.78l4.24-4.24m5.08-5.08l4.24-4.24"></path>
+        </svg>
+        Settings
+      </a>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="recent-transactions">
+      <h3>Recent Activity</h3>
+      <div id="transactionsList">
+        <p style="color: var(--text-light); text-align: center; padding: 2rem;">
+          No transactions yet. Make your first transfer to get started.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Check if user is logged in
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+
+    if (!token || !user) {
+      window.location.href = '/index.html';
+    } else {
+      const userData = JSON.parse(user);
+      document.getElementById('userNameDisplay').textContent = `${userData.firstName} ${userData.lastName}`;
+      document.getElementById('userRoleDisplay').textContent = userData.role || 'User';
+      
+      loadDashboardData();
+    }
+
+    async function loadDashboardData() {
+      const token = localStorage.getItem('token');
+      
+      try {
+        // Get accounts
+        const accountsRes = await fetch('/api/accounts', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (accountsRes.ok) {
+          const data = await accountsRes.json();
+          const accounts = data.accounts || [];
+          
+          document.getElementById('accountCount').textContent = accounts.length;
+          
+          const totalBalance = accounts.reduce((sum, acc) => sum + (acc.balance || 0), 0);
+          document.getElementById('totalBalance').textContent = `$${totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+      } catch (error) {
+        console.error('Error loading accounts:', error);
+      }
+    }
+
+    function signOut() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/index.html';
+    }
+  </script>
+</body>
+</html>

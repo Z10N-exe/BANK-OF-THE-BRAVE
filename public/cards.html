@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cards & Spending - Bank of the Brave</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f5;
+    }
+    
+    .navbar {
+      background: #667eea;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+    
+    .page-header h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+    
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .card-item {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .card-visual {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      position: relative;
+      height: 200px;
+    }
+    
+    .card-logo {
+      font-size: 24px;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+    }
+    
+    .card-holder {
+      font-size: 12px;
+      margin-top: 50px;
+      opacity: 0.8;
+    }
+    
+    .card-number {
+      font-size: 18px;
+      letter-spacing: 2px;
+      margin-top: 30px;
+      font-family: monospace;
+    }
+    
+    .card-details {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+      font-size: 12px;
+    }
+    
+    .card-info {
+      margin: 15px 0;
+    }
+    
+    .card-type {
+      font-size: 12px;
+      color: #667eea;
+      font-weight: 600;
+    }
+    
+    .card-account {
+      color: #666;
+      font-size: 14px;
+      margin: 5px 0;
+    }
+    
+    .card-status {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin: 10px 0;
+    }
+    
+    .status-active {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .status-frozen {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .card-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    button {
+      padding: 8px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #5568d3;
+    }
+    
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+    
+    .btn-secondary:hover {
+      background: #d0d0d0;
+    }
+    
+    .btn-danger {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .btn-danger:hover {
+      background: #f5c6cb;
+    }
+    
+    .action-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .btn-large {
+      padding: 12px 24px;
+      font-size: 14px;
+    }
+    
+    .settings-card {
+      background: white;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    
+    .settings-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+    
+    .setting-item {
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .setting-item:last-child {
+      border-bottom: none;
+    }
+    
+    .setting-label {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+    
+    .setting-desc {
+      color: #666;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+    
+    input[type="range"] {
+      width: 100%;
+      cursor: pointer;
+    }
+    
+    .limit-value {
+      color: #667eea;
+      font-weight: 600;
+      margin-top: 5px;
+    }
+    
+    .toggle {
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+      background: #ccc;
+      border-radius: 12px;
+      cursor: pointer;
+      position: relative;
+    }
+    
+    .toggle.on {
+      background: #667eea;
+    }
+    
+    .toggle-slider {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 50%;
+      transition: left 0.3s;
+    }
+    
+    .toggle.on .toggle-slider {
+      left: 29px;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <span style="font-weight: bold; font-size: 20px;">🏦 Bank of the Brave</span>
+    <div style="display: flex; gap: 20px;">
+      <a href="/dashboard.html" style="color: white; text-decoration: none;">Dashboard</a>
+      <a href="/accounts.html" style="color: white; text-decoration: none;">Accounts</a>
+      <button onclick="logout()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 8px 16px; border-radius: 5px; cursor: pointer;">Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="page-header">
+      <h1>Cards & Spending</h1>
+      <p>Manage your cards and set spending controls</p>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+      <button class="btn-primary btn-large" onclick="requestNewCard()">+ Request New Card</button>
+      <button class="btn-secondary btn-large" onclick="viewCardStatement()">📊 Card Statement</button>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="cards-grid" id="cardsGrid">
+      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #999;">
+        Loading cards...
+      </div>
+    </div>
+
+    <!-- Card Controls & Settings -->
+    <div class="settings-card">
+      <div class="settings-title">Card Controls & Limits</div>
+
+      <div class="setting-item">
+        <div class="setting-label">Daily Spending Limit</div>
+        <div class="setting-desc">Maximum amount you can spend per day</div>
+        <input type="range" id="dailyLimit" min="100" max="50000" value="5000" oninput="updateSpendingLimit('daily')">
+        <div class="limit-value">$<span id="dailyLimitValue">5000</span>/day</div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-label">ATM Withdrawal Limit</div>
+        <div class="setting-desc">Maximum cash withdrawal per transaction</div>
+        <input type="range" id="atmLimit" min="100" max="10000" value="1000" oninput="updateSpendingLimit('atm')">
+        <div class="limit-value">$<span id="atmLimitValue">1000</span>/transaction</div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-label">Online Payments</div>
+        <div class="setting-desc">Allow online and card-not-present transactions</div>
+        <div class="toggle on" onclick="toggleOnlinePayments()" style="margin-top: 10px;">
+          <div class="toggle-slider"></div>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-label">International Transactions</div>
+        <div class="setting-desc">Allow purchases outside your country</div>
+        <div class="toggle" onclick="toggleInternational()" style="margin-top: 10px;">
+          <div class="toggle-slider"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Settings -->
+    <div class="settings-card">
+      <div class="settings-title">Security & PIN</div>
+
+      <div class="setting-item">
+        <div class="setting-label">Change PIN</div>
+        <div class="setting-desc">Update your card PIN for security</div>
+        <button class="btn-secondary" onclick="changePIN()" style="margin-top: 10px;">Change PIN</button>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-label">3D Secure Authentication</div>
+        <div class="setting-desc">Require additional authentication for online purchases</div>
+        <div class="toggle on" onclick="toggle3DSecure()" style="margin-top: 10px;">
+          <div class="toggle-slider"></div>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-label">Card Notifications</div>
+        <div class="setting-desc">Receive alerts for all transactions</div>
+        <div class="toggle on" onclick="toggleNotifications()" style="margin-top: 10px;">
+          <div class="toggle-slider"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:5000/api';
+
+    async function loadCards() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_URL}/accounts`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        const data = await response.json();
+        const accounts = data.accounts || [];
+        const cardsGrid = document.getElementById('cardsGrid');
+
+        const cardsAccounts = accounts.filter(a => a.cardIssued);
+
+        if (cardsAccounts.length === 0) {
+          cardsGrid.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #999;">
+              <p>No cards yet. Request a new card to get started.</p>
+            </div>
+          `;
+          return;
+        }
+
+        cardsGrid.innerHTML = cardsAccounts.map((account, idx) => `
+          <div class="card-item">
+            <div class="card-visual">
+              <div class="card-logo">${account.currency === 'USD' ? '$' : '€'}</div>
+              <div class="card-holder">CARDHOLDER NAME</div>
+              <div class="card-number">•••• •••• •••• ${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}</div>
+              <div class="card-details">
+                <span>Valid Thru</span>
+                <span>12/28</span>
+              </div>
+            </div>
+
+            <div class="card-info">
+              <div class="card-type">${account.cardType.toUpperCase()} ${account.currency} CARD</div>
+              <div class="card-account">${account.accountType} - ${account.accountNumber || 'Account ' + (idx+1)}</div>
+              <span class="card-status ${account.cardStatus === 'active' ? 'status-active' : 'status-frozen'}">
+                ${account.cardStatus.toUpperCase()}
+              </span>
+            </div>
+
+            <div class="card-controls">
+              <button class="btn-${account.cardStatus === 'active' ? 'danger' : 'primary'}" onclick="freezeCard('${account._id}', '${account.cardStatus}')">
+                ${account.cardStatus === 'active' ? 'Freeze' : 'Unfreeze'}
+              </button>
+              <button class="btn-secondary" onclick="cardDetails('${account._id}')">Details</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Error loading cards:', error);
+      }
+    }
+
+    async function freezeCard(accountId, currentStatus) {
+      try {
+        const token = localStorage.getItem('token');
+        const newStatus = currentStatus === 'active' ? 'frozen' : 'active';
+
+        const response = await fetch(`${API_URL}/accounts/${accountId}/card-control`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({
+            action: newStatus === 'frozen' ? 'freeze' : 'unfreeze'
+          })
+        });
+
+        if (response.ok) {
+          alert(`Card ${newStatus}d successfully`);
+          loadCards();
+        }
+      } catch (error) {
+        alert('Error: ' + error.message);
+      }
+    }
+
+    function updateSpendingLimit(type) {
+      if (type === 'daily') {
+        const value = document.getElementById('dailyLimit').value;
+        document.getElementById('dailyLimitValue').textContent = value;
+      } else {
+        const value = document.getElementById('atmLimit').value;
+        document.getElementById('atmLimitValue').textContent = value;
+      }
+    }
+
+    function toggleOnlinePayments() {
+      event.target.closest('.toggle').classList.toggle('on');
+    }
+
+    function toggleInternational() {
+      event.target.closest('.toggle').classList.toggle('on');
+    }
+
+    function toggle3DSecure() {
+      event.target.closest('.toggle').classList.toggle('on');
+    }
+
+    function toggleNotifications() {
+      event.target.closest('.toggle').classList.toggle('on');
+    }
+
+    function changePIN() {
+      alert('PIN change feature coming soon');
+    }
+
+    function requestNewCard() {
+      alert('Card request feature coming soon');
+    }
+
+    function cardDetails(accountId) {
+      alert('Card details view coming soon');
+    }
+
+    function viewCardStatement() {
+      alert('Card statement feature coming soon');
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = '/index.html';
+    }
+
+    loadCards();
+  </script>
+</body>
+</html>

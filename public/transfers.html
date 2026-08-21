@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Money Transfers - Bank of the Brave</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f5;
+    }
+    
+    .navbar {
+      background: #667eea;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+    
+    .page-header {
+      margin-bottom: 30px;
+    }
+    
+    .page-header h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+    
+    .transfer-types {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    
+    .transfer-type-btn {
+      padding: 20px;
+      border: 2px solid #ddd;
+      background: white;
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s;
+    }
+    
+    .transfer-type-btn:hover {
+      border-color: #667eea;
+      background: #f8f9ff;
+    }
+    
+    .transfer-type-btn.active {
+      border-color: #667eea;
+      background: #f8f9ff;
+    }
+    
+    .transfer-type-icon {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+    
+    .transfer-type-name {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 5px;
+    }
+    
+    .transfer-type-desc {
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .form-card {
+      background: white;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .form-title {
+      font-size: 22px;
+      color: #333;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+    
+    .form-section {
+      margin-bottom: 25px;
+    }
+    
+    .form-section-title {
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+    }
+    
+    .two-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    
+    .exchange-rate {
+      background: #f0f4ff;
+      border-left: 4px solid #667eea;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+    
+    .exchange-rate-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+    }
+    
+    .exchange-rate-value {
+      color: #667eea;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    
+    .fee-breakdown {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+    
+    .fee-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    
+    .fee-row:last-child {
+      margin-bottom: 0;
+      border-top: 1px solid rgba(0,0,0,0.1);
+      padding-top: 8px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .approval-warning {
+      background: #d4edda;
+      border-left: 4px solid #28a745;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      font-size: 14px;
+      color: #155724;
+    }
+    
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 30px;
+    }
+    
+    button {
+      padding: 12px 30px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary {
+      background: #667eea;
+      color: white;
+      flex: 1;
+    }
+    
+    .btn-primary:hover {
+      background: #5568d3;
+    }
+    
+    .btn-primary:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+      flex: 1;
+    }
+    
+    .btn-secondary:hover {
+      background: #d0d0d0;
+    }
+    
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 12px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      display: none;
+    }
+    
+    .success {
+      background: #d4edda;
+      color: #155724;
+      padding: 12px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      display: none;
+    }
+    
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <span style="font-weight: bold; font-size: 20px;">🏦 Bank of the Brave</span>
+    <div style="display: flex; gap: 20px;">
+      <a href="/dashboard.html" style="color: white; text-decoration: none;">Dashboard</a>
+      <a href="/accounts.html" style="color: white; text-decoration: none;">Accounts</a>
+      <button onclick="logout()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 8px 16px; border-radius: 5px; cursor: pointer;">Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="page-header">
+      <h1>Send Money</h1>
+      <p>Choose transfer type and complete your transaction</p>
+    </div>
+
+    <!-- Transfer Type Selection -->
+    <div class="transfer-types">
+      <div class="transfer-type-btn active" onclick="selectTransferType('internal')">
+        <div class="transfer-type-icon">🔄</div>
+        <div class="transfer-type-name">Internal Transfer</div>
+        <div class="transfer-type-desc">Own accounts</div>
+      </div>
+      
+      <div class="transfer-type-btn" onclick="selectTransferType('wire')">
+        <div class="transfer-type-icon">🌍</div>
+        <div class="transfer-type-name">International Wire</div>
+        <div class="transfer-type-desc">SWIFT/SEPA</div>
+      </div>
+      
+      <div class="transfer-type-btn" onclick="selectTransferType('ach')">
+        <div class="transfer-type-icon">🏦</div>
+        <div class="transfer-type-name">ACH Transfer</div>
+        <div class="transfer-type-desc">Domestic US</div>
+      </div>
+      
+      <div class="transfer-type-btn" onclick="selectTransferType('fx')">
+        <div class="transfer-type-icon">💱</div>
+        <div class="transfer-type-name">Currency Exchange</div>
+        <div class="transfer-type-desc">Convert currencies</div>
+      </div>
+    </div>
+
+    <!-- Transfer Form -->
+    <div class="form-card">
+      <div id="errorMsg" class="error"></div>
+      <div id="successMsg" class="success"></div>
+
+      <div class="form-title">Transfer Details</div>
+
+      <!-- Internal Transfer Form -->
+      <div id="internalForm" class="form-section">
+        <div class="form-section-title">FROM YOUR ACCOUNT</div>
+        <div class="form-group">
+          <label>From Account</label>
+          <select id="fromAccount" required>
+            <option value="">Select account...</option>
+          </select>
+        </div>
+
+        <div class="form-section-title">TO ACCOUNT</div>
+        <div class="form-group">
+          <label>To Account</label>
+          <select id="toAccount" required>
+            <option value="">Select account...</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Amount</label>
+          <input type="number" id="amount" placeholder="0.00" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+          <label>Description (Optional)</label>
+          <textarea id="description" placeholder="What's this transfer for?" rows="3"></textarea>
+        </div>
+      </div>
+
+      <!-- Wire Transfer Form -->
+      <div id="wireForm" class="form-section hidden">
+        <div class="form-section-title">FROM YOUR ACCOUNT</div>
+        <div class="form-group">
+          <label>From Account</label>
+          <select id="wireFromAccount" required>
+            <option value="">Select account...</option>
+          </select>
+        </div>
+
+        <div class="form-section-title">BENEFICIARY DETAILS</div>
+        
+        <div class="form-group">
+          <label>Beneficiary Name</label>
+          <input type="text" id="beneficiaryName" placeholder="Full name" required>
+        </div>
+
+        <div class="two-column">
+          <div class="form-group">
+            <label>IBAN / Account Number</label>
+            <input type="text" id="beneficiaryIban" placeholder="IBAN or account" required>
+          </div>
+          
+          <div class="form-group">
+            <label>Bank Name</label>
+            <input type="text" id="bankName" placeholder="Bank name" required>
+          </div>
+        </div>
+
+        <div class="two-column">
+          <div class="form-group">
+            <label>Bank Country</label>
+            <input type="text" id="bankCountry" placeholder="Country" required>
+          </div>
+          
+          <div class="form-group">
+            <label>SWIFT Code</label>
+            <input type="text" id="swiftCode" placeholder="SWIFT code">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Amount (USD)</label>
+          <input type="number" id="wireAmount" placeholder="0.00" step="0.01" required>
+        </div>
+
+        <div id="wireApprovalWarning" class="approval-warning hidden">
+          ⚠️ This transfer exceeds $100,000 and will require admin approval.
+        </div>
+      </div>
+
+      <!-- Fee Breakdown -->
+      <div class="fee-breakdown">
+        <div class="fee-row">
+          <span>Amount:</span>
+          <span id="feeAmount">$0.00</span>
+        </div>
+        <div class="fee-row">
+          <span>Fee:</span>
+          <span id="feeFee">$0.00</span>
+        </div>
+        <div class="fee-row">
+          <span>Total:</span>
+          <span id="feeTotal">$0.00</span>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="buttons">
+        <button class="btn-secondary" onclick="resetForm()">Clear</button>
+        <button class="btn-primary" onclick="submitTransfer()">Review & Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:5000/api';
+    let currentTransferType = 'internal';
+    let accounts = [];
+
+    async function loadAccounts() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_URL}/accounts`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        const data = await response.json();
+        accounts = data.accounts || [];
+
+        // Populate account dropdowns
+        const accountSelects = ['fromAccount', 'toAccount', 'wireFromAccount'];
+        accountSelects.forEach(selectId => {
+          const select = document.getElementById(selectId);
+          select.innerHTML = '<option value="">Select account...</option>';
+          accounts.forEach(account => {
+            select.innerHTML += `<option value="${account._id}">${account.accountType} - ${account.currency} ($${account.balance})</option>`;
+          });
+        });
+      } catch (error) {
+        console.error('Error loading accounts:', error);
+      }
+    }
+
+    function selectTransferType(type) {
+      currentTransferType = type;
+      
+      // Update buttons
+      document.querySelectorAll('.transfer-type-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.closest('.transfer-type-btn').classList.add('active');
+
+      // Show/hide forms
+      document.getElementById('internalForm').classList.add('hidden');
+      document.getElementById('wireForm').classList.add('hidden');
+
+      if (type === 'internal') {
+        document.getElementById('internalForm').classList.remove('hidden');
+      } else if (type === 'wire') {
+        document.getElementById('wireForm').classList.remove('hidden');
+      }
+    }
+
+    function updateFeeBreakdown() {
+      const amount = parseFloat(currentTransferType === 'internal' 
+        ? document.getElementById('amount').value || 0
+        : document.getElementById('wireAmount').value || 0);
+      
+      const fee = currentTransferType === 'internal' ? 0 : amount * 0.01; // 1% fee for wire
+      const total = amount + fee;
+
+      document.getElementById('feeAmount').textContent = '$' + amount.toFixed(2);
+      document.getElementById('feeFee').textContent = '$' + fee.toFixed(2);
+      document.getElementById('feeTotal').textContent = '$' + total.toFixed(2);
+
+      // Show approval warning for high-value wire transfers
+      if (currentTransferType === 'wire' && amount > 100000) {
+        document.getElementById('wireApprovalWarning').classList.remove('hidden');
+      } else {
+        document.getElementById('wireApprovalWarning').classList.add('hidden');
+      }
+    }
+
+    async function submitTransfer() {
+      const errorDiv = document.getElementById('errorMsg');
+      const successDiv = document.getElementById('successMsg');
+      errorDiv.style.display = 'none';
+      successDiv.style.display = 'none';
+
+      try {
+        const token = localStorage.getItem('token');
+
+        if (currentTransferType === 'internal') {
+          const fromAccountId = document.getElementById('fromAccount').value;
+          const toAccountId = document.getElementById('toAccount').value;
+          const amount = parseFloat(document.getElementById('amount').value);
+          const description = document.getElementById('description').value;
+
+          if (!fromAccountId || !toAccountId || !amount) {
+            errorDiv.textContent = 'Please fill in all required fields';
+            errorDiv.style.display = 'block';
+            return;
+          }
+
+          const response = await fetch(`${API_URL}/transactions/internal-transfer`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({
+              fromAccountId,
+              toAccountId,
+              amount,
+              description: description || 'Internal transfer'
+            })
+          });
+
+          const data = await response.json();
+          
+          if (!response.ok) {
+            errorDiv.textContent = data.error || 'Transfer failed';
+            errorDiv.style.display = 'block';
+            return;
+          }
+
+          successDiv.textContent = '✓ Transfer completed successfully!';
+          successDiv.style.display = 'block';
+          resetForm();
+        }
+      } catch (error) {
+        errorDiv.textContent = 'Error: ' + error.message;
+        errorDiv.style.display = 'block';
+      }
+    }
+
+    function resetForm() {
+      document.getElementById('amount').value = '';
+      document.getElementById('description').value = '';
+      document.getElementById('wireAmount').value = '';
+      updateFeeBreakdown();
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = '/index.html';
+    }
+
+    // Event listeners for fee calculation
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAccounts();
+      
+      document.getElementById('amount').addEventListener('change', updateFeeBreakdown);
+      document.getElementById('wireAmount').addEventListener('change', updateFeeBreakdown);
+    });
+  </script>
+</body>
+</html>

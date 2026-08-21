@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In - Bank of the Brave</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    body {
+      background-color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    
+    .login-container {
+      max-width: 420px;
+      width: 100%;
+      padding: 20px;
+    }
+    
+    .login-card {
+      background: white;
+      border: 1px solid var(--border-gray);
+      border-radius: 8px;
+      padding: 40px 32px;
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .login-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    
+    .logo-container {
+      height: 50px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: center;
+    }
+    
+    .logo-container svg {
+      width: 50px;
+      height: 50px;
+      color: var(--primary-blue);
+    }
+    
+    .login-header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+    
+    .login-header p {
+      color: var(--text-light);
+      font-size: 13px;
+    }
+    
+    .form-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 24px;
+      border-bottom: 2px solid var(--border-gray);
+    }
+    
+    .form-tab {
+      flex: 1;
+      padding: 12px 0;
+      background: transparent;
+      border: none;
+      color: var(--text-light);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+      text-align: center;
+    }
+    
+    .form-tab.active {
+      color: var(--secondary-blue);
+      border-bottom-color: var(--secondary-blue);
+    }
+    
+    .form-section {
+      display: none;
+    }
+    
+    .form-section.active {
+      display: block;
+    }
+    
+    .form-group {
+      margin-bottom: 18px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      font-size: 13px;
+      color: var(--text-dark);
+    }
+    
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border-gray);
+      border-radius: 4px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: var(--secondary-blue);
+      box-shadow: 0 0 0 3px var(--light-blue);
+    }
+    
+    .submit-btn {
+      width: 100%;
+      padding: 11px 16px;
+      background: var(--secondary-blue);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-top: 6px;
+    }
+    
+    .submit-btn:hover {
+      background: var(--primary-blue);
+    }
+    
+    .alert {
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .alert.show {
+      display: flex;
+    }
+    
+    .alert-success {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      border-left: 4px solid var(--success-green);
+    }
+    
+    .alert-error {
+      background-color: #ffebee;
+      color: #c62828;
+      border-left: 4px solid var(--danger-red);
+    }
+    
+    .divider {
+      text-align: center;
+      margin: 20px 0;
+      color: var(--text-light);
+      font-size: 13px;
+    }
+    
+    .register-link {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-light);
+    }
+    
+    .register-link a {
+      color: var(--secondary-blue);
+      font-weight: 600;
+    }
+
+    @media (max-width: 480px) {
+      .login-card {
+        padding: 24px 16px;
+      }
+      
+      .login-header h1 {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="logo-container">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+            <path d="M2 10h20"></path>
+          </svg>
+        </div>
+        <h1>Bank of the Brave</h1>
+        <p>Secure Banking Platform</p>
+      </div>
+
+      <div id="alertMessage" class="alert"></div>
+
+      <div class="form-tabs">
+        <button class="form-tab active" onclick="switchTab('login')">Sign In</button>
+        <button class="form-tab" onclick="switchTab('signup')">Create Account</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" class="form-section active">
+        <div class="form-group">
+          <label for="loginEmail">Email Address</label>
+          <input type="email" id="loginEmail" placeholder="your.email@example.com" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" placeholder="Enter your password" required>
+        </div>
+        
+        <button type="submit" class="submit-btn">Sign In</button>
+      </form>
+
+      <!-- Signup Form -->
+      <form id="signupForm" class="form-section">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" placeholder="John" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" placeholder="Doe" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="signupEmail">Email Address</label>
+          <input type="email" id="signupEmail" placeholder="your.email@example.com" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" placeholder="+1 (555) 123-4567" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="signupPassword">Password</label>
+          <input type="password" id="signupPassword" placeholder="At least 6 characters" required>
+        </div>
+        
+        <button type="submit" class="submit-btn">Create Account</button>
+      </form>
+
+      <div class="divider">
+        <p>For support, contact: support@bankofthebrave.com</p>
+      </div>
+
+      <div class="register-link">
+        <p>By signing in, you agree to our Terms of Service and Privacy Policy</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(tab) {
+      document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.form-tab').forEach(t => t.classList.remove('active'));
+      
+      if (tab === 'login') {
+        document.getElementById('loginForm').classList.add('active');
+        document.querySelectorAll('.form-tab')[0].classList.add('active');
+      } else {
+        document.getElementById('signupForm').classList.add('active');
+        document.querySelectorAll('.form-tab')[1].classList.add('active');
+      }
+    }
+
+    function showAlert(message, type) {
+      const alert = document.getElementById('alertMessage');
+      alert.textContent = message;
+      alert.className = `alert show alert-${type}`;
+      setTimeout(() => alert.classList.remove('show'), 5000);
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          
+          // Redirect based on role and KYC status
+          if (data.user.role === 'admin' || data.user.isHardcodedAdmin) {
+            window.location.href = '/dashboard.html';
+          } else if (data.user.kycStatus === 'verified') {
+            window.location.href = '/dashboard.html';
+          } else {
+            window.location.href = '/kyc.html';
+          }
+        } else {
+          showAlert(data.error || 'Login failed. Please check your credentials.', 'error');
+        }
+      } catch (error) {
+        showAlert('An error occurred. Please try again.', 'error');
+      }
+    });
+
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      const email = document.getElementById('signupEmail').value;
+      const phone = document.getElementById('phone').value;
+      const password = document.getElementById('signupPassword').value;
+      
+      try {
+        const response = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ firstName, lastName, email, phone, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          showAlert('Account created successfully. Redirecting to verification...', 'success');
+          
+          setTimeout(() => {
+            window.location.href = '/kyc.html';
+          }, 1500);
+        } else {
+          showAlert(data.error || 'Account creation failed. Please try again.', 'error');
+        }
+      } catch (error) {
+        showAlert('An error occurred. Please try again.', 'error');
+      }
+    });
+  </script>
+</body>
+</html>
