@@ -51,17 +51,22 @@ mongoose.connect(mongodbURI)
     // Don't crash the server if MongoDB fails - continue in degraded mode
   });
 
-// Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/users', require('./routes/users'));
-app.use('/api/accounts', require('./routes/accounts'));
-app.use('/api/transactions', require('./routes/transactions'));
-app.use('/api/admin', require('./routes/admin'));
-app.use('/api/kyc', require('./routes/kyc'));
-app.use('/api/loans', require('./routes/loans'));
-app.use('/api/cards', require('./routes/cards'));
-app.use('/api/deposits', require('./routes/deposits'));
-app.use('/api/withdrawals', require('./routes/withdrawals'));
+// Routes - temporarily disabled for debugging
+// app.use('/api/auth', require('./routes/auth'));
+// app.use('/api/users', require('./routes/users'));
+// app.use('/api/accounts', require('./routes/accounts'));
+// app.use('/api/transactions', require('./routes/transactions'));
+// app.use('/api/admin', require('./routes/admin'));
+// app.use('/api/kyc', require('./routes/kyc'));
+// app.use('/api/loans', require('./routes/loans'));
+// app.use('/api/cards', require('./routes/cards'));
+// app.use('/api/deposits', require('./routes/deposits'));
+// app.use('/api/withdrawals', require('./routes/withdrawals'));
+
+// Simple health check for debugging
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', message: 'Server is running' });
+});
 
 // Handle favicon request - return 204 to prevent 404/500 errors
 app.get('/favicon.ico', (req, res) => {
