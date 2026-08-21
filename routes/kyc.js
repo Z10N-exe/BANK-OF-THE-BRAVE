@@ -27,6 +27,11 @@ uploadDirs.forEach(dir => {
 // Multer setup for KYC file uploads
 const kycStorage = multer.diskStorage({
   destination: (req, file, cb) => {
+    // In serverless environments, use memory storage
+    if (process.env.VERCEL === '1') {
+      cb(new Error('File uploads not supported in serverless environment'), null);
+      return;
+    }
     const dir = path.join(__dirname, '../uploads/kyc');
     // Ensure directory exists
     try {
@@ -35,7 +40,6 @@ const kycStorage = multer.diskStorage({
       }
       cb(null, dir);
     } catch (err) {
-      // In serverless environments, use memory storage
       cb(new Error('File uploads not supported in serverless environment'), null);
     }
   },

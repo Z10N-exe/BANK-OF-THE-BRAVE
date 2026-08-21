@@ -22,6 +22,11 @@ try {
 // Multer setup for IRS document uploads
 const irsStorage = multer.diskStorage({
   destination: (req, file, cb) => {
+    // In serverless environments, use memory storage
+    if (process.env.VERCEL === '1') {
+      cb(new Error('File uploads not supported in serverless environment'), null);
+      return;
+    }
     const dir = path.join(__dirname, '../uploads/irs');
     try {
       if (!fs.existsSync(dir)) {

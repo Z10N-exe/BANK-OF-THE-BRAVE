@@ -20,8 +20,10 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 // Serve static files from public directory
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Serve uploaded files
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// Serve uploaded files (skip in serverless environments)
+if (process.env.VERCEL !== '1') {
+  app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+}
 
 // Create uploads directories if they don't exist
 const uploadDirs = [
@@ -33,8 +35,13 @@ const uploadDirs = [
 ];
 
 uploadDirs.forEach(dir => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+  try {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+  } catch (err) {
+    // Ignore directory creation errors in serverless environments (Vercel)
+    console.log(`Note: Could not create directory ${dir} (serverless environment)`);
   }
 });
 
@@ -57,6 +64,11 @@ app.use('/api/loans', require('../routes/loans'));
 app.use('/api/cards', require('../routes/cards'));
 app.use('/api/deposits', require('../routes/deposits'));
 app.use('/api/withdrawals', require('../routes/withdrawals'));
+
+// Handle favicon request - return 204 to prevent 404/500 errors
+app.get('/favicon.ico', (req, res) => {
+  res.status(204).end();
+});
 
 // Serve frontend pages (catch-all for SPA)
 app.get('/', (req, res) => {

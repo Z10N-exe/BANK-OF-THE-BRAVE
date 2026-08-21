@@ -14,6 +14,11 @@ const { body, validationResult } = require('express-validator');
 // Multer configuration for withdrawal screenshots
 const withdrawalStorage = multer.diskStorage({
   destination: (req, file, cb) => {
+    // In serverless environments, use memory storage
+    if (process.env.VERCEL === '1') {
+      cb(new Error('File uploads not supported in serverless environment'), null);
+      return;
+    }
     const dir = path.join(__dirname, '../uploads/withdrawals');
     try {
       if (!fs.existsSync(dir)) {
@@ -404,13 +409,21 @@ router.get('/:withdrawalId/screenshot', authenticateToken, async (req, res) => {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    const filePath = path.join(__dirname, '../uploads/withdrawals', path.basename(withdrawal.screenshotUrl));
-
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ error: 'Screenshot not found' });
+    // Skip file serving in serverless environments
+    if (process.env.VERCEL === '1') {
+      return res.status(503).json({ error: 'File downloads not available in serverless environment' });
     }
 
-    res.sendFile(filePath);
+    const filePath = path.join(__dirname, '../uploads/withdrawals', path.basename(withdrawal.screenshotUrl));
+
+    try {
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ error: 'Screenshot not found' });
+      }
+      res.sendFile(filePath);
+    } catch (err) {
+      return res.status(500).json({ error: 'Error serving file' });
+    }
   } catch (error) {
     res.status(500).json({ error: 'Server error: ' + error.message });
   }

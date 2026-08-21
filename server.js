@@ -47,7 +47,10 @@ uploadDirs.forEach(dir => {
 const mongodbURI = process.env.MONGODB_URI || 'mongodb+srv://taskly:1234@cluster0.hguzjbh.mongodb.net/?appName=Cluster0';
 mongoose.connect(mongodbURI)
   .then(() => console.log('✓ MongoDB connected'))
-  .catch(err => console.log('✗ MongoDB connection error:', err));
+  .catch(err => {
+    console.log('✗ MongoDB connection error:', err);
+    // Don't crash the server if MongoDB fails - continue in degraded mode
+  });
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
@@ -100,22 +103,28 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`
+// Export app for Vercel serverless deployment
+module.exports = app;
+
+// Only start the server if not running in Vercel
+if (process.env.VERCEL !== '1') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`
 ╔════════════════════════════════════════════════════════╗
 ║                                                        ║
 ║   🏦 Bank of the Brave - Private Banking Platform     ║
 ║                                                        ║
-║   ✓ Server running on port ${PORT}                       
-║   ✓ MongoDB connected                                 
-║   ✓ Static files served                               
-║   ✓ Upload directories ready                          
-║   ✓ API endpoints available                           
+║   ✓ Server running on port ${PORT}
+║   ✓ MongoDB connected
+║   ✓ Static files served
+║   ✓ Upload directories ready
+║   ✓ API endpoints available
 ║                                                        ║
-║   Frontend: http://localhost:${PORT}                   
-║   API Docs: http://localhost:${PORT}/api/health        
+║   Frontend: http://localhost:${PORT}
+║   API Docs: http://localhost:${PORT}/api/health
 ║                                                        ║
 ╚════════════════════════════════════════════════════════╝
   `);
-});
+  });
+}

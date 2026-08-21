@@ -8,7 +8,7 @@
     "MONGODB_URI": "mongodb+srv://taskly:1234@cluster0.hguzjbh.mongodb.net/?appName=Cluster0"
   },
   "functions": {
-    "server.js": {
+    "api/index.js": {
       "memory": 1024,
       "maxDuration": 30
     }
@@ -20,7 +20,7 @@
     },
     {
       "src": "/api/(.*)",
-      "dest": "/server.js"
+      "dest": "/api/index.js"
     },
     {
       "src": "/uploads/(.*)",
@@ -28,7 +28,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/server.js"
+      "dest": "/api/index.js"
     }
   ]
 }
