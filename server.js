@@ -17,8 +17,10 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 // Serve static files from public directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Serve uploaded files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Serve uploaded files (skip in serverless environments)
+if (process.env.VERCEL !== '1') {
+  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+}
 
 // Create uploads directories if they don't exist
 const uploadDirs = [
@@ -30,9 +32,14 @@ const uploadDirs = [
 ];
 
 uploadDirs.forEach(dir => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-    console.log(`Created directory: ${dir}`);
+  try {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+      console.log(`Created directory: ${dir}`);
+    }
+  } catch (err) {
+    // Ignore directory creation errors in serverless environments (Vercel)
+    console.log(`Note: Could not create directory ${dir} (serverless environment)`);
   }
 });
 
@@ -66,11 +73,13 @@ app.get('/', (req, res) => {
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ 
+  const isServerless = process.env.VERCEL === '1';
+  res.json({
     status: 'Server is running',
     timestamp: new Date().toISOString(),
+    environment: isServerless ? 'serverless (Vercel)' : 'traditional',
     mongodb: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
-    uploads: {
+    uploads: isServerless ? 'Not available in serverless' : {
       kyc: fs.existsSync(path.join(__dirname, 'uploads', 'kyc')),
       irs: fs.existsSync(path.join(__dirname, 'uploads', 'irs'))
     }

@@ -11,18 +11,26 @@ const { body, validationResult } = require('express-validator');
 
 // Ensure upload directory exists
 const irsUploadDir = path.join(__dirname, '../uploads/irs');
-if (!fs.existsSync(irsUploadDir)) {
-  fs.mkdirSync(irsUploadDir, { recursive: true });
+try {
+  if (!fs.existsSync(irsUploadDir)) {
+    fs.mkdirSync(irsUploadDir, { recursive: true });
+  }
+} catch (err) {
+  console.log(`Note: Could not create directory ${irsUploadDir} (serverless environment)`);
 }
 
 // Multer setup for IRS document uploads
 const irsStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = path.join(__dirname, '../uploads/irs');
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+    try {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      cb(null, dir);
+    } catch (err) {
+      cb(new Error('File uploads not supported in serverless environment'), null);
     }
-    cb(null, dir);
   },
   filename: (req, file, cb) => {
     const uniqueName = `${req.user.id}-${Date.now()}${path.extname(file.originalname)}`;

@@ -14,8 +14,13 @@ const uploadDirs = [
 ];
 
 uploadDirs.forEach(dir => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+  try {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+  } catch (err) {
+    // Ignore directory creation errors in serverless environments
+    console.log(`Note: Could not create directory ${dir} (serverless environment)`);
   }
 });
 
@@ -24,10 +29,15 @@ const kycStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = path.join(__dirname, '../uploads/kyc');
     // Ensure directory exists
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+    try {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      cb(null, dir);
+    } catch (err) {
+      // In serverless environments, use memory storage
+      cb(new Error('File uploads not supported in serverless environment'), null);
     }
-    cb(null, dir);
   },
   filename: (req, file, cb) => {
     const uniqueName = `${req.user.id}-${Date.now()}${path.extname(file.originalname)}`;
