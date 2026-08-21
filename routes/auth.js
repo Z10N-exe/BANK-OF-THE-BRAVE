@@ -17,10 +17,12 @@ router.post('/signup', [
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Validation errors:', errors.array());
       return res.status(400).json({ errors: errors.array() });
     }
 
     const { firstName, lastName, email, phone, password } = req.body;
+    console.log('Signup attempt:', { firstName, lastName, email, phone });
 
     // Check if user already exists
     let user = await User.findOne({ email });
@@ -40,6 +42,7 @@ router.post('/signup', [
     });
 
     await user.save();
+    console.log('User saved successfully');
 
     // Create default checking account
     const account = new Account({
@@ -75,6 +78,7 @@ router.post('/signup', [
       },
     });
   } catch (error) {
+    console.error('Signup error:', error);
     res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });
