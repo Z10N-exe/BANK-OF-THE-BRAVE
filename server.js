@@ -37,7 +37,8 @@ uploadDirs.forEach(dir => {
 });
 
 // Database Connection
-mongoose.connect(process.env.MONGODB_URI)
+const mongodbURI = process.env.MONGODB_URI || 'mongodb+srv://taskly:1234@cluster0.hguzjbh.mongodb.net/?appName=Cluster0';
+mongoose.connect(mongodbURI)
   .then(() => console.log('✓ MongoDB connected'))
   .catch(err => console.log('✗ MongoDB connection error:', err));
 
@@ -55,7 +56,7 @@ app.use('/api/withdrawals', require('./routes/withdrawals'));
 
 // Serve frontend pages (catch-all for SPA)
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'landing.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Health check

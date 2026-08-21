@@ -40,9 +40,10 @@ uploadDirs.forEach(dir => {
 
 // Database Connection
 if (!mongoose.connection.readyState) {
-  mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/bank_of_the_brave')
-    .then(() => console.log('MongoDB connected'))
-    .catch(err => console.log('MongoDB connection error:', err.message));
+  const mongodbURI = process.env.MONGODB_URI || 'mongodb+srv://taskly:1234@cluster0.hguzjbh.mongodb.net/?appName=Cluster0';
+  mongoose.connect(mongodbURI)
+    .then(() => console.log('✓ MongoDB connected'))
+    .catch(err => console.log('✗ MongoDB connection error:', err.message));
 }
 
 // Routes
