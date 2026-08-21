@@ -54,6 +54,11 @@ app.use('/api/cards', require('./routes/cards'));
 app.use('/api/deposits', require('./routes/deposits'));
 app.use('/api/withdrawals', require('./routes/withdrawals'));
 
+// Handle favicon request - return 204 to prevent 404/500 errors
+app.get('/favicon.ico', (req, res) => {
+  res.status(204).end();
+});
+
 // Serve frontend pages (catch-all for SPA)
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
