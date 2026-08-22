@@ -274,7 +274,7 @@
       </div>
 
       <div class="info-box">
-        ✓ KYC verification submitted! We'll review your documents shortly.<br>
+        KYC verification submitted! We'll review your documents shortly.<br>
         Minimum deposit required: <strong>$500</strong>
       </div>
 
@@ -285,19 +285,33 @@
       
       <div class="deposit-methods">
         <div class="method-card active" onclick="selectMethod('bank_transfer')">
-          <div class="method-icon">🏦</div>
+          <div class="method-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+              <path d="M2 10h20"></path>
+            </svg>
+          </div>
           <div class="method-name">Bank Transfer</div>
           <div class="method-desc">ACH/Wire Transfer</div>
         </div>
         
         <div class="method-card" onclick="selectMethod('cashapp')">
-          <div class="method-icon">💰</div>
+          <div class="method-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+          </div>
           <div class="method-name">CashApp</div>
           <div class="method-desc">Direct transfer</div>
         </div>
         
         <div class="method-card" onclick="selectMethod('venmo')">
-          <div class="method-icon">📱</div>
+          <div class="method-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+              <line x1="12" y1="18" x2="12.01" y2="18"></line>
+            </svg>
+          </div>
           <div class="method-name">Venmo</div>
           <div class="method-desc">P2P transfer</div>
         </div>

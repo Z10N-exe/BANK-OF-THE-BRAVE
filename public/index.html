@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign In - Bank of the Brave</title>
+  <title>Bank of the Brave - Secure Private Banking</title>
   <link rel="stylesheet" href="/style.css">
   <style>
     :root {
@@ -13,432 +13,1268 @@
       --light-purple: #E8E6FF;
       --lavender: #F3F0FF;
       --accent-teal: #00D9A5;
+      --accent-teal-dark: #00B888;
     }
 
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
     body {
-      background: linear-gradient(135deg, var(--lavender) 0%, var(--light-purple) 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      color: #1F1F1F;
+      background: #ffffff;
     }
     
-    .login-container {
-      max-width: 440px;
-      width: 100%;
-    }
-    
-    .login-card {
-      background: white;
-      border: 1px solid rgba(108, 99, 255, 0.15);
-      border-radius: 20px;
-      padding: 48px 40px;
-      box-shadow: 0 8px 40px rgba(108, 99, 255, 0.12);
-    }
-    
-    .login-header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-    
-    .logo-container {
-      height: 70px;
-      margin-bottom: 24px;
-      display: flex;
-      justify-content: center;
-    }
-    
-    .logo-container img {
-      width: 70px;
-      height: 70px;
-      object-fit: contain;
-    }
-    
-    .login-header h1 {
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--text-dark);
-      margin-bottom: 8px;
-    }
-    
-    .login-header p {
-      color: var(--text-light);
-      font-size: 14px;
-    }
-    
-    .form-tabs {
-      display: flex;
-      gap: 0;
-      margin-bottom: 32px;
-      border-bottom: 2px solid var(--light-purple);
-    }
-    
-    .form-tab {
-      flex: 1;
-      padding: 14px 0;
-      background: transparent;
-      border: none;
-      color: var(--text-light);
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 15px;
-      border-bottom: 3px solid transparent;
-      transition: all 0.3s;
-      text-align: center;
-    }
-    
-    .form-tab.active {
+    header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
       color: var(--primary-purple);
-      border-bottom-color: var(--primary-purple);
+      padding: 16px 0;
+      position: sticky;
+      top: 0;
+      box-shadow: 0 2px 20px rgba(108, 99, 255, 0.1);
+      z-index: 1000;
     }
     
-    .form-section {
-      display: none;
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     
-    .form-section.active {
-      display: block;
-    }
-    
-    .form-group {
-      margin-bottom: 20px;
-    }
-    
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      font-size: 13px;
-      color: var(--text-dark);
-    }
-    
-    input {
-      width: 100%;
-      padding: 12px 16px;
-      border: 2px solid var(--border-gray);
-      border-radius: 10px;
-      font-size: 14px;
-      font-family: inherit;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-    
-    input:focus {
-      outline: none;
-      border-color: var(--primary-purple);
-      box-shadow: 0 0 0 4px var(--light-purple);
-    }
-    
-    .submit-btn {
-      width: 100%;
-      padding: 14px 20px;
-      background: var(--primary-purple);
-      color: white;
-      border: none;
-      border-radius: 10px;
+    .logo {
+      font-size: 24px;
       font-weight: 700;
-      font-size: 15px;
-      cursor: pointer;
-      transition: all 0.3s;
-      margin-top: 8px;
-      box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
-    }
-    
-    .submit-btn:hover {
-      background: var(--dark-purple);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(108, 99, 255, 0.4);
-    }
-    
-    .alert {
-      padding: 14px 18px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      display: none;
+      color: var(--primary-purple);
+      display: flex;
       align-items: center;
       gap: 12px;
     }
     
-    .alert.show {
-      display: flex;
+    .logo img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
     }
     
-    .alert-success {
-      background-color: #e8f5e9;
-      color: #2e7d32;
-      border-left: 4px solid var(--success-green);
+    nav a {
+      color: #666;
+      margin-left: 32px;
+      text-decoration: none;
+      transition: color 0.3s;
+      font-weight: 500;
     }
     
-    .alert-error {
-      background-color: #ffebee;
-      color: #c62828;
-      border-left: 4px solid var(--danger-red);
-    }
-    
-    .divider {
-      text-align: center;
-      margin: 24px 0;
-      color: var(--text-light);
-      font-size: 13px;
-    }
-    
-    .register-link {
-      text-align: center;
-      font-size: 13px;
-      color: var(--text-light);
-    }
-    
-    .register-link a {
+    nav a:hover {
       color: var(--primary-purple);
-      font-weight: 700;
     }
-
-    @media (max-width: 480px) {
-      .login-card {
-        padding: 32px 24px;
-        border-radius: 16px;
-      }
-      
-      .login-header h1 {
-        font-size: 24px;
-      }
-      
-      body {
-        padding: 16px;
-      }
+    
+    .auth-buttons {
+      display: flex;
+      gap: 12px;
     }
-
-    /* Loader Styles */
-    .loader-overlay {
-      position: fixed;
+    
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      font-size: 14px;
+    }
+    
+    .btn-login {
+      background: transparent;
+      color: var(--primary-purple);
+      border: 2px solid var(--primary-purple);
+    }
+    
+    .btn-login:hover {
+      background: var(--light-purple);
+    }
+    
+    .btn-signup {
+      background: var(--primary-purple);
+      color: white;
+      box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+    }
+    
+    .btn-signup:hover {
+      background: var(--dark-purple);
+      transform: translateY(-2px);
+    }
+    
+    .hero {
+      background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 50%, #A99BFF 100%);
+      color: white;
+      padding: 100px 24px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero::before {
+      content: '';
+      position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.95);
-      display: none;
+      right: 0;
+      bottom: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      opacity: 0.5;
+    }
+    
+    .hero-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 60px;
+    }
+    
+    .hero-text {
+      flex: 1;
+      text-align: left;
+    }
+    
+    .hero-image {
+      flex: 1;
+      display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 9999;
     }
-
-    .loader-overlay.show {
-      display: flex;
+    
+    .hero-image img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: float 3s ease-in-out infinite;
     }
-
-    .loader-logo {
-      width: 80px;
-      height: 80px;
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
+    
+    @keyframes float {
       0%, 100% {
-        transform: scale(1);
-        opacity: 1;
+        transform: translateY(0);
       }
       50% {
-        transform: scale(1.1);
-        opacity: 0.8;
+        transform: translateY(-10px);
       }
     }
-
-    .loader-text {
-      position: absolute;
-      margin-top: 100px;
-      font-size: 14px;
+    
+    .hero h1 {
+      font-size: 56px;
+      margin-bottom: 24px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+    
+    .hero p {
+      font-size: 20px;
+      margin-bottom: 40px;
+      opacity: 0.95;
+      line-height: 1.6;
+    }
+    
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .btn-primary {
+      background: white;
       color: var(--primary-purple);
+      padding: 16px 40px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      display: inline-block;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-secondary {
+      background: transparent;
+      color: white;
+      border: 2px solid white;
+      padding: 14px 38px;
+      border-radius: 12px;
+      text-decoration: none;
       font-weight: 600;
+      display: inline-block;
+      transition: all 0.3s;
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    
+    .features {
+      padding: 100px 24px;
+      background: var(--lavender);
+    }
+    
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 32px;
+      margin-top: 48px;
+    }
+    
+    .feature-card {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(108, 99, 255, 0.08);
+      transition: all 0.3s;
+      border: 1px solid rgba(108, 99, 255, 0.1);
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 40px rgba(108, 99, 255, 0.15);
+    }
+    
+    .feature-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--light-purple);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+    }
+    
+    .feature-card h3 {
+      color: var(--primary-purple);
+      margin-bottom: 12px;
+      font-size: 20px;
+    }
+    
+    .feature-card p {
+      color: #666;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+    
+    .section-title {
+      font-size: 42px;
+      text-align: center;
+      margin-bottom: 16px;
+      color: var(--primary-purple);
+      font-weight: 800;
+    }
+    
+    .section-subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 48px;
+      font-size: 18px;
+    }
+    
+    .security {
+      padding: 100px 24px;
+      background: white;
+    }
+    
+    .security-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 32px;
+      margin-top: 48px;
+    }
+    
+    .security-item {
+      padding: 32px;
+      border-radius: 16px;
+      background: var(--lavender);
+      border-left: 4px solid var(--primary-purple);
+      transition: all 0.3s;
+    }
+    
+    .security-item:hover {
+      background: var(--light-purple);
+      transform: translateX(4px);
+    }
+    
+    .security-item h4 {
+      color: var(--primary-purple);
+      margin-bottom: 12px;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .security-item p {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    
+    /* Stats Section */
+    .stats {
+      padding: 80px 24px;
+      background: var(--primary-purple);
+      color: white;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    
+    .stat-item h3 {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    
+    .stat-item p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+    
+    /* How It Works Section */
+    .how-it-works {
+      padding: 100px 24px;
+      background: white;
+    }
+    
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 32px;
+      margin-top: 48px;
+    }
+    
+    .step-item {
+      text-align: center;
+      position: relative;
+    }
+    
+    .step-number {
+      width: 60px;
+      height: 60px;
+      background: var(--primary-purple);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 800;
+      margin: 0 auto 20px;
+    }
+    
+    .step-item h4 {
+      color: var(--primary-purple);
+      margin-bottom: 12px;
+      font-size: 18px;
+    }
+    
+    .step-item p {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    
+    /* Testimonials Section */
+    .testimonials {
+      padding: 100px 24px;
+      background: var(--lavender);
+    }
+    
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 32px;
+      margin-top: 48px;
+    }
+    
+    .testimonial-card {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(108, 99, 255, 0.08);
+      transition: all 0.3s;
+    }
+    
+    .testimonial-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 40px rgba(108, 99, 255, 0.15);
+    }
+    
+    .testimonial-quote {
+      font-size: 16px;
+      color: #666;
+      line-height: 1.8;
+      margin-bottom: 24px;
+      font-style: italic;
+    }
+    
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .author-avatar {
+      width: 50px;
+      height: 50px;
+      background: var(--light-purple);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary-purple);
+    }
+    
+    .author-info h5 {
+      color: var(--primary-purple);
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+    
+    .author-info p {
+      color: #999;
+      font-size: 12px;
+    }
+    
+    /* FAQ Section */
+    .faq {
+      padding: 100px 24px;
+      background: white;
+    }
+    
+    .faq-grid {
+      max-width: 800px;
+      margin: 48px auto 0;
+    }
+    
+    .faq-item {
+      background: var(--lavender);
+      border-radius: 12px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    
+    .faq-question {
+      padding: 20px 24px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      color: var(--primary-purple);
+      transition: all 0.3s;
+    }
+    
+    .faq-question:hover {
+      background: var(--light-purple);
+    }
+    
+    .faq-answer {
+      padding: 0 24px 20px;
+      color: #666;
+      line-height: 1.6;
+      display: none;
+    }
+    
+    .faq-item.active .faq-answer {
+      display: block;
+    }
+    
+    .faq-item.active .faq-question {
+      background: var(--light-purple);
+    }
+    
+    /* Trust Badges Section */
+    .trust-badges {
+      padding: 60px 24px;
+      background: var(--dark-purple);
+      color: white;
+      text-align: center;
+    }
+    
+    .trust-badges p {
+      margin-bottom: 32px;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+    
+    .badges-grid {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    
+    .badge-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    
+    .badge-item svg {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .pricing {
+      padding: 100px 24px;
+      background: var(--lavender);
+    }
+    
+    .pricing-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 32px;
+      margin-top: 48px;
+    }
+    
+    .pricing-card {
+      background: white;
+      padding: 48px 40px;
+      border-radius: 24px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(108, 99, 255, 0.08);
+      transition: all 0.3s;
+      border: 2px solid transparent;
+    }
+    
+    .pricing-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 40px rgba(108, 99, 255, 0.15);
+    }
+    
+    .pricing-card.featured {
+      border: 2px solid var(--primary-purple);
+      transform: scale(1.05);
+      box-shadow: 0 8px 30px rgba(108, 99, 255, 0.2);
+    }
+    
+    .pricing-card.featured:hover {
+      transform: scale(1.05) translateY(-8px);
+    }
+    
+    .price {
+      font-size: 48px;
+      color: var(--primary-purple);
+      margin: 24px 0;
+      font-weight: 800;
+    }
+    
+    .price-period {
+      color: #999;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    
+    .features-list {
+      list-style: none;
+      text-align: left;
+      margin: 32px 0;
+    }
+    
+    .features-list li {
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+      color: #666;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .features-list li {
+      position: relative;
+      padding-left: 32px;
+    }
+    
+    .features-list li:before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      background: var(--accent-teal);
+      border-radius: 50%;
+    }
+    
+    .features-list li:after {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 6px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: translateY(-50%) rotate(45deg);
+    }
+    
+    footer {
+      background: var(--dark-purple);
+      color: white;
+      padding: 60px 24px 30px;
+      text-align: center;
+    }
+    
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 40px;
+      max-width: 1200px;
+      margin: 0 auto 40px;
+      text-align: left;
+    }
+    
+    .footer-section h4 {
+      margin-bottom: 20px;
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .footer-section a {
+      display: block;
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      margin-bottom: 12px;
+      font-size: 14px;
+      transition: color 0.3s;
+    }
+    
+    .footer-section a:hover {
+      color: white;
+    }
+    
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 36px;
+      }
+      
+      .hero p {
+        font-size: 16px;
+      }
+      
+      .hero-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 40px;
+      }
+      
+      .hero-text {
+        text-align: center;
+      }
+      
+      .hero-buttons {
+        justify-content: center;
+      }
+      
+      .hero-image img {
+        max-width: 80%;
+      }
+      
+      .nav-container {
+        flex-direction: column;
+        gap: 16px;
+      }
+      
+      nav a {
+        margin: 0 12px;
+      }
+      
+      .pricing-card.featured {
+        transform: scale(1);
+      }
+      
+      .pricing-card.featured:hover {
+        transform: translateY(-8px);
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Loader -->
-  <div class="loader-overlay" id="loader">
-    <img src="/logo.png" alt="Loading..." class="loader-logo">
-    <span class="loader-text">Loading...</span>
-  </div>
-
-  <div class="login-container">
-    <div class="login-card">
-      <div class="login-header">
-        <div class="logo-container">
-          <img src="/logo.png" alt="Bank of the Brave Logo">
-        </div>
-        <h1>Bank of the Brave</h1>
-        <p>Secure Banking Platform</p>
+  <!-- Header -->
+  <header>
+    <div class="nav-container">
+      <div class="logo">
+        <img src="/logo.png" alt="Bank of the Brave Logo">
+        Bank of the Brave
       </div>
-
-      <div id="alertMessage" class="alert"></div>
-
-      <div class="form-tabs">
-        <button class="form-tab active" onclick="switchTab('login')">Sign In</button>
-        <button class="form-tab" onclick="switchTab('signup')">Create Account</button>
-      </div>
-
-      <!-- Login Form -->
-      <form id="loginForm" class="form-section active">
-        <div class="form-group">
-          <label for="loginEmail">Email Address</label>
-          <input type="email" id="loginEmail" placeholder="your.email@example.com" required>
-        </div>
-        
-        <div class="form-group">
-          <label for="loginPassword">Password</label>
-          <input type="password" id="loginPassword" placeholder="Enter your password" required>
-        </div>
-        
-        <button type="submit" class="submit-btn">Sign In</button>
-      </form>
-
-      <!-- Signup Form -->
-      <form id="signupForm" class="form-section">
-        <div class="form-group">
-          <label for="firstName">First Name</label>
-          <input type="text" id="firstName" placeholder="John" required>
-        </div>
-        
-        <div class="form-group">
-          <label for="lastName">Last Name</label>
-          <input type="text" id="lastName" placeholder="Doe" required>
-        </div>
-        
-        <div class="form-group">
-          <label for="signupEmail">Email Address</label>
-          <input type="email" id="signupEmail" placeholder="your.email@example.com" required>
-        </div>
-        
-        <div class="form-group">
-          <label for="phone">Phone Number</label>
-          <input type="tel" id="phone" placeholder="+1 (555) 123-4567" required>
-        </div>
-        
-        <div class="form-group">
-          <label for="signupPassword">Password</label>
-          <input type="password" id="signupPassword" placeholder="At least 6 characters" required>
-        </div>
-        
-        <button type="submit" class="submit-btn">Create Account</button>
-      </form>
-
-      <div class="divider">
-        <p>For support, contact: support@bankofthebrave.com</p>
-      </div>
-
-      <div class="register-link">
-        <p>By signing in, you agree to our Terms of Service and Privacy Policy</p>
+      <nav>
+        <a href="#features">Features</a>
+        <a href="#security">Security</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#support">Support</a>
+      </nav>
+      <div class="auth-buttons">
+        <button class="btn-login" onclick="window.location.href='/login.html'">Login</button>
+        <button class="btn-signup" onclick="window.location.href='/signup.html'">Sign Up</button>
       </div>
     </div>
-  </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1>Secure Private Banking for HNWIs</h1>
+        <p>Access world-class banking services with enterprise-grade security, multi-currency support, and dedicated wealth management.</p>
+        <div class="hero-buttons">
+          <a href="/signup.html" class="btn-primary">Get Started</a>
+          <a href="#features" class="btn-secondary">Learn More</a>
+        </div>
+      </div>
+      <div class="hero-image">
+        <img src="/monie.avif" alt="Happy woman with money">
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features" id="features">
+    <div class="container">
+      <h2 class="section-title">Premium Banking Features</h2>
+      <p class="section-subtitle">Everything you need for modern private banking</p>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+              <path d="M2 10h20"></path>
+              <path d="M12 10v10"></path>
+              <path d="M2 14h20"></path>
+            </svg>
+          </div>
+          <h3>Multi-Currency Accounts</h3>
+          <p>Hold and manage USD, EUR, GBP, and BTC in one platform with real-time exchange rates.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <rect x="1" y="4" width="22" height="16" rx="2"></rect>
+              <path d="M1 10h22"></path>
+              <circle cx="6" cy="15" r="1"></circle>
+              <circle cx="18" cy="15" r="1"></circle>
+            </svg>
+          </div>
+          <h3>Instant Card Issuance</h3>
+          <p>Get virtual cards instantly or order physical cards. Full control over limits and security.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M2 12h20"></path>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              <path d="M12 2v20"></path>
+            </svg>
+          </div>
+          <h3>International Transfers</h3>
+          <p>Send money globally via SWIFT, SEPA, or ACH with competitive rates and fast settlement.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+          </div>
+          <h3>Loans & Credit</h3>
+          <p>Access collateralized loans, investment deposits, and revolving credit lines with flexible terms.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+          </div>
+          <h3>Portfolio Management</h3>
+          <p>Track investments, fixed deposits, and assets with real-time analytics and reporting.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <h3>Dedicated Relationship Manager</h3>
+          <p>Direct access to your personal wealth advisor for consulting and portfolio guidance.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <h3>$2.5B+</h3>
+        <p>Assets Under Management</p>
+      </div>
+      <div class="stat-item">
+        <h3>50K+</h3>
+        <p>Active Clients</p>
+      </div>
+      <div class="stat-item">
+        <h3>150+</h3>
+        <p>Countries Supported</p>
+      </div>
+      <div class="stat-item">
+        <h3>99.9%</h3>
+        <p>Uptime Guarantee</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="how-it-works">
+    <div class="container">
+      <h2 class="section-title">How It Works</h2>
+      <p class="section-subtitle">Get started in just 3 simple steps</p>
+      
+      <div class="steps-grid">
+        <div class="step-item">
+          <div class="step-number">1</div>
+          <h4>Create Account</h4>
+          <p>Sign up in minutes with our streamlined registration process. Complete KYC verification securely online.</p>
+        </div>
+        
+        <div class="step-item">
+          <div class="step-number">2</div>
+          <h4>Fund Your Account</h4>
+          <p>Deposit funds via bank transfer, wire, or supported payment methods. Minimum deposit starts at $500.</p>
+        </div>
+        
+        <div class="step-item">
+          <div class="step-number">3</div>
+          <h4>Start Banking</h4>
+          <p>Access your dashboard, issue cards, make transfers, and manage your portfolio from anywhere.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section class="testimonials">
+    <div class="container">
+      <h2 class="section-title">What Our Clients Say</h2>
+      <p class="section-subtitle">Trusted by high-net-worth individuals worldwide</p>
+      
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"Bank of the Brave has transformed how I manage my international finances. The multi-currency accounts and instant transfers are game-changers for my business."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">JM</div>
+            <div class="author-info">
+              <h5>James Mitchell</h5>
+              <p>Entrepreneur, New York</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"The security features give me peace of mind. I've tried many digital banks, but Bank of the Brave offers the best combination of security and usability."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">SC</div>
+            <div class="author-info">
+              <h5>Sarah Chen</h5>
+              <p>Investor, Singapore</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="testimonial-card">
+          <p class="testimonial-quote">"Exceptional customer service and dedicated relationship manager. They truly understand the needs of high-net-worth clients."</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">RK</div>
+            <div class="author-info">
+              <h5>Robert Klein</h5>
+              <p>Business Owner, London</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq">
+    <div class="container">
+      <h2 class="section-title">Frequently Asked Questions</h2>
+      <p class="section-subtitle">Find answers to common questions</p>
+      
+      <div class="faq-grid">
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-question">
+            What is the minimum deposit requirement?
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+          <div class="faq-answer">The minimum deposit to activate your account is $500. For Premium accounts, we recommend a minimum balance of $5,000 to access all features.</div>
+        </div>
+        
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-question">
+            How long does KYC verification take?
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+          <div class="faq-answer">KYC verification typically takes 1-2 business days. Our automated system processes most applications within 24 hours.</div>
+        </div>
+        
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-question">
+            What currencies are supported?
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+          <div class="faq-answer">We support USD, EUR, GBP, and BTC. Premium members can access additional currencies including JPY, CHF, and CAD.</div>
+        </div>
+        
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-question">
+            Are my funds insured?
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+          <div class="faq-answer">Yes, client funds are held in segregated accounts with partner banks and are protected by FDIC/FSCS insurance up to applicable limits.</div>
+        </div>
+        
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-question">
+            Can I access my account from anywhere?
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+          <div class="faq-answer">Yes, our platform is accessible globally via web and mobile apps. You can manage your finances from anywhere in the world.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust Badges Section -->
+  <section class="trust-badges">
+    <div class="container">
+      <p>Trusted by leading organizations and compliant with international standards</p>
+      <div class="badges-grid">
+        <div class="badge-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          SOC 2 Compliant
+        </div>
+        <div class="badge-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          256-bit Encryption
+        </div>
+        <div class="badge-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+            Global Coverage
+        </div>
+        <div class="badge-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+            Regulated
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Security Section -->
+  <section class="security" id="security">
+    <div class="container">
+      <h2 class="section-title">Bank-Grade Security</h2>
+      <p class="section-subtitle">Your funds and data are protected by enterprise-grade security measures</p>
+      
+      <div class="security-grid">
+        <div class="security-item">
+          <h4>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            End-to-End Encryption
+          </h4>
+          <p>All data encrypted with TLS 1.3 in transit and AES-256 at rest.</p>
+        </div>
+        
+        <div class="security-item">
+          <h4>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+            </svg>
+            Multi-Factor Authentication
+          </h4>
+          <p>TOTP, hardware tokens, and biometric authentication options available.</p>
+        </div>
+        
+        <div class="security-item">
+          <h4>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            KYC/AML Compliance
+          </h4>
+          <p>Full identity verification with liveness detection and document validation.</p>
+        </div>
+        
+        <div class="security-item">
+          <h4>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            Real-Time Monitoring
+          </h4>
+          <p>Automated fraud detection with velocity checks and anomaly detection.</p>
+        </div>
+        
+        <div class="security-item">
+          <h4>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            Immutable Audit Trail
+          </h4>
+          <p>Every transaction logged with IP, timestamp, and full state tracking.</p>
+        </div>
+        
+        <div class="security-item">
+          <h4>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            Compliance Ready
+          </h4>
+          <p>SOC 2 compliant infrastructure with multi-factor admin approvals.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <h2 class="section-title">Simple, Transparent Pricing</h2>
+      <p class="section-subtitle">Choose the plan that works for you</p>
+      
+      <div class="pricing-cards">
+        <div class="pricing-card">
+          <h3>Starter</h3>
+          <div class="price">Free<span class="price-period">/month</span></div>
+          <ul class="features-list">
+            <li>1 USD account</li>
+            <li>Virtual debit card</li>
+            <li>Internal transfers</li>
+            <li>Basic support</li>
+            <li>Account statements</li>
+          </ul>
+          <button class="btn-primary" onclick="window.location.href='/signup.html'">Get Started</button>
+        </div>
+        
+        <div class="pricing-card featured">
+          <h3>Premium</h3>
+          <div class="price">$29<span class="price-period">/month</span></div>
+          <ul class="features-list">
+            <li>Unlimited accounts</li>
+            <li>Physical + virtual cards</li>
+            <li>International transfers</li>
+            <li>Priority support</li>
+            <li>Advanced analytics</li>
+            <li>Loan products</li>
+          </ul>
+          <button class="btn-primary" onclick="window.location.href='/signup.html'">Start Free Trial</button>
+        </div>
+        
+        <div class="pricing-card">
+          <h3>Private Banking</h3>
+          <div class="price">Custom<span class="price-period">/month</span></div>
+          <ul class="features-list">
+            <li>All Premium features</li>
+            <li>Dedicated RM</li>
+            <li>Portfolio management</li>
+            <li>Custom structuring</li>
+            <li>24/7 concierge</li>
+          </ul>
+          <button class="btn-primary" onclick="alert('Contact sales team')">Request Demo</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Support Section -->
+  <section class="security" id="support">
+    <div class="container">
+      <h2 class="section-title">Need Help?</h2>
+      <p class="section-subtitle">We're here to support you every step of the way</p>
+      
+      <div class="security-grid">
+        <div class="security-item">
+          <h4>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            Live Chat
+          </h4>
+          <p>Get instant help from our support team during business hours.</p>
+        </div>
+        
+        <div class="security-item">
+          <h4>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            Email Support
+          </h4>
+          <p>Contact our support team at support@bankofthebrave.com</p>
+        </div>
+        
+        <div class="security-item">
+          <h4>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            Knowledge Base
+          </h4>
+          <p>Browse our comprehensive FAQ and user guides.</p>
+        </div>
+        
+        <div class="security-item">
+          <h4>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <polygon points="23 7 16 12 23 17 23 7"></polygon>
+              <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+            </svg>
+            Video Tutorials
+          </h4>
+          <p>Step-by-step video guides for all major features.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>Product</h4>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#">Mobile App</a>
+        <a href="#">API Docs</a>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Company</h4>
+        <a href="#">About Us</a>
+        <a href="#">Blog</a>
+        <a href="#">Careers</a>
+        <a href="#">Press</a>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Legal</h4>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Security</a>
+        <a href="#">Compliance</a>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Support</h4>
+        <a href="#">Help Center</a>
+        <a href="#">Contact Us</a>
+        <a href="#">Status Page</a>
+        <a href="#">Community</a>
+      </div>
+    </div>
+    
+    <div style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 24px;">
+      <p>&copy; 2026 Bank of the Brave. All rights reserved.</p>
+      <p style="font-size: 13px; margin-top: 12px; color: rgba(255,255,255,0.6);">
+        Bank of the Brave is a digital banking platform. All transactions are subject to compliance with applicable regulations.
+      </p>
+    </div>
+  </footer>
 
   <script>
-    function showLoader() {
-      document.getElementById('loader').classList.add('show');
+    function toggleFaq(element) {
+      element.classList.toggle('active');
     }
-
-    function hideLoader() {
-      document.getElementById('loader').classList.remove('show');
-    }
-
-    function switchTab(tab) {
-      document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
-      document.querySelectorAll('.form-tab').forEach(t => t.classList.remove('active'));
-      
-      if (tab === 'login') {
-        document.getElementById('loginForm').classList.add('active');
-        document.querySelectorAll('.form-tab')[0].classList.add('active');
-      } else {
-        document.getElementById('signupForm').classList.add('active');
-        document.querySelectorAll('.form-tab')[1].classList.add('active');
-      }
-    }
-
-    function showAlert(message, type) {
-      const alert = document.getElementById('alertMessage');
-      alert.textContent = message;
-      alert.className = `alert show alert-${type}`;
-      setTimeout(() => alert.classList.remove('show'), 5000);
-    }
-
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      
-      showLoader();
-      
-      try {
-        const response = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-          localStorage.setItem('token', data.token);
-          localStorage.setItem('user', JSON.stringify(data.user));
-          
-          // Redirect based on role and KYC status
-          if (data.user.role === 'admin' || data.user.isHardcodedAdmin) {
-            window.location.href = '/dashboard.html';
-          } else if (data.user.kycStatus === 'verified') {
-            window.location.href = '/dashboard.html';
-          } else {
-            window.location.href = '/kyc.html';
-          }
-        } else {
-          showAlert(data.error || 'Login failed. Please check your credentials.', 'error');
-        }
-      } catch (error) {
-        showAlert('An error occurred. Please try again.', 'error');
-      } finally {
-        hideLoader();
-      }
-    });
-
-    document.getElementById('signupForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const firstName = document.getElementById('firstName').value;
-      const lastName = document.getElementById('lastName').value;
-      const email = document.getElementById('signupEmail').value;
-      const phone = document.getElementById('phone').value;
-      const password = document.getElementById('signupPassword').value;
-
-      console.log('Signup data:', { firstName, lastName, email, phone, password });
-
-      showLoader();
-
-      try {
-        const response = await fetch('/api/auth/signup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ firstName, lastName, email, phone, password })
-        });
-
-        const data = await response.json();
-        console.log('Signup response:', data);
-
-        if (response.ok) {
-          localStorage.setItem('token', data.token);
-          localStorage.setItem('user', JSON.stringify(data.user));
-          showAlert('Account created successfully. Redirecting to verification...', 'success');
-          
-          setTimeout(() => {
-            window.location.href = '/kyc.html';
-          }, 1500);
-        } else {
-          showAlert(data.error || 'Account creation failed. Please try again.', 'error');
-        }
-      } catch (error) {
-        showAlert('An error occurred. Please try again.', 'error');
-      } finally {
-        hideLoader();
-      }
-    });
   </script>
 </body>
 </html>

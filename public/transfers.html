@@ -375,25 +375,48 @@
     <!-- Transfer Type Selection -->
     <div class="transfer-types">
       <div class="transfer-type-btn active" onclick="selectTransferType('internal')">
-        <div class="transfer-type-icon">🔄</div>
+        <div class="transfer-type-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+            <path d="M17 1l4 4-4 4"></path>
+            <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+            <path d="M7 23l-4-4 4-4"></path>
+            <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+          </svg>
+        </div>
         <div class="transfer-type-name">Internal Transfer</div>
         <div class="transfer-type-desc">Own accounts</div>
       </div>
       
       <div class="transfer-type-btn" onclick="selectTransferType('wire')">
-        <div class="transfer-type-icon">🌍</div>
+        <div class="transfer-type-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M2 12h20"></path>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            <path d="M12 2v20"></path>
+          </svg>
+        </div>
         <div class="transfer-type-name">International Wire</div>
         <div class="transfer-type-desc">SWIFT/SEPA</div>
       </div>
       
       <div class="transfer-type-btn" onclick="selectTransferType('ach')">
-        <div class="transfer-type-icon">🏦</div>
+        <div class="transfer-type-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+            <path d="M2 10h20"></path>
+          </svg>
+        </div>
         <div class="transfer-type-name">ACH Transfer</div>
         <div class="transfer-type-desc">Domestic US</div>
       </div>
       
       <div class="transfer-type-btn" onclick="selectTransferType('fx')">
-        <div class="transfer-type-icon">💱</div>
+        <div class="transfer-type-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
         <div class="transfer-type-name">Currency Exchange</div>
         <div class="transfer-type-desc">Convert currencies</div>
       </div>
@@ -622,7 +645,7 @@
             return;
           }
 
-          successDiv.textContent = '✓ Transfer completed successfully!';
+          successDiv.textContent = 'Transfer completed successfully!';
           successDiv.style.display = 'block';
           resetForm();
         }
@@ -641,7 +664,7 @@
 
     function logout() {
       localStorage.clear();
-      window.location.href = '/index.html';
+      window.location.href = '/login.html';
     }
 
     // Event listeners for fee calculation

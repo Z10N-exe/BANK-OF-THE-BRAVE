@@ -236,7 +236,6 @@
       align-items: center;
       justify-content: center;
       margin: 0 auto 24px;
-      font-size: 36px;
     }
     
     .feature-card h3 {
@@ -458,8 +457,8 @@
         <a href="#support">Support</a>
       </nav>
       <div class="auth-buttons">
-        <button class="btn-login" onclick="window.location.href='/index.html'">Login</button>
-        <button class="btn-signup" onclick="window.location.href='/index.html?mode=signup'">Sign Up</button>
+        <button class="btn-login" onclick="window.location.href='/login.html'">Login</button>
+        <button class="btn-signup" onclick="window.location.href='/signup.html'">Sign Up</button>
       </div>
     </div>
   </header>
@@ -470,7 +469,7 @@
       <h1>Secure Private Banking for HNWIs</h1>
       <p>Access world-class banking services with enterprise-grade security, multi-currency support, and dedicated wealth management.</p>
       <div class="hero-buttons">
-        <a href="/index.html?mode=signup" class="btn-primary">Get Started</a>
+        <a href="/signup.html" class="btn-primary">Get Started</a>
         <a href="#features" class="btn-secondary">Learn More</a>
       </div>
     </div>
@@ -484,37 +483,75 @@
       
       <div class="features-grid">
         <div class="feature-card">
-          <div class="feature-icon">💰</div>
+          <div class="feature-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+              <path d="M2 10h20"></path>
+              <path d="M12 10v10"></path>
+              <path d="M2 14h20"></path>
+            </svg>
+          </div>
           <h3>Multi-Currency Accounts</h3>
           <p>Hold and manage USD, EUR, GBP, and BTC in one platform with real-time exchange rates.</p>
         </div>
         
         <div class="feature-card">
-          <div class="feature-icon">💳</div>
+          <div class="feature-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <rect x="1" y="4" width="22" height="16" rx="2"></rect>
+              <path d="M1 10h22"></path>
+              <circle cx="6" cy="15" r="1"></circle>
+              <circle cx="18" cy="15" r="1"></circle>
+            </svg>
+          </div>
           <h3>Instant Card Issuance</h3>
           <p>Get virtual cards instantly or order physical cards. Full control over limits and security.</p>
         </div>
         
         <div class="feature-card">
-          <div class="feature-icon">🌍</div>
+          <div class="feature-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M2 12h20"></path>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              <path d="M12 2v20"></path>
+            </svg>
+          </div>
           <h3>International Transfers</h3>
           <p>Send money globally via SWIFT, SEPA, or ACH with competitive rates and fast settlement.</p>
         </div>
         
         <div class="feature-card">
-          <div class="feature-icon">💵</div>
+          <div class="feature-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+          </div>
           <h3>Loans & Credit</h3>
           <p>Access collateralized loans, investment deposits, and revolving credit lines with flexible terms.</p>
         </div>
         
         <div class="feature-card">
-          <div class="feature-icon">📊</div>
+          <div class="feature-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+          </div>
           <h3>Portfolio Management</h3>
           <p>Track investments, fixed deposits, and assets with real-time analytics and reporting.</p>
         </div>
         
         <div class="feature-card">
-          <div class="feature-icon">👥</div>
+          <div class="feature-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
           <h3>Dedicated Relationship Manager</h3>
           <p>Direct access to your personal wealth advisor for consulting and portfolio guidance.</p>
         </div>
@@ -579,7 +616,7 @@
             <li>Basic support</li>
             <li>Account statements</li>
           </ul>
-          <button class="btn-primary" onclick="window.location.href='/index.html?mode=signup'">Get Started</button>
+          <button class="btn-primary" onclick="window.location.href='/signup.html'">Get Started</button>
         </div>
         
         <div class="pricing-card featured">
@@ -593,7 +630,7 @@
             <li>Advanced analytics</li>
             <li>Loan products</li>
           </ul>
-          <button class="btn-primary" onclick="window.location.href='/index.html?mode=signup'">Start Free Trial</button>
+          <button class="btn-primary" onclick="window.location.href='/signup.html'">Start Free Trial</button>
         </div>
         
         <div class="pricing-card">

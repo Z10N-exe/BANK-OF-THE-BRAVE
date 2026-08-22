@@ -523,7 +523,7 @@
     const user = localStorage.getItem('user');
 
     if (!token || !user) {
-      window.location.href = '/index.html';
+      window.location.href = '/login.html';
     } else {
       const userData = JSON.parse(user);
       document.getElementById('userNameDisplay').textContent = `${userData.firstName} ${userData.lastName}`;
@@ -562,7 +562,7 @@
     function signOut() {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/index.html';
+      window.location.href = '/login.html';
     }
   </script>
 </body>

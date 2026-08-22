@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account - Bank of the Brave</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    :root {
+      --primary-purple: #6C63FF;
+      --secondary-purple: #8B85FF;
+      --dark-purple: #4A45A8;
+      --light-purple: #E8E6FF;
+      --lavender: #F3F0FF;
+      --accent-teal: #00D9A5;
+    }
+
+    body {
+      background: linear-gradient(135deg, var(--lavender) 0%, var(--light-purple) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .signup-container {
+      max-width: 440px;
+      width: 100%;
+    }
+    
+    .signup-card {
+      background: white;
+      border: 1px solid rgba(108, 99, 255, 0.15);
+      border-radius: 20px;
+      padding: 48px 40px;
+      box-shadow: 0 8px 40px rgba(108, 99, 255, 0.12);
+    }
+    
+    .signup-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    
+    .logo-container {
+      height: 70px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: center;
+    }
+    
+    .logo-container img {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+    }
+    
+    .signup-header h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+    
+    .signup-header p {
+      color: var(--text-light);
+      font-size: 14px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text-dark);
+    }
+    
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid var(--border-gray);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: var(--primary-purple);
+      box-shadow: 0 0 0 4px var(--light-purple);
+    }
+    
+    .submit-btn {
+      width: 100%;
+      padding: 14px 20px;
+      background: var(--primary-purple);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 8px;
+      box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+    }
+    
+    .submit-btn:hover {
+      background: var(--dark-purple);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(108, 99, 255, 0.4);
+    }
+    
+    .alert {
+      padding: 14px 18px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .alert.show {
+      display: flex;
+    }
+    
+    .alert-success {
+      background-color: #e8f5e9;
+      color: #2e7d32;
+      border-left: 4px solid var(--success-green);
+    }
+    
+    .alert-error {
+      background-color: #ffebee;
+      color: #c62828;
+      border-left: 4px solid var(--danger-red);
+    }
+    
+    .divider {
+      text-align: center;
+      margin: 24px 0;
+      color: var(--text-light);
+      font-size: 13px;
+    }
+    
+    .register-link {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-light);
+    }
+    
+    .register-link a {
+      color: var(--primary-purple);
+      font-weight: 700;
+    }
+
+    @media (max-width: 480px) {
+      .signup-card {
+        padding: 32px 24px;
+        border-radius: 16px;
+      }
+      
+      .signup-header h1 {
+        font-size: 24px;
+      }
+      
+      body {
+        padding: 16px;
+      }
+    }
+
+    /* Loader Styles */
+    .loader-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.95);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .loader-overlay.show {
+      display: flex;
+    }
+
+    .loader-logo {
+      width: 80px;
+      height: 80px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+    }
+
+    .loader-text {
+      position: absolute;
+      margin-top: 100px;
+      font-size: 14px;
+      color: var(--primary-purple);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <!-- Loader -->
+  <div class="loader-overlay" id="loader">
+    <img src="/logo.png" alt="Loading..." class="loader-logo">
+    <span class="loader-text">Loading...</span>
+  </div>
+
+  <div class="signup-container">
+    <div class="signup-card">
+      <div class="signup-header">
+        <div class="logo-container">
+          <img src="/logo.png" alt="Bank of the Brave Logo">
+        </div>
+        <h1>Bank of the Brave</h1>
+        <p>Secure Banking Platform</p>
+      </div>
+
+      <div id="alertMessage" class="alert"></div>
+
+      <!-- Signup Form -->
+      <form id="signupForm">
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" placeholder="John" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" placeholder="Doe" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="signupEmail">Email Address</label>
+          <input type="email" id="signupEmail" placeholder="your.email@example.com" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" placeholder="+1 (555) 123-4567" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="signupPassword">Password</label>
+          <input type="password" id="signupPassword" placeholder="At least 6 characters" required>
+        </div>
+        
+        <button type="submit" class="submit-btn">Create Account</button>
+      </form>
+
+      <div class="divider">
+        <p>For support, contact: support@bankofthebrave.com</p>
+      </div>
+
+      <div class="register-link">
+        <p>Already have an account? <a href="/login.html">Sign In</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showLoader() {
+      document.getElementById('loader').classList.add('show');
+    }
+
+    function hideLoader() {
+      document.getElementById('loader').classList.remove('show');
+    }
+
+    function showAlert(message, type) {
+      const alert = document.getElementById('alertMessage');
+      alert.textContent = message;
+      alert.className = `alert show alert-${type}`;
+      setTimeout(() => alert.classList.remove('show'), 5000);
+    }
+
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      const email = document.getElementById('signupEmail').value;
+      const phone = document.getElementById('phone').value;
+      const password = document.getElementById('signupPassword').value;
+
+      console.log('Signup data:', { firstName, lastName, email, phone, password });
+
+      showLoader();
+
+      try {
+        const response = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ firstName, lastName, email, phone, password })
+        });
+
+        const data = await response.json();
+        console.log('Signup response:', data);
+
+        if (response.ok) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          showAlert('Account created successfully. Redirecting to verification...', 'success');
+          
+          setTimeout(() => {
+            window.location.href = '/kyc.html';
+          }, 1500);
+        } else {
+          showAlert(data.error || 'Account creation failed. Please try again.', 'error');
+        }
+      } catch (error) {
+        showAlert('An error occurred. Please try again.', 'error');
+      } finally {
+        hideLoader();
+      }
+    });
+  </script>
+</body>
+</html>
