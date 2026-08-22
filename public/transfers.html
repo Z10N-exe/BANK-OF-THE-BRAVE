@@ -4,24 +4,60 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Money Transfers - Bank of the Brave</title>
+  <link rel="stylesheet" href="/style.css">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    :root {
+      --primary-purple: #6C63FF;
+      --secondary-purple: #8B85FF;
+      --dark-purple: #4A45A8;
+      --light-purple: #E8E6FF;
+      --lavender: #F3F0FF;
+      --accent-teal: #00D9A5;
     }
-    
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f5f5f5;
+      background: var(--lavender);
     }
     
     .navbar {
-      background: #667eea;
+      background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%);
       color: white;
       padding: 15px 30px;
       display: flex;
       justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(108, 99, 255, 0.2);
+    }
+    
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+    
+    .navbar-brand img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+    }
+    
+    .navbar-left {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+    
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      cursor: pointer;
+      opacity: 0.9;
+      transition: opacity 0.3s;
+    }
+    
+    .nav-link:hover {
+      opacity: 1;
     }
     
     .container {
@@ -35,46 +71,48 @@
     }
     
     .page-header h1 {
-      color: #333;
+      color: var(--primary-purple);
       margin-bottom: 10px;
     }
     
     .transfer-types {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
+      gap: 16px;
       margin-bottom: 30px;
     }
     
     .transfer-type-btn {
-      padding: 20px;
-      border: 2px solid #ddd;
+      padding: 24px;
+      border: 2px solid var(--border-gray);
       background: white;
-      border-radius: 10px;
+      border-radius: 16px;
       cursor: pointer;
       text-align: center;
       transition: all 0.3s;
+      box-shadow: 0 4px 20px rgba(108, 99, 255, 0.08);
     }
     
     .transfer-type-btn:hover {
-      border-color: #667eea;
-      background: #f8f9ff;
+      border-color: var(--primary-purple);
+      background: var(--light-purple);
+      transform: translateY(-4px);
     }
     
     .transfer-type-btn.active {
-      border-color: #667eea;
-      background: #f8f9ff;
+      border-color: var(--primary-purple);
+      background: var(--light-purple);
     }
     
     .transfer-type-icon {
       font-size: 32px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
     
     .transfer-type-name {
       font-weight: 600;
-      color: #333;
-      margin-bottom: 5px;
+      color: var(--text-dark);
+      margin-bottom: 6px;
     }
     
     .transfer-type-desc {
@@ -84,17 +122,19 @@
     
     .form-card {
       background: white;
-      border-radius: 10px;
+      border: 1px solid rgba(108, 99, 255, 0.1);
+      border-radius: 16px;
       padding: 30px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 20px rgba(108, 99, 255, 0.08);
     }
     
     .form-title {
       font-size: 22px;
-      color: #333;
+      color: var(--primary-purple);
       margin-bottom: 20px;
-      border-bottom: 2px solid #667eea;
-      padding-bottom: 10px;
+      border-bottom: 3px solid var(--primary-purple);
+      padding-bottom: 12px;
+      font-weight: 700;
     }
     
     .form-section {
@@ -103,7 +143,7 @@
     
     .form-section-title {
       font-weight: 600;
-      color: #667eea;
+      color: var(--primary-purple);
       margin-bottom: 15px;
       font-size: 14px;
     }
@@ -212,13 +252,15 @@
     }
     
     .btn-primary {
-      background: #667eea;
+      background: var(--primary-purple);
       color: white;
       flex: 1;
+      box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
     }
     
     .btn-primary:hover {
-      background: #5568d3;
+      background: var(--dark-purple);
+      transform: translateY(-2px);
     }
     
     .btn-primary:disabled {
@@ -239,8 +281,8 @@
     .error {
       background: #f8d7da;
       color: #721c24;
-      padding: 12px;
-      border-radius: 5px;
+      padding: 12px 16px;
+      border-radius: 10px;
       margin-bottom: 15px;
       display: none;
     }
@@ -248,8 +290,8 @@
     .success {
       background: #d4edda;
       color: #155724;
-      padding: 12px;
-      border-radius: 5px;
+      padding: 12px 16px;
+      border-radius: 10px;
       margin-bottom: 15px;
       display: none;
     }
@@ -257,15 +299,70 @@
     .hidden {
       display: none;
     }
+
+    /* Loader Styles */
+    .loader-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(243, 240, 255, 0.95);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .loader-overlay.show {
+      display: flex;
+    }
+
+    .loader-logo {
+      width: 80px;
+      height: 80px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+    }
+
+    .loader-text {
+      position: absolute;
+      margin-top: 100px;
+      font-size: 14px;
+      color: var(--primary-purple);
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
+  <!-- Loader -->
+  <div class="loader-overlay" id="loader">
+    <img src="/logo.png" alt="Loading..." class="loader-logo">
+    <span class="loader-text">Loading...</span>
+  </div>
+
   <div class="navbar">
-    <span style="font-weight: bold; font-size: 20px;">🏦 Bank of the Brave</span>
+    <div class="navbar-left">
+      <div class="navbar-brand">
+        <img src="/logo.png" alt="Bank of the Brave Logo">
+        Bank of the Brave
+      </div>
+      <a class="nav-link" href="/dashboard.html">Dashboard</a>
+      <a class="nav-link" href="/accounts.html">Accounts</a>
+      <a class="nav-link" href="/transfers.html">Transfers</a>
+    </div>
     <div style="display: flex; gap: 20px;">
-      <a href="/dashboard.html" style="color: white; text-decoration: none;">Dashboard</a>
-      <a href="/accounts.html" style="color: white; text-decoration: none;">Accounts</a>
-      <button onclick="logout()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 8px 16px; border-radius: 5px; cursor: pointer;">Logout</button>
+      <button onclick="logout()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 10px 20px; border-radius: 10px; cursor: pointer;">Logout</button>
     </div>
   </div>
 

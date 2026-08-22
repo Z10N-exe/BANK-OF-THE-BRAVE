@@ -4,32 +4,49 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Accounts - Bank of the Brave</title>
+  <link rel="stylesheet" href="/style.css">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    :root {
+      --primary-purple: #6C63FF;
+      --secondary-purple: #8B85FF;
+      --dark-purple: #4A45A8;
+      --light-purple: #E8E6FF;
+      --lavender: #F3F0FF;
+      --accent-teal: #00D9A5;
     }
-    
+
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f5f5f5;
+      background: var(--lavender);
     }
-    
+
     .navbar {
-      background: #667eea;
+      background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%);
       color: white;
       padding: 15px 30px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 20px rgba(108, 99, 255, 0.2);
     }
     
     .navbar-left {
       display: flex;
       align-items: center;
       gap: 30px;
+    }
+    
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+    
+    .navbar-brand img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
     }
     
     .navbar-right {
@@ -42,15 +59,26 @@
       color: white;
       text-decoration: none;
       cursor: pointer;
+      opacity: 0.9;
+      transition: opacity 0.3s;
+    }
+    
+    .nav-link:hover {
+      opacity: 1;
     }
     
     .logout-btn {
       background: rgba(255,255,255,0.2);
       border: 1px solid white;
       color: white;
-      padding: 8px 16px;
-      border-radius: 5px;
+      padding: 10px 20px;
+      border-radius: 10px;
       cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .logout-btn:hover {
+      background: rgba(255,255,255,0.3);
     }
     
     .container {
@@ -64,7 +92,7 @@
     }
     
     .page-header h1 {
-      color: #333;
+      color: var(--primary-purple);
       margin-bottom: 10px;
     }
     
@@ -74,30 +102,34 @@
     
     .action-buttons {
       display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
+      gap: 12px;
+      margin-bottom: 24px;
     }
     
     button {
-      padding: 10px 20px;
+      padding: 12px 24px;
       border: none;
-      border-radius: 5px;
+      border-radius: 10px;
       cursor: pointer;
       font-weight: 600;
+      transition: all 0.3s;
     }
     
     .btn-primary {
-      background: #667eea;
+      background: var(--primary-purple);
       color: white;
+      box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
     }
     
     .btn-primary:hover {
-      background: #5568d3;
+      background: var(--dark-purple);
+      transform: translateY(-2px);
     }
     
     .btn-secondary {
-      background: #e0e0e0;
-      color: #333;
+      background: white;
+      color: var(--text-dark);
+      border: 1px solid var(--border-gray);
     }
     
     .btn-secondary:hover {
@@ -113,16 +145,17 @@
     
     .account-card {
       background: white;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      border: 1px solid rgba(108, 99, 255, 0.1);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(108, 99, 255, 0.08);
       cursor: pointer;
       transition: all 0.3s;
     }
     
     .account-card:hover {
-      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(108, 99, 255, 0.15);
+      transform: translateY(-4px);
     }
     
     .account-header {
@@ -133,19 +166,20 @@
     }
     
     .account-type {
-      font-size: 14px;
-      color: #666;
-      background: #f0f0f0;
-      padding: 5px 10px;
-      border-radius: 3px;
+      font-size: 13px;
+      color: var(--primary-purple);
+      background: var(--light-purple);
+      padding: 6px 12px;
+      border-radius: 8px;
       width: fit-content;
+      font-weight: 600;
     }
     
     .account-balance {
-      font-size: 28px;
-      color: #667eea;
-      font-weight: bold;
-      margin: 15px 0;
+      font-size: 32px;
+      color: var(--primary-purple);
+      font-weight: 800;
+      margin: 16px 0;
     }
     
     .account-details {
@@ -171,17 +205,19 @@
     
     .transactions-section {
       background: white;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      border: 1px solid rgba(108, 99, 255, 0.1);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(108, 99, 255, 0.08);
     }
     
     .section-title {
-      font-size: 20px;
-      color: #333;
-      margin-bottom: 20px;
-      border-bottom: 2px solid #667eea;
-      padding-bottom: 10px;
+      font-size: 22px;
+      color: var(--primary-purple);
+      margin-bottom: 24px;
+      border-bottom: 3px solid var(--primary-purple);
+      padding-bottom: 12px;
+      font-weight: 700;
     }
     
     .transaction-list {
@@ -198,7 +234,7 @@
     }
     
     .transaction-item:hover {
-      background: #f9f9f9;
+      background: var(--lavender);
     }
     
     .transaction-info {
@@ -239,12 +275,64 @@
       font-size: 48px;
       margin-bottom: 15px;
     }
+
+    /* Loader Styles */
+    .loader-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(243, 240, 255, 0.95);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .loader-overlay.show {
+      display: flex;
+    }
+
+    .loader-logo {
+      width: 80px;
+      height: 80px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+    }
+
+    .loader-text {
+      position: absolute;
+      margin-top: 100px;
+      font-size: 14px;
+      color: var(--primary-purple);
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
+  <!-- Loader -->
+  <div class="loader-overlay" id="loader">
+    <img src="/logo.png" alt="Loading..." class="loader-logo">
+    <span class="loader-text">Loading...</span>
+  </div>
+
   <div class="navbar">
     <div class="navbar-left">
-      <span style="font-weight: bold; font-size: 20px;">🏦 Bank of the Brave</span>
+      <div class="navbar-brand">
+        <img src="/logo.png" alt="Bank of the Brave Logo">
+        Bank of the Brave
+      </div>
       <a class="nav-link" href="/dashboard.html">Dashboard</a>
       <a class="nav-link" href="/accounts.html">Accounts</a>
       <a class="nav-link" href="/transfers.html">Transfers</a>
