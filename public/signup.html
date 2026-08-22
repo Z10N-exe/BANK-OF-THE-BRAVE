@@ -108,7 +108,7 @@ document.getElementById('signupForm').addEventListener('submit',async e=>{
   if(pw!==cpw){showAlert('Passwords do not match.','error');return;}
   showLoader();
   try{
-    const r=await fetch('/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+    const r=await fetch('/api/auth/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
       firstName:document.getElementById('firstName').value,
       lastName:document.getElementById('lastName').value,
       email:document.getElementById('email').value,
