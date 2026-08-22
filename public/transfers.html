@@ -1,679 +1,395 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Money Transfers - Bank of the Brave</title>
-  <link rel="stylesheet" href="/style.css">
-  <style>
-    :root {
-      --primary-purple: #6C63FF;
-      --secondary-purple: #8B85FF;
-      --dark-purple: #4A45A8;
-      --light-purple: #E8E6FF;
-      --lavender: #F3F0FF;
-      --accent-teal: #00D9A5;
-    }
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Transfers - Bank of the Brave</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Inter:wght@300;400;500;600;700&display=swap');
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-dark: #9A7A2E;
+    --navy: #0A0F2E;
+    --navy-mid: #141B45;
+    --navy-light: #1E2860;
+    --off-white: #F8F7F2;
+    --danger: #e53e3e;
+    --success: #38a169;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: "Inter", sans-serif; background: var(--off-white); color: #1a1a2e; }
 
-    body {
-      background: var(--lavender);
-    }
-    
-    .navbar {
-      background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%);
-      color: white;
-      padding: 15px 30px;
-      display: flex;
-      justify-content: space-between;
-      box-shadow: 0 4px 20px rgba(108, 99, 255, 0.2);
-    }
-    
-    .navbar-brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 20px;
-      font-weight: 700;
-    }
-    
-    .navbar-brand img {
-      width: 40px;
-      height: 40px;
-      object-fit: contain;
-    }
-    
-    .navbar-left {
-      display: flex;
-      align-items: center;
-      gap: 30px;
-    }
-    
-    .nav-link {
-      color: white;
-      text-decoration: none;
-      cursor: pointer;
-      opacity: 0.9;
-      transition: opacity 0.3s;
-    }
-    
-    .nav-link:hover {
-      opacity: 1;
-    }
-    
-    .container {
-      max-width: 900px;
-      margin: 30px auto;
-      padding: 0 20px;
-    }
-    
-    .page-header {
-      margin-bottom: 30px;
-    }
-    
-    .page-header h1 {
-      color: var(--primary-purple);
-      margin-bottom: 10px;
-    }
-    
-    .transfer-types {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-bottom: 30px;
-    }
-    
-    .transfer-type-btn {
-      padding: 24px;
-      border: 2px solid var(--border-gray);
-      background: white;
-      border-radius: 16px;
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.3s;
-      box-shadow: 0 4px 20px rgba(108, 99, 255, 0.08);
-    }
-    
-    .transfer-type-btn:hover {
-      border-color: var(--primary-purple);
-      background: var(--light-purple);
-      transform: translateY(-4px);
-    }
-    
-    .transfer-type-btn.active {
-      border-color: var(--primary-purple);
-      background: var(--light-purple);
-    }
-    
-    .transfer-type-icon {
-      font-size: 32px;
-      margin-bottom: 12px;
-    }
-    
-    .transfer-type-name {
-      font-weight: 600;
-      color: var(--text-dark);
-      margin-bottom: 6px;
-    }
-    
-    .transfer-type-desc {
-      font-size: 12px;
-      color: #666;
-    }
-    
-    .form-card {
-      background: white;
-      border: 1px solid rgba(108, 99, 255, 0.1);
-      border-radius: 16px;
-      padding: 30px;
-      box-shadow: 0 4px 20px rgba(108, 99, 255, 0.08);
-    }
-    
-    .form-title {
-      font-size: 22px;
-      color: var(--primary-purple);
-      margin-bottom: 20px;
-      border-bottom: 3px solid var(--primary-purple);
-      padding-bottom: 12px;
-      font-weight: 700;
-    }
-    
-    .form-section {
-      margin-bottom: 25px;
-    }
-    
-    .form-section-title {
-      font-weight: 600;
-      color: var(--primary-purple);
-      margin-bottom: 15px;
-      font-size: 14px;
-    }
-    
-    .form-group {
-      margin-bottom: 15px;
-    }
-    
-    label {
-      display: block;
-      margin-bottom: 5px;
-      color: #333;
-      font-weight: 500;
-      font-size: 14px;
-    }
-    
-    input, select, textarea {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 14px;
-      font-family: inherit;
-    }
-    
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
-    }
-    
-    .two-column {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-    }
-    
-    .exchange-rate {
-      background: #f0f4ff;
-      border-left: 4px solid #667eea;
-      padding: 15px;
-      border-radius: 5px;
-      margin-bottom: 15px;
-      font-size: 14px;
-    }
-    
-    .exchange-rate-title {
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: #333;
-    }
-    
-    .exchange-rate-value {
-      color: #667eea;
-      font-weight: bold;
-      font-size: 16px;
-    }
-    
-    .fee-breakdown {
-      background: #fff3cd;
-      border-left: 4px solid #ffc107;
-      padding: 15px;
-      border-radius: 5px;
-      margin-bottom: 15px;
-      font-size: 14px;
-    }
-    
-    .fee-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-    
-    .fee-row:last-child {
-      margin-bottom: 0;
-      border-top: 1px solid rgba(0,0,0,0.1);
-      padding-top: 8px;
-      font-weight: 600;
-      color: #333;
-    }
-    
-    .approval-warning {
-      background: #d4edda;
-      border-left: 4px solid #28a745;
-      padding: 15px;
-      border-radius: 5px;
-      margin-bottom: 15px;
-      font-size: 14px;
-      color: #155724;
-    }
-    
-    .buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 30px;
-    }
-    
-    button {
-      padding: 12px 30px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 14px;
-      transition: all 0.3s;
-    }
-    
-    .btn-primary {
-      background: var(--primary-purple);
-      color: white;
-      flex: 1;
-      box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
-    }
-    
-    .btn-primary:hover {
-      background: var(--dark-purple);
-      transform: translateY(-2px);
-    }
-    
-    .btn-primary:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-    
-    .btn-secondary {
-      background: #e0e0e0;
-      color: #333;
-      flex: 1;
-    }
-    
-    .btn-secondary:hover {
-      background: #d0d0d0;
-    }
-    
-    .error {
-      background: #f8d7da;
-      color: #721c24;
-      padding: 12px 16px;
-      border-radius: 10px;
-      margin-bottom: 15px;
-      display: none;
-    }
-    
-    .success {
-      background: #d4edda;
-      color: #155724;
-      padding: 12px 16px;
-      border-radius: 10px;
-      margin-bottom: 15px;
-      display: none;
-    }
-    
-    .hidden {
-      display: none;
-    }
+  /* SIDEBAR LAYOUT */
+  .app-layout { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
 
-    /* Loader Styles */
-    .loader-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(243, 240, 255, 0.95);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--navy);
+    display: flex; flex-direction: column;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    border-right: 1px solid rgba(201,168,76,0.15);
+  }
+  .sidebar-logo {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;
+  }
+  .sidebar-logo img {
+    width: 120px; height: 120px; object-fit: contain;
+    filter: drop-shadow(0 4px 16px rgba(201,168,76,0.45));
+  }
+  .sidebar-brand { font-family: "Playfair Display", serif; font-size: 16px; font-weight: 700; color: white; line-height: 1.2; }
+  .sidebar-brand span { display: block; font-size: 9px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; font-family: "Inter", sans-serif; font-weight: 500; margin-top: 2px; }
+  .sidebar-nav { padding: 16px 12px; flex: 1; }
+  .sidebar-section-label { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 16px 12px 8px; font-weight: 600; }
+  .sidebar-link {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border-radius: 10px; margin-bottom: 2px;
+    color: rgba(255,255,255,0.6); text-decoration: none;
+    font-size: 14px; font-weight: 500; transition: all 0.25s;
+  }
+  .sidebar-link svg { width: 18px; height: 18px; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .sidebar-link:hover { background: rgba(201,168,76,0.1); color: var(--gold); }
+  .sidebar-link.active { background: rgba(201,168,76,0.15); color: var(--gold); border-left: 3px solid var(--gold); padding-left: 11px; }
+  .sidebar-footer { padding: 16px 12px; border-top: 1px solid rgba(255,255,255,0.07); }
+  .sidebar-user { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 10px; background: rgba(255,255,255,0.04); margin-bottom: 8px; }
+  .sidebar-user-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg,var(--gold),var(--gold-light)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: var(--navy); flex-shrink: 0; }
+  .sidebar-user-name { font-size: 13px; font-weight: 600; color: white; }
+  .sidebar-user-role { font-size: 11px; color: rgba(255,255,255,0.4); }
+  .signout-btn { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; background: transparent; border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.5); cursor: pointer; font-size: 13px; font-family: "Inter",sans-serif; transition: all 0.25s; }
+  .signout-btn:hover { background: rgba(229,62,62,0.1); border-color: rgba(229,62,62,0.4); color: #fc8181; }
+  .signout-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
 
-    .loader-overlay.show {
-      display: flex;
-    }
+  /* MAIN AREA */
+  .main-content { display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden; }
+  .topbar { background: white; border-bottom: 1px solid #eee; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .topbar-title { font-family: "Playfair Display", serif; font-size: 20px; font-weight: 700; color: var(--navy); }
+  .topbar-right { display: flex; align-items: center; gap: 16px; }
+  .topbar-badge { background: linear-gradient(135deg,var(--gold),var(--gold-light)); color: var(--navy); padding: 6px 14px; border-radius: 100px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
+  .page-body { padding: 32px; flex: 1; }
 
-    .loader-logo {
-      width: 80px;
-      height: 80px;
-      animation: pulse 1.5s ease-in-out infinite;
-    }
+  /* HERO BANNER */
+  .page-banner {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+    border-radius: 20px; padding: 36px 40px; margin-bottom: 28px;
+    position: relative; overflow: hidden;
+  }
+  .page-banner::before { content: ""; position: absolute; top: -60px; right: -60px; width: 240px; height: 240px; border-radius: 50%; background: rgba(201,168,76,0.08); }
+  .page-banner::after { content: ""; position: absolute; bottom: -40px; left: 40%; width: 160px; height: 160px; border-radius: 50%; background: rgba(201,168,76,0.05); }
+  .page-banner h1 { font-family: "Playfair Display", serif; font-size: 28px; font-weight: 700; color: white; margin-bottom: 6px; position: relative; z-index: 1; }
+  .page-banner p { color: rgba(255,255,255,0.65); font-size: 15px; position: relative; z-index: 1; }
+  .page-banner .banner-icon { position: absolute; right: 40px; top: 50%; transform: translateY(-50%); width: 80px; height: 80px; border-radius: 20px; background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.3); display: flex; align-items: center; justify-content: center; }
+  .page-banner .banner-icon svg { width: 36px; height: 36px; stroke: var(--gold); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 
-    @keyframes pulse {
-      0%, 100% {
-        transform: scale(1);
-        opacity: 1;
-      }
-      50% {
-        transform: scale(1.1);
-        opacity: 0.8;
-      }
-    }
+  /* STAT CARDS */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 20px; margin-bottom: 28px; }
+  .stat-card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); border: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; }
+  .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.09); border-color: rgba(201,168,76,0.3); }
+  .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #999; margin-bottom: 8px; font-weight: 600; }
+  .stat-value { font-family: "Playfair Display", serif; font-size: 30px; font-weight: 700; color: var(--navy); }
+  .stat-icon-box { width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg,rgba(201,168,76,0.14),rgba(201,168,76,0.05)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .stat-icon-box svg { width: 24px; height: 24px; stroke: var(--gold); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-    .loader-text {
-      position: absolute;
-      margin-top: 100px;
-      font-size: 14px;
-      color: var(--primary-purple);
-      font-weight: 600;
-    }
-  </style>
-</head>
-<body>
-  <!-- Loader -->
+  /* CARD */
+  .card { background: white; border-radius: 16px; padding: 28px; border: 1px solid #eee; box-shadow: 0 2px 12px rgba(0,0,0,0.04); margin-bottom: 24px; }
+  .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+  .card-title { font-family: "Playfair Display", serif; font-size: 18px; font-weight: 700; color: var(--navy); }
+  .card-subtitle { font-size: 13px; color: #999; margin-top: 2px; }
+
+  /* BUTTONS */
+  .btn { padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; font-family: "Inter",sans-serif; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+  .btn-gold { background: linear-gradient(135deg,var(--gold),var(--gold-light)); color: var(--navy); }
+  .btn-gold:hover { box-shadow: 0 6px 20px rgba(201,168,76,0.4); transform: translateY(-2px); }
+  .btn-navy { background: var(--navy); color: white; }
+  .btn-navy:hover { background: var(--navy-mid); transform: translateY(-2px); }
+  .btn-outline { background: transparent; border: 2px solid var(--navy); color: var(--navy); }
+  .btn-outline:hover { background: var(--navy); color: white; }
+  .btn-danger { background: var(--danger); color: white; }
+  .btn-danger:hover { background: #c53030; transform: translateY(-2px); }
+  .btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* FORMS */
+  .form-group { margin-bottom: 20px; }
+  .form-label { display: block; font-size: 12px; font-weight: 600; color: #555; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+  .form-control { width: 100%; padding: 12px 16px; border: 2px solid #eee; border-radius: 10px; font-size: 14px; font-family: "Inter",sans-serif; transition: all 0.3s; color: var(--navy); background: white; }
+  .form-control:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.12); }
+  select.form-control { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
+
+  /* TABLE */
+  .table-wrapper { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #aaa; font-weight: 600; padding: 12px 16px; text-align: left; border-bottom: 2px solid #f0f0f0; }
+  td { padding: 16px; border-bottom: 1px solid #f5f5f5; font-size: 14px; color: #444; vertical-align: middle; }
+  tr:hover td { background: var(--off-white); }
+  tr:last-child td { border-bottom: none; }
+
+  /* BADGE */
+  .badge { display: inline-block; padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; }
+  .badge-success { background: rgba(56,161,105,0.12); color: var(--success); }
+  .badge-danger { background: rgba(229,62,62,0.1); color: var(--danger); }
+  .badge-warning { background: rgba(236,153,75,0.12); color: #d97706; }
+  .badge-gold { background: rgba(201,168,76,0.14); color: var(--gold-dark); }
+
+  /* ALERT */
+  .alert { padding: 14px 18px; border-radius: 10px; margin-bottom: 20px; display: none; font-size: 14px; font-weight: 500; border-left: 4px solid; }
+  .alert.show { display: flex; align-items: center; gap: 10px; }
+  .alert-success { background: rgba(56,161,105,0.08); color: var(--success); border-color: var(--success); }
+  .alert-error { background: rgba(229,62,62,0.08); color: var(--danger); border-color: var(--danger); }
+
+  /* LOADER */
+  .loader-overlay { position: fixed; inset: 0; background: rgba(248,247,242,0.96); display: none; justify-content: center; align-items: center; flex-direction: column; gap: 16px; z-index: 9999; }
+  .loader-overlay.show { display: flex; }
+  .loader-logo { width: 80px; height: 80px; animation: spin 2s ease-in-out infinite; }
+  @keyframes spin { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+  .loader-text { font-size: 13px; color: var(--gold-dark); font-weight: 600; letter-spacing: 1px; }
+
+  /* QUICK ACTION BUTTONS */
+  .action-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap: 16px; margin-bottom: 28px; }
+  .action-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px 16px; background: white; border: 1px solid #eee; border-radius: 16px; cursor: pointer; text-decoration: none; color: var(--navy); font-weight: 600; font-size: 13px; text-align: center; transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .action-btn:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.09); border-color: rgba(201,168,76,0.4); color: var(--gold-dark); }
+  .action-btn svg { width: 28px; height: 28px; stroke: var(--gold); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* EMPTY STATE */
+  .empty-state { text-align: center; padding: 60px 24px; }
+  .empty-state svg { width: 64px; height: 64px; stroke: #ccc; fill: none; stroke-width: 1.5; margin-bottom: 20px; stroke-linecap: round; stroke-linejoin: round; }
+  .empty-state h3 { font-size: 17px; font-weight: 600; color: #999; margin-bottom: 8px; }
+  .empty-state p { font-size: 14px; color: #bbb; }
+
+  /* MOBILE */
+  @media (max-width: 900px) {
+    .app-layout { grid-template-columns: 1fr; }
+    .sidebar { position: fixed; left: -260px; top: 0; z-index: 200; transition: left 0.3s; height: 100vh; width: 260px; }
+    .sidebar.open { left: 0; }
+    .mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 199; }
+    .mobile-overlay.show { display: block; }
+    .mobile-topbar { display: flex; }
+    .page-body { padding: 20px 16px; }
+    .topbar { padding: 14px 16px; }
+  }
+  @media (min-width: 901px) {
+    .mobile-topbar { display: none !important; }
+    .mobile-overlay { display: none !important; }
+    .hamburger-btn { display: none !important; }
+  }
+  .hamburger-btn { background: none; border: none; cursor: pointer; padding: 8px; }
+  .hamburger-btn span { display: block; width: 22px; height: 2px; background: var(--navy); border-radius: 2px; margin: 4px 0; transition: all 0.3s; }
+
+.transfer-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+@media(max-width:800px){.transfer-grid{grid-template-columns:1fr;}}
+</style>
+</head><body>
+
   <div class="loader-overlay" id="loader">
-    <img src="/logo.png" alt="Loading..." class="loader-logo">
-    <span class="loader-text">Loading...</span>
+    <img src="/logo.png" class="loader-logo" alt="Loading">
+    <div class="loader-text">Please wait...</div>
   </div>
+<div class="app-layout">
 
-  <div class="navbar">
-    <div class="navbar-left">
-      <div class="navbar-brand">
-        <img src="/logo.png" alt="Bank of the Brave Logo">
-        Bank of the Brave
+  <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebar()"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="/logo.png" alt="Bank of the Brave Logo">
+      <div class="sidebar-brand">Bank of the Brave<span>Private Banking</span></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Navigation</div>
+      
+    <a href="/dashboard.html" class="sidebar-link">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Dashboard
+    </a>
+    <a href="/accounts.html" class="sidebar-link">
+      <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Accounts
+    </a>
+    <a href="/transfers.html" class="sidebar-link active">
+      <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Transfers
+    </a>
+    <a href="/cards.html" class="sidebar-link">
+      <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/><circle cx="6" cy="15" r="1"/></svg>
+      Cards
+    </a>
+    <a href="/funding.html" class="sidebar-link">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Deposit / Withdraw
+    </a>
+    <a href="/loans.html" class="sidebar-link">
+      <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Loans
+    </a>
+    <a href="/settings.html" class="sidebar-link">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </a>
+    <a href="/kyc.html" class="sidebar-link">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>
+      KYC Verification
+    </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar" id="userInitials">?</div>
+        <div>
+          <div class="sidebar-user-name" id="sidebarUserName">Loading...</div>
+          <div class="sidebar-user-role" id="sidebarUserRole">Member</div>
+        </div>
       </div>
-      <a class="nav-link" href="/dashboard.html">Dashboard</a>
-      <a class="nav-link" href="/accounts.html">Accounts</a>
-      <a class="nav-link" href="/transfers.html">Transfers</a>
+      <button class="signout-btn" onclick="signOut()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign Out
+      </button>
     </div>
-    <div style="display: flex; gap: 20px;">
-      <button onclick="logout()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 10px 20px; border-radius: 10px; cursor: pointer;">Logout</button>
+  </aside>
+<div class="main-content">
+
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <span class="topbar-title">Transfers</span>
     </div>
+    <div class="topbar-right">
+      <span class="topbar-badge">Private Banking</span>
+    </div>
+  </header>
+<div class="page-body">
+  <div class="page-banner">
+    <h1>Send Money</h1>
+    <p>Transfer funds globally via SWIFT, SEPA, or internal transfer.</p>
+    <div class="banner-icon"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
   </div>
-
-  <div class="container">
-    <div class="page-header">
-      <h1>Send Money</h1>
-      <p>Choose transfer type and complete your transaction</p>
+  <div class="transfer-grid">
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-header"><div class="card-title">New Transfer</div></div>
+      <div id="transferAlert" class="alert"></div>
+      <form id="transferForm">
+        <div class="form-group">
+          <label class="form-label">From Account</label>
+          <select class="form-control" id="fromAccount"><option value="">Loading accounts...</option></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Recipient Account Number</label>
+          <input type="text" class="form-control" id="recipientAccount" placeholder="Account number" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Recipient Name</label>
+          <input type="text" class="form-control" id="recipientName" placeholder="Full name" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Amount (USD)</label>
+          <input type="number" class="form-control" id="transferAmount" placeholder="0.00" step="0.01" min="1" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Transfer Type</label>
+          <select class="form-control" id="transferType">
+            <option value="internal">Internal Transfer</option>
+            <option value="swift">International (SWIFT)</option>
+            <option value="sepa">SEPA Transfer</option>
+            <option value="ach">ACH Transfer</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Reference / Note</label>
+          <input type="text" class="form-control" id="transferNote" placeholder="Optional note">
+        </div>
+        <button type="submit" class="btn btn-gold" style="width:100%;justify-content:center;">
+          <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Send Transfer
+        </button>
+      </form>
     </div>
-
-    <!-- Transfer Type Selection -->
-    <div class="transfer-types">
-      <div class="transfer-type-btn active" onclick="selectTransferType('internal')">
-        <div class="transfer-type-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-            <path d="M17 1l4 4-4 4"></path>
-            <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
-            <path d="M7 23l-4-4 4-4"></path>
-            <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
-          </svg>
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-header"><div class="card-title">Recent Transfers</div></div>
+      <div id="recentTransfers">
+        <div class="empty-state" style="padding:40px 24px;">
+          <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <h3>No transfers yet</h3>
+          <p>Your transfer history will appear here.</p>
         </div>
-        <div class="transfer-type-name">Internal Transfer</div>
-        <div class="transfer-type-desc">Own accounts</div>
-      </div>
-      
-      <div class="transfer-type-btn" onclick="selectTransferType('wire')">
-        <div class="transfer-type-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <path d="M2 12h20"></path>
-            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-            <path d="M12 2v20"></path>
-          </svg>
-        </div>
-        <div class="transfer-type-name">International Wire</div>
-        <div class="transfer-type-desc">SWIFT/SEPA</div>
-      </div>
-      
-      <div class="transfer-type-btn" onclick="selectTransferType('ach')">
-        <div class="transfer-type-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-            <path d="M2 10h20"></path>
-          </svg>
-        </div>
-        <div class="transfer-type-name">ACH Transfer</div>
-        <div class="transfer-type-desc">Domestic US</div>
-      </div>
-      
-      <div class="transfer-type-btn" onclick="selectTransferType('fx')">
-        <div class="transfer-type-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-          </svg>
-        </div>
-        <div class="transfer-type-name">Currency Exchange</div>
-        <div class="transfer-type-desc">Convert currencies</div>
-      </div>
-    </div>
-
-    <!-- Transfer Form -->
-    <div class="form-card">
-      <div id="errorMsg" class="error"></div>
-      <div id="successMsg" class="success"></div>
-
-      <div class="form-title">Transfer Details</div>
-
-      <!-- Internal Transfer Form -->
-      <div id="internalForm" class="form-section">
-        <div class="form-section-title">FROM YOUR ACCOUNT</div>
-        <div class="form-group">
-          <label>From Account</label>
-          <select id="fromAccount" required>
-            <option value="">Select account...</option>
-          </select>
-        </div>
-
-        <div class="form-section-title">TO ACCOUNT</div>
-        <div class="form-group">
-          <label>To Account</label>
-          <select id="toAccount" required>
-            <option value="">Select account...</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Amount</label>
-          <input type="number" id="amount" placeholder="0.00" step="0.01" required>
-        </div>
-
-        <div class="form-group">
-          <label>Description (Optional)</label>
-          <textarea id="description" placeholder="What's this transfer for?" rows="3"></textarea>
-        </div>
-      </div>
-
-      <!-- Wire Transfer Form -->
-      <div id="wireForm" class="form-section hidden">
-        <div class="form-section-title">FROM YOUR ACCOUNT</div>
-        <div class="form-group">
-          <label>From Account</label>
-          <select id="wireFromAccount" required>
-            <option value="">Select account...</option>
-          </select>
-        </div>
-
-        <div class="form-section-title">BENEFICIARY DETAILS</div>
-        
-        <div class="form-group">
-          <label>Beneficiary Name</label>
-          <input type="text" id="beneficiaryName" placeholder="Full name" required>
-        </div>
-
-        <div class="two-column">
-          <div class="form-group">
-            <label>IBAN / Account Number</label>
-            <input type="text" id="beneficiaryIban" placeholder="IBAN or account" required>
-          </div>
-          
-          <div class="form-group">
-            <label>Bank Name</label>
-            <input type="text" id="bankName" placeholder="Bank name" required>
-          </div>
-        </div>
-
-        <div class="two-column">
-          <div class="form-group">
-            <label>Bank Country</label>
-            <input type="text" id="bankCountry" placeholder="Country" required>
-          </div>
-          
-          <div class="form-group">
-            <label>SWIFT Code</label>
-            <input type="text" id="swiftCode" placeholder="SWIFT code">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Amount (USD)</label>
-          <input type="number" id="wireAmount" placeholder="0.00" step="0.01" required>
-        </div>
-
-        <div id="wireApprovalWarning" class="approval-warning hidden">
-          ⚠️ This transfer exceeds $100,000 and will require admin approval.
-        </div>
-      </div>
-
-      <!-- Fee Breakdown -->
-      <div class="fee-breakdown">
-        <div class="fee-row">
-          <span>Amount:</span>
-          <span id="feeAmount">$0.00</span>
-        </div>
-        <div class="fee-row">
-          <span>Fee:</span>
-          <span id="feeFee">$0.00</span>
-        </div>
-        <div class="fee-row">
-          <span>Total:</span>
-          <span id="feeTotal">$0.00</span>
-        </div>
-      </div>
-
-      <!-- Buttons -->
-      <div class="buttons">
-        <button class="btn-secondary" onclick="resetForm()">Clear</button>
-        <button class="btn-primary" onclick="submitTransfer()">Review & Send</button>
       </div>
     </div>
   </div>
+</div></div></div>
+<script>
 
-  <script>
-    const API_URL = 'http://localhost:5000/api';
-    let currentTransferType = 'internal';
-    let accounts = [];
+  const _token = localStorage.getItem('token');
+  const _userRaw = localStorage.getItem('user');
+  if (!_token || !_userRaw) { window.location.href = '/login.html'; }
+  else {
+    const _u = JSON.parse(_userRaw);
+    const _name = (_u.firstName || '') + ' ' + (_u.lastName || '');
+    const el = document.getElementById('sidebarUserName');
+    const rl = document.getElementById('sidebarUserRole');
+    const ini = document.getElementById('userInitials');
+    if (el) el.textContent = _name.trim() || 'Member';
+    if (rl) rl.textContent = _u.role || 'Member';
+    if (ini) ini.textContent = ((_u.firstName||'?')[0]+(_u.lastName||'')[0]).toUpperCase();
+  }
+  function signOut() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '/login.html';
+  }
+  function showLoader() { document.getElementById('loader').classList.add('show'); }
+  function hideLoader() { document.getElementById('loader').classList.remove('show'); }
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('mobileOverlay').classList.toggle('show');
+  }
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('mobileOverlay').classList.remove('show');
+  }
 
-    async function loadAccounts() {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`${API_URL}/accounts`, {
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
-
-        const data = await response.json();
-        accounts = data.accounts || [];
-
-        // Populate account dropdowns
-        const accountSelects = ['fromAccount', 'toAccount', 'wireFromAccount'];
-        accountSelects.forEach(selectId => {
-          const select = document.getElementById(selectId);
-          select.innerHTML = '<option value="">Select account...</option>';
-          accounts.forEach(account => {
-            select.innerHTML += `<option value="${account._id}">${account.accountType} - ${account.currency} ($${account.balance})</option>`;
-          });
-        });
-      } catch (error) {
-        console.error('Error loading accounts:', error);
+(async () => {
+  const tok = localStorage.getItem('token');
+  showLoader();
+  try {
+    const r = await fetch('/api/accounts', { headers: { Authorization: 'Bearer ' + tok } });
+    if (r.ok) {
+      const d = await r.json();
+      const accs = d.accounts || [];
+      const sel = document.getElementById('fromAccount');
+      sel.innerHTML = accs.map(a => `<option value="${a._id}">${a.currency} — $${(a.balance||0).toFixed(2)}</option>`).join('');
+    }
+  } catch(e) {}
+  try {
+    const r2 = await fetch('/api/transactions?limit=10', { headers: { Authorization: 'Bearer ' + tok } });
+    if (r2.ok) {
+      const d2 = await r2.json();
+      const txs = d2.transactions || [];
+      if (txs.length > 0) {
+        document.getElementById('recentTransfers').innerHTML = '<div class="table-wrapper"><table><thead><tr><th>Date</th><th>Recipient</th><th>Amount</th><th>Status</th></tr></thead><tbody>' +
+          txs.map(t => `<tr><td>${new Date(t.createdAt).toLocaleDateString()}</td><td>${t.recipientName||'—'}</td><td style="font-weight:700;color:var(--navy);">$${(t.amount||0).toFixed(2)}</td><td><span class="badge badge-${t.status==='completed'?'success':t.status==='pending'?'warning':'danger'}">${t.status||'pending'}</span></td></tr>`).join('') +
+          '</tbody></table></div>';
       }
     }
-
-    function selectTransferType(type) {
-      currentTransferType = type;
-      
-      // Update buttons
-      document.querySelectorAll('.transfer-type-btn').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      event.target.closest('.transfer-type-btn').classList.add('active');
-
-      // Show/hide forms
-      document.getElementById('internalForm').classList.add('hidden');
-      document.getElementById('wireForm').classList.add('hidden');
-
-      if (type === 'internal') {
-        document.getElementById('internalForm').classList.remove('hidden');
-      } else if (type === 'wire') {
-        document.getElementById('wireForm').classList.remove('hidden');
-      }
-    }
-
-    function updateFeeBreakdown() {
-      const amount = parseFloat(currentTransferType === 'internal' 
-        ? document.getElementById('amount').value || 0
-        : document.getElementById('wireAmount').value || 0);
-      
-      const fee = currentTransferType === 'internal' ? 0 : amount * 0.01; // 1% fee for wire
-      const total = amount + fee;
-
-      document.getElementById('feeAmount').textContent = '$' + amount.toFixed(2);
-      document.getElementById('feeFee').textContent = '$' + fee.toFixed(2);
-      document.getElementById('feeTotal').textContent = '$' + total.toFixed(2);
-
-      // Show approval warning for high-value wire transfers
-      if (currentTransferType === 'wire' && amount > 100000) {
-        document.getElementById('wireApprovalWarning').classList.remove('hidden');
-      } else {
-        document.getElementById('wireApprovalWarning').classList.add('hidden');
-      }
-    }
-
-    async function submitTransfer() {
-      const errorDiv = document.getElementById('errorMsg');
-      const successDiv = document.getElementById('successMsg');
-      errorDiv.style.display = 'none';
-      successDiv.style.display = 'none';
-
-      try {
-        const token = localStorage.getItem('token');
-
-        if (currentTransferType === 'internal') {
-          const fromAccountId = document.getElementById('fromAccount').value;
-          const toAccountId = document.getElementById('toAccount').value;
-          const amount = parseFloat(document.getElementById('amount').value);
-          const description = document.getElementById('description').value;
-
-          if (!fromAccountId || !toAccountId || !amount) {
-            errorDiv.textContent = 'Please fill in all required fields';
-            errorDiv.style.display = 'block';
-            return;
-          }
-
-          const response = await fetch(`${API_URL}/transactions/internal-transfer`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + token
-            },
-            body: JSON.stringify({
-              fromAccountId,
-              toAccountId,
-              amount,
-              description: description || 'Internal transfer'
-            })
-          });
-
-          const data = await response.json();
-          
-          if (!response.ok) {
-            errorDiv.textContent = data.error || 'Transfer failed';
-            errorDiv.style.display = 'block';
-            return;
-          }
-
-          successDiv.textContent = 'Transfer completed successfully!';
-          successDiv.style.display = 'block';
-          resetForm();
-        }
-      } catch (error) {
-        errorDiv.textContent = 'Error: ' + error.message;
-        errorDiv.style.display = 'block';
-      }
-    }
-
-    function resetForm() {
-      document.getElementById('amount').value = '';
-      document.getElementById('description').value = '';
-      document.getElementById('wireAmount').value = '';
-      updateFeeBreakdown();
-    }
-
-    function logout() {
-      localStorage.clear();
-      window.location.href = '/login.html';
-    }
-
-    // Event listeners for fee calculation
-    document.addEventListener('DOMContentLoaded', () => {
-      loadAccounts();
-      
-      document.getElementById('amount').addEventListener('change', updateFeeBreakdown);
-      document.getElementById('wireAmount').addEventListener('change', updateFeeBreakdown);
-    });
-  </script>
-</body>
-</html>
+  } catch(e) {}
+  hideLoader();
+})();
+function showAlert(msg,type){const a=document.getElementById('transferAlert');a.textContent=msg;a.className='alert show alert-'+type;setTimeout(()=>a.classList.remove('show'),6000);}
+document.getElementById('transferForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  showLoader();
+  const tok = localStorage.getItem('token');
+  try {
+    const body = {
+      fromAccountId: document.getElementById('fromAccount').value,
+      recipientAccount: document.getElementById('recipientAccount').value,
+      recipientName: document.getElementById('recipientName').value,
+      amount: parseFloat(document.getElementById('transferAmount').value),
+      type: document.getElementById('transferType').value,
+      note: document.getElementById('transferNote').value
+    };
+    const r = await fetch('/api/transfers', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify(body) });
+    const d = await r.json();
+    if (r.ok) { showAlert('Transfer submitted successfully!', 'success'); document.getElementById('transferForm').reset(); }
+    else { showAlert(d.error || 'Transfer failed.', 'error'); }
+  } catch(e) { showAlert('An error occurred.', 'error'); }
+  hideLoader();
+});
+</script>
+</body></html>
