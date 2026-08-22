@@ -3,1368 +3,740 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bank of the Brave - Secure Private Banking</title>
-  <link rel="stylesheet" href="/style.css">
+  <title>Bank of the Brave - Private Banking at Its Best</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,800;1,400;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary-purple: #6C63FF;
-      --secondary-purple: #8B85FF;
-      --dark-purple: #4A45A8;
-      --light-purple: #E8E6FF;
-      --lavender: #F3F0FF;
-      --accent-teal: #00D9A5;
-      --accent-teal-dark: #00B888;
+      --gold: #C9A84C;
+      --gold-light: #E8C97A;
+      --gold-dark: #9A7A2E;
+      --navy: #0A0F2E;
+      --navy-mid: #141B45;
+      --white: #FFFFFF;
+      --off-white: #F8F7F2;
     }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: "Inter", sans-serif; background: var(--white); color: #1a1a2e; overflow-x: hidden; }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    /* ── NAV ── */
+    header { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; transition: all 0.4s; }
+    header.scrolled { background: rgba(10,15,46,0.97); backdrop-filter: blur(20px); box-shadow: 0 4px 30px rgba(0,0,0,0.3); }
+    .nav-container { max-width: 1280px; margin: 0 auto; padding: 20px 32px; display: flex; justify-content: space-between; align-items: center; }
+    .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .logo img { width: 60px; height: 60px; object-fit: contain; filter: drop-shadow(0 2px 8px rgba(201,168,76,0.4)); }
+    .logo-text { font-family: "Playfair Display", serif; font-size: 22px; font-weight: 700; color: #fff; line-height: 1.1; }
+    .logo-sub { display: block; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); font-family: "Inter", sans-serif; font-weight: 500; }
+    nav a { color: rgba(255,255,255,0.8); text-decoration: none; padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.3s; }
+    nav a:hover { color: var(--gold); background: rgba(201,168,76,0.1); }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .btn-nav-login { color: #fff; background: transparent; border: 1px solid rgba(255,255,255,0.3); padding: 10px 22px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s; font-family: "Inter", sans-serif; }
+    .btn-nav-login:hover { border-color: var(--gold); color: var(--gold); }
+    .btn-nav-cta { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: var(--navy); border: none; padding: 10px 24px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.3s; font-family: "Inter", sans-serif; }
+    .btn-nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(201,168,76,0.4); }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; }
+    .hamburger span { width: 24px; height: 2px; background: white; border-radius: 2px; }
+
+    /* ── MOBILE MENU ── */
+    .mobile-menu { display: none; position: fixed; inset: 0; background: var(--navy); z-index: 999; flex-direction: column; align-items: center; justify-content: center; gap: 32px; }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { font-size: 28px; font-family: "Playfair Display", serif; color: white; text-decoration: none; transition: color 0.3s; }
+    .mobile-menu a:hover { color: var(--gold); }
+    .mobile-close { position: absolute; top: 24px; right: 32px; font-size: 36px; color: white; cursor: pointer; background: none; border: none; font-family: sans-serif; }
+
+    /* ── HERO ── */
+    .hero { position: relative; min-height: 100vh; display: flex; align-items: center; overflow: hidden; }
+    .hero-bg { position: absolute; inset: 0; background-image: url("https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1800&q=80&auto=format&fit=crop"); background-size: cover; background-position: center; }
+    .hero-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(10,15,46,0.93) 0%, rgba(10,15,46,0.72) 60%, rgba(10,15,46,0.55) 100%); }
+    .hero-content { position: relative; z-index: 2; max-width: 1280px; margin: 0 auto; padding: 150px 32px 100px; width: 100%; }
+    .hero-huge-logo { width: 180px; height: 180px; object-fit: contain; margin-bottom: 24px; filter: drop-shadow(0 8px 32px rgba(201,168,76,0.6)); }
+    .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.4); color: var(--gold); padding: 8px 20px; border-radius: 100px; font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 24px; }
+    .hero-tagline { font-size: clamp(13px,1.5vw,16px); color: var(--gold); font-weight: 600; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 18px; }
+    .hero h1 { font-family: "Playfair Display", serif; font-size: clamp(40px,6vw,82px); font-weight: 800; color: white; line-height: 1.1; margin-bottom: 24px; max-width: 780px; }
+    .hero h1 em { font-style: italic; color: var(--gold); }
+    .hero p { font-size: clamp(15px,1.4vw,18px); color: rgba(255,255,255,0.8); max-width: 580px; line-height: 1.85; margin-bottom: 44px; }
+    .hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; }
+    .btn-gold { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: var(--navy); padding: 18px 48px; border-radius: 12px; font-size: 16px; font-weight: 700; text-decoration: none; display: inline-block; transition: all 0.3s; box-shadow: 0 8px 30px rgba(201,168,76,0.35); }
+    .btn-gold:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(201,168,76,0.5); }
+    .btn-outline-white { background: transparent; color: white; border: 2px solid rgba(255,255,255,0.35); padding: 16px 40px; border-radius: 12px; font-size: 16px; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.3s; }
+    .btn-outline-white:hover { background: rgba(255,255,255,0.08); border-color: white; transform: translateY(-2px); }
+    .hero-scroll { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; color: rgba(255,255,255,0.4); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; animation: bounce 2.2s infinite; }
+    .hero-scroll::after { content: ""; width: 1px; height: 50px; background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent); }
+    @keyframes bounce { 0%,100%{ transform: translateX(-50%) translateY(0); } 50%{ transform: translateX(-50%) translateY(9px); } }
+
+    /* ── STATS ── */
+    .stats-bar { background: var(--navy); padding: 44px 32px; border-bottom: 1px solid rgba(201,168,76,0.18); }
+    .stats-inner { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(4,1fr); }
+    .stat-item { padding: 16px 24px; text-align: center; border-right: 1px solid rgba(255,255,255,0.08); }
+    .stat-item:last-child { border-right: none; }
+    .stat-number { font-family: "Playfair Display", serif; font-size: 44px; font-weight: 700; color: var(--gold); line-height: 1; margin-bottom: 10px; }
+    .stat-label { font-size: 11px; color: rgba(255,255,255,0.45); letter-spacing: 2px; text-transform: uppercase; }
+
+    /* ── TRUST BAR ── */
+    .trust-section { background: white; padding: 52px 32px; border-bottom: 1px solid #f0f0f0; }
+    .trust-inner { max-width: 1280px; margin: 0 auto; text-align: center; }
+    .trust-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #bbb; margin-bottom: 28px; }
+    .trust-logos { display: flex; align-items: center; justify-content: center; gap: 52px; flex-wrap: wrap; }
+    .trust-logo-item { font-family: "Playfair Display", serif; font-size: 16px; font-weight: 700; color: #ccc; letter-spacing: 2px; transition: color 0.3s; cursor: default; user-select: none; }
+    .trust-logo-item:hover { color: var(--gold-dark); }
+
+    /* ── CELEBRITY ── */
+    .celebrity-section { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%); padding: 110px 32px; }
+    .celebrity-inner { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+    .eyebrow { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; font-weight: 600; display: block; }
+    .celebrity-text h2 { font-family: "Playfair Display", serif; font-size: clamp(30px,4vw,54px); color: white; font-weight: 700; line-height: 1.2; margin-bottom: 24px; }
+    .celebrity-text h2 em { font-style: italic; color: var(--gold); }
+    .celebrity-text p { color: rgba(255,255,255,0.68); font-size: 16px; line-height: 1.85; margin-bottom: 16px; }
+    .celebrity-badges { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+    .celebrity-badge { background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.3); color: var(--gold); padding: 7px 18px; border-radius: 100px; font-size: 13px; font-weight: 500; }
+    .celebrity-images { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .celeb-img { border-radius: 16px; overflow: hidden; }
+    .celeb-img img { width: 100%; height: 220px; object-fit: cover; display: block; transition: transform 0.5s, filter 0.5s; filter: brightness(0.88) saturate(0.9); }
+    .celeb-img:hover img { transform: scale(1.06); filter: brightness(1) saturate(1.1); }
+    .celeb-img.tall { grid-row: span 2; }
+    .celeb-img.tall img { height: 100%; min-height: 458px; }
+
+    /* ── TESTIMONIALS ── */
+    .testimonials { background: var(--off-white); padding: 110px 32px; }
+    .section-eyebrow { text-align: center; font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--gold-dark); margin-bottom: 14px; font-weight: 600; }
+    .section-title { font-family: "Playfair Display", serif; font-size: clamp(28px,4vw,48px); text-align: center; color: var(--navy); font-weight: 700; margin-bottom: 14px; }
+    .section-subtitle { text-align: center; color: #777; font-size: 16px; margin-bottom: 64px; max-width: 540px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+    .testimonials-grid { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 28px; }
+    .testimonial-card { background: white; border-radius: 20px; padding: 40px; box-shadow: 0 4px 30px rgba(0,0,0,0.05); border-top: 4px solid var(--gold); transition: all 0.3s; }
+    .testimonial-card:hover { transform: translateY(-8px); box-shadow: 0 20px 54px rgba(0,0,0,0.1); }
+    .testimonial-stars { color: var(--gold); font-size: 16px; margin-bottom: 18px; letter-spacing: 3px; }
+    .testimonial-text { font-size: 15px; line-height: 1.82; color: #555; margin-bottom: 26px; font-style: italic; }
+    .testimonial-author { display: flex; align-items: center; gap: 14px; }
+    .author-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
+    .author-name { font-weight: 700; color: var(--navy); font-size: 15px; }
+    .author-title { font-size: 12px; color: #aaa; margin-top: 2px; }
+
+    /* ── IMAGE BREAK ── */
+    .image-break { position: relative; height: 440px; overflow: hidden; }
+    .image-break img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.42); }
+    .image-break-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 32px; }
+    .image-break-overlay h2 { font-family: "Playfair Display", serif; font-size: clamp(26px,4vw,56px); color: white; font-weight: 700; margin-bottom: 16px; max-width: 800px; }
+    .image-break-overlay p { color: rgba(255,255,255,0.78); font-size: 18px; max-width: 580px; line-height: 1.7; }
+    .gold-line { width: 72px; height: 3px; background: linear-gradient(90deg, var(--gold), var(--gold-light)); margin: 20px auto; border-radius: 2px; }
+
+    /* ── FEATURES ── */
+    .features { padding: 110px 32px; background: white; }
+    .features-inner { max-width: 1280px; margin: 0 auto; }
+    .features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 28px; margin-top: 64px; }
+    .feature-card { padding: 44px 32px; border-radius: 20px; border: 1px solid #eee; transition: all 0.4s; position: relative; overflow: hidden; }
+    .feature-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--gold), var(--gold-light)); transform: scaleX(0); transition: transform 0.4s; transform-origin: left; }
+    .feature-card:hover::before { transform: scaleX(1); }
+    .feature-card:hover { box-shadow: 0 20px 60px rgba(0,0,0,0.08); transform: translateY(-6px); border-color: rgba(201,168,76,0.25); }
+    .feature-icon { width: 64px; height: 64px; background: linear-gradient(135deg, rgba(201,168,76,0.14), rgba(201,168,76,0.04)); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 22px; font-size: 26px; }
+    .feature-card h3 { font-family: "Playfair Display", serif; font-size: 19px; color: var(--navy); margin-bottom: 12px; font-weight: 700; }
+    .feature-card p { color: #666; font-size: 15px; line-height: 1.78; }
+
+    /* ── SECURITY ── */
+    .security { padding: 110px 32px; background: var(--navy); }
+    .security-inner { max-width: 1280px; margin: 0 auto; }
+    .security .section-title { color: white; }
+    .security .section-subtitle { color: rgba(255,255,255,0.5); }
+    .security .section-eyebrow { color: var(--gold); }
+    .security-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; margin-top: 64px; }
+    .security-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(201,168,76,0.18); border-radius: 16px; padding: 36px 28px; transition: all 0.3s; }
+    .security-card:hover { background: rgba(201,168,76,0.07); border-color: rgba(201,168,76,0.38); transform: translateY(-4px); }
+    .security-card .sec-icon { width: 48px; height: 48px; border-radius: 12px; background: rgba(201,168,76,0.12); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+    .security-card .sec-icon svg { width: 24px; height: 24px; stroke: var(--gold); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .security-card h4 { font-size: 17px; font-weight: 700; color: white; margin-bottom: 12px; }
+    .security-card p { color: rgba(255,255,255,0.52); font-size: 14px; line-height: 1.75; }
+
+    /* ── PRICING ── */
+    .pricing { padding: 110px 32px; background: var(--off-white); }
+    .pricing-inner { max-width: 1280px; margin: 0 auto; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 28px; margin-top: 64px; align-items: start; }
+    .pricing-card { background: white; border-radius: 24px; padding: 48px 36px; border: 1px solid #ebebeb; transition: all 0.4s; position: relative; }
+    .pricing-card:hover { transform: translateY(-8px); box-shadow: 0 24px 60px rgba(0,0,0,0.09); }
+    .pricing-card.featured { background: var(--navy); border: 2px solid var(--gold); transform: scale(1.03); }
+    .pricing-card.featured:hover { transform: scale(1.03) translateY(-8px); }
+    .pricing-badge { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: var(--navy); padding: 6px 22px; border-radius: 100px; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; white-space: nowrap; }
+    .pricing-tier { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #aaa; margin-bottom: 14px; font-weight: 600; }
+    .pricing-card.featured .pricing-tier { color: var(--gold); }
+    .pricing-price { font-family: "Playfair Display", serif; font-size: 52px; font-weight: 700; color: var(--navy); line-height: 1; margin-bottom: 4px; }
+    .pricing-card.featured .pricing-price { color: white; }
+    .pricing-price .currency { font-size: 26px; vertical-align: top; margin-top: 10px; display: inline-block; }
+    .pricing-period { font-size: 14px; color: #aaa; margin-bottom: 30px; }
+    .pricing-card.featured .pricing-period { color: rgba(255,255,255,0.42); }
+    .pricing-features { list-style: none; margin-bottom: 32px; }
+    .pricing-features li { padding: 11px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; color: #555; display: flex; align-items: center; gap: 12px; }
+    .pricing-card.featured .pricing-features li { border-bottom-color: rgba(255,255,255,0.08); color: rgba(255,255,255,0.72); }
+    .pricing-features li::before { content: ""; display: inline-block; width: 18px; height: 18px; border-radius: 50%; background: rgba(201,168,76,0.15); border: 1.5px solid var(--gold); flex-shrink: 0; position: relative; }
+    .pricing-features li::after { content: ""; display: block; }
+    .check-item { display: flex; align-items: center; gap: 12px; }
+    .check-mark { width: 18px; height: 18px; border-radius: 50%; background: rgba(201,168,76,0.12); border: 1.5px solid var(--gold); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .check-mark svg { width: 10px; height: 10px; stroke: var(--gold); fill: none; stroke-width: 2.5; }
+    .btn-pricing { width: 100%; padding: 16px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.3s; border: none; font-family: "Inter", sans-serif; letter-spacing: 0.3px; }
+    .btn-pricing-outline { background: transparent; border: 2px solid var(--navy); color: var(--navy); }
+    .btn-pricing-outline:hover { background: var(--navy); color: white; }
+    .btn-pricing-gold { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: var(--navy); }
+    .btn-pricing-gold:hover { box-shadow: 0 8px 24px rgba(201,168,76,0.42); transform: translateY(-2px); }
+
+    /* ── SUPPORT ── */
+    .support { padding: 110px 32px; background: white; }
+    .support-inner { max-width: 1280px; margin: 0 auto; }
+    .support-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 24px; margin-top: 64px; }
+    .support-card { text-align: center; padding: 40px 20px; border-radius: 20px; border: 1px solid #eee; transition: all 0.3s; }
+    .support-card:hover { border-color: rgba(201,168,76,0.38); box-shadow: 0 12px 40px rgba(0,0,0,0.07); transform: translateY(-6px); }
+    .support-icon { width: 60px; height: 60px; border-radius: 16px; background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(201,168,76,0.04)); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+    .support-icon svg { width: 28px; height: 28px; stroke: var(--gold); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .support-card h4 { font-weight: 700; color: var(--navy); margin-bottom: 10px; font-size: 16px; }
+    .support-card p { color: #888; font-size: 14px; line-height: 1.72; }
+
+    /* ── CTA ── */
+    .cta-section { position: relative; padding: 130px 32px; overflow: hidden; }
+    .cta-bg { position: absolute; inset: 0; background-image: url("https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=1600&q=80&auto=format&fit=crop"); background-size: cover; background-position: center; filter: brightness(0.3); }
+    .cta-content { position: relative; z-index: 2; text-align: center; max-width: 700px; margin: 0 auto; }
+    .cta-content h2 { font-family: "Playfair Display", serif; font-size: clamp(30px,4vw,56px); color: white; font-weight: 700; margin-bottom: 20px; }
+    .cta-content p { color: rgba(255,255,255,0.78); font-size: 17px; margin-bottom: 44px; line-height: 1.75; }
+    .cta-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+    /* ── FOOTER ── */
+    footer { background: var(--navy); padding: 80px 32px 36px; border-top: 1px solid rgba(201,168,76,0.18); }
+    .footer-grid { max-width: 1280px; margin: 0 auto 56px; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 56px; }
+    .footer-brand-name { font-family: "Playfair Display", serif; font-size: 22px; font-weight: 700; color: white; margin-bottom: 4px; }
+    .footer-brand-sub { font-size: 10px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; font-family: "Inter", sans-serif; font-weight: 500; }
+    .footer-brand p { color: rgba(255,255,255,0.42); font-size: 14px; line-height: 1.8; max-width: 300px; margin-top: 18px; }
+    .footer-gold-text { color: var(--gold); font-style: italic; font-size: 14px; margin-top: 16px; display: block; font-family: "Playfair Display", serif; }
+    .footer-col h5 { color: white; font-size: 11px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 22px; }
+    .footer-col a { display: block; color: rgba(255,255,255,0.42); text-decoration: none; font-size: 14px; margin-bottom: 13px; transition: color 0.3s; }
+    .footer-col a:hover { color: var(--gold); }
+    .footer-bottom { max-width: 1280px; margin: 0 auto; padding-top: 28px; border-top: 1px solid rgba(255,255,255,0.07); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
+    .footer-bottom p { color: rgba(255,255,255,0.28); font-size: 13px; }
+    .footer-bottom-links { display: flex; gap: 24px; }
+    .footer-bottom-links a { color: rgba(255,255,255,0.28); text-decoration: none; font-size: 13px; transition: color 0.3s; }
+    .footer-bottom-links a:hover { color: var(--gold); }
+
+    /* ── FADE UP ── */
+    .fade-up { opacity: 0; transform: translateY(36px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .stats-inner { grid-template-columns: repeat(2,1fr); }
+      .features-grid { grid-template-columns: repeat(2,1fr); }
+      .security-grid { grid-template-columns: repeat(2,1fr); }
+      .pricing-grid { grid-template-columns: 1fr; max-width: 440px; margin-left: auto; margin-right: auto; }
+      .pricing-card.featured { transform: scale(1); }
+      .pricing-card.featured:hover { transform: translateY(-8px); }
+      .support-grid { grid-template-columns: repeat(2,1fr); }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 36px; }
+      .celebrity-inner { grid-template-columns: 1fr; gap: 48px; }
+      .testimonials-grid { grid-template-columns: repeat(2,1fr); }
     }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      line-height: 1.6;
-      color: #1F1F1F;
-      background: #ffffff;
-    }
-    
-    header {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      color: var(--primary-purple);
-      padding: 16px 0;
-      position: sticky;
-      top: 0;
-      box-shadow: 0 2px 20px rgba(108, 99, 255, 0.1);
-      z-index: 1000;
-    }
-    
-    .nav-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .logo {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--primary-purple);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    
-    .logo img {
-      width: 40px;
-      height: 40px;
-      object-fit: contain;
-    }
-    
-    nav a {
-      color: #666;
-      margin-left: 32px;
-      text-decoration: none;
-      transition: color 0.3s;
-      font-weight: 500;
-    }
-    
-    nav a:hover {
-      color: var(--primary-purple);
-    }
-    
-    .auth-buttons {
-      display: flex;
-      gap: 12px;
-    }
-    
-    button {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: all 0.3s;
-      font-size: 14px;
-    }
-    
-    .btn-login {
-      background: transparent;
-      color: var(--primary-purple);
-      border: 2px solid var(--primary-purple);
-    }
-    
-    .btn-login:hover {
-      background: var(--light-purple);
-    }
-    
-    .btn-signup {
-      background: var(--primary-purple);
-      color: white;
-      box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
-    }
-    
-    .btn-signup:hover {
-      background: var(--dark-purple);
-      transform: translateY(-2px);
-    }
-    
-    .hero {
-      background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 50%, #A99BFF 100%);
-      color: white;
-      padding: 100px 24px 80px;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-      opacity: 0.5;
-    }
-    
-    .hero-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      gap: 60px;
-    }
-    
-    .hero-text {
-      flex: 1;
-      text-align: left;
-    }
-    
-    .hero-image {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    
-    .hero-image img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      animation: float 3s ease-in-out infinite;
-    }
-    
-    @keyframes float {
-      0%, 100% {
-        transform: translateY(0);
-      }
-      50% {
-        transform: translateY(-10px);
-      }
-    }
-    
-    .hero h1 {
-      font-size: 56px;
-      margin-bottom: 24px;
-      font-weight: 800;
-      line-height: 1.2;
-    }
-    
-    .hero p {
-      font-size: 20px;
-      margin-bottom: 40px;
-      opacity: 0.95;
-      line-height: 1.6;
-    }
-    
-    .hero-buttons {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    
-    .btn-primary {
-      background: white;
-      color: var(--primary-purple);
-      padding: 16px 40px;
-      border-radius: 12px;
-      text-decoration: none;
-      font-weight: 700;
-      display: inline-block;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-      transition: all 0.3s;
-    }
-    
-    .btn-primary:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-    }
-    
-    .btn-secondary {
-      background: transparent;
-      color: white;
-      border: 2px solid white;
-      padding: 14px 38px;
-      border-radius: 12px;
-      text-decoration: none;
-      font-weight: 600;
-      display: inline-block;
-      transition: all 0.3s;
-    }
-    
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.1);
-      transform: translateY(-2px);
-    }
-    
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-    
-    .features {
-      padding: 100px 24px;
-      background: var(--lavender);
-    }
-    
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 32px;
-      margin-top: 48px;
-    }
-    
-    .feature-card {
-      background: white;
-      padding: 40px;
-      border-radius: 20px;
-      text-align: center;
-      box-shadow: 0 4px 20px rgba(108, 99, 255, 0.08);
-      transition: all 0.3s;
-      border: 1px solid rgba(108, 99, 255, 0.1);
-    }
-    
-    .feature-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 12px 40px rgba(108, 99, 255, 0.15);
-    }
-    
-    .feature-icon {
-      width: 80px;
-      height: 80px;
-      background: var(--light-purple);
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 24px;
-    }
-    
-    .feature-card h3 {
-      color: var(--primary-purple);
-      margin-bottom: 12px;
-      font-size: 20px;
-    }
-    
-    .feature-card p {
-      color: #666;
-      font-size: 15px;
-      line-height: 1.7;
-    }
-    
-    .section-title {
-      font-size: 42px;
-      text-align: center;
-      margin-bottom: 16px;
-      color: var(--primary-purple);
-      font-weight: 800;
-    }
-    
-    .section-subtitle {
-      text-align: center;
-      color: #666;
-      margin-bottom: 48px;
-      font-size: 18px;
-    }
-    
-    .security {
-      padding: 100px 24px;
-      background: white;
-    }
-    
-    .security-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 32px;
-      margin-top: 48px;
-    }
-    
-    .security-item {
-      padding: 32px;
-      border-radius: 16px;
-      background: var(--lavender);
-      border-left: 4px solid var(--primary-purple);
-      transition: all 0.3s;
-    }
-    
-    .security-item:hover {
-      background: var(--light-purple);
-      transform: translateX(4px);
-    }
-    
-    .security-item h4 {
-      color: var(--primary-purple);
-      margin-bottom: 12px;
-      font-size: 18px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .security-item p {
-      color: #666;
-      font-size: 14px;
-      line-height: 1.6;
-    }
-    
-    /* Stats Section */
-    .stats {
-      padding: 80px 24px;
-      background: var(--primary-purple);
-      color: white;
-    }
-    
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 40px;
-      max-width: 1200px;
-      margin: 0 auto;
-      text-align: center;
-    }
-    
-    .stat-item h3 {
-      font-size: 48px;
-      font-weight: 800;
-      margin-bottom: 8px;
-    }
-    
-    .stat-item p {
-      font-size: 16px;
-      opacity: 0.9;
-    }
-    
-    /* How It Works Section */
-    .how-it-works {
-      padding: 100px 24px;
-      background: white;
-    }
-    
-    .steps-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 32px;
-      margin-top: 48px;
-    }
-    
-    .step-item {
-      text-align: center;
-      position: relative;
-    }
-    
-    .step-number {
-      width: 60px;
-      height: 60px;
-      background: var(--primary-purple);
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      font-weight: 800;
-      margin: 0 auto 20px;
-    }
-    
-    .step-item h4 {
-      color: var(--primary-purple);
-      margin-bottom: 12px;
-      font-size: 18px;
-    }
-    
-    .step-item p {
-      color: #666;
-      font-size: 14px;
-      line-height: 1.6;
-    }
-    
-    /* Testimonials Section */
-    .testimonials {
-      padding: 100px 24px;
-      background: var(--lavender);
-    }
-    
-    .testimonials-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 32px;
-      margin-top: 48px;
-    }
-    
-    .testimonial-card {
-      background: white;
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 4px 20px rgba(108, 99, 255, 0.08);
-      transition: all 0.3s;
-    }
-    
-    .testimonial-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 12px 40px rgba(108, 99, 255, 0.15);
-    }
-    
-    .testimonial-quote {
-      font-size: 16px;
-      color: #666;
-      line-height: 1.8;
-      margin-bottom: 24px;
-      font-style: italic;
-    }
-    
-    .testimonial-author {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    
-    .author-avatar {
-      width: 50px;
-      height: 50px;
-      background: var(--light-purple);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--primary-purple);
-    }
-    
-    .author-info h5 {
-      color: var(--primary-purple);
-      margin-bottom: 4px;
-      font-size: 14px;
-    }
-    
-    .author-info p {
-      color: #999;
-      font-size: 12px;
-    }
-    
-    /* FAQ Section */
-    .faq {
-      padding: 100px 24px;
-      background: white;
-    }
-    
-    .faq-grid {
-      max-width: 800px;
-      margin: 48px auto 0;
-    }
-    
-    .faq-item {
-      background: var(--lavender);
-      border-radius: 12px;
-      margin-bottom: 16px;
-      overflow: hidden;
-    }
-    
-    .faq-question {
-      padding: 20px 24px;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: 600;
-      color: var(--primary-purple);
-      transition: all 0.3s;
-    }
-    
-    .faq-question:hover {
-      background: var(--light-purple);
-    }
-    
-    .faq-answer {
-      padding: 0 24px 20px;
-      color: #666;
-      line-height: 1.6;
-      display: none;
-    }
-    
-    .faq-item.active .faq-answer {
-      display: block;
-    }
-    
-    .faq-item.active .faq-question {
-      background: var(--light-purple);
-    }
-    
-    /* Trust Badges Section */
-    .trust-badges {
-      padding: 60px 24px;
-      background: var(--dark-purple);
-      color: white;
-      text-align: center;
-    }
-    
-    .trust-badges p {
-      margin-bottom: 32px;
-      font-size: 14px;
-      opacity: 0.8;
-    }
-    
-    .badges-grid {
-      display: flex;
-      justify-content: center;
-      gap: 40px;
-      flex-wrap: wrap;
-    }
-    
-    .badge-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      opacity: 0.9;
-    }
-    
-    .badge-item svg {
-      width: 20px;
-      height: 20px;
-    }
-    
-    .pricing {
-      padding: 100px 24px;
-      background: var(--lavender);
-    }
-    
-    .pricing-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 32px;
-      margin-top: 48px;
-    }
-    
-    .pricing-card {
-      background: white;
-      padding: 48px 40px;
-      border-radius: 24px;
-      text-align: center;
-      box-shadow: 0 4px 20px rgba(108, 99, 255, 0.08);
-      transition: all 0.3s;
-      border: 2px solid transparent;
-    }
-    
-    .pricing-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 12px 40px rgba(108, 99, 255, 0.15);
-    }
-    
-    .pricing-card.featured {
-      border: 2px solid var(--primary-purple);
-      transform: scale(1.05);
-      box-shadow: 0 8px 30px rgba(108, 99, 255, 0.2);
-    }
-    
-    .pricing-card.featured:hover {
-      transform: scale(1.05) translateY(-8px);
-    }
-    
-    .price {
-      font-size: 48px;
-      color: var(--primary-purple);
-      margin: 24px 0;
-      font-weight: 800;
-    }
-    
-    .price-period {
-      color: #999;
-      font-size: 16px;
-      font-weight: 500;
-    }
-    
-    .features-list {
-      list-style: none;
-      text-align: left;
-      margin: 32px 0;
-    }
-    
-    .features-list li {
-      padding: 12px 0;
-      border-bottom: 1px solid #eee;
-      color: #666;
-      font-size: 15px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    
-    .features-list li {
-      position: relative;
-      padding-left: 32px;
-    }
-    
-    .features-list li:before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 18px;
-      height: 18px;
-      background: var(--accent-teal);
-      border-radius: 50%;
-    }
-    
-    .features-list li:after {
-      content: '';
-      position: absolute;
-      left: 5px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 6px;
-      height: 10px;
-      border: solid white;
-      border-width: 0 2px 2px 0;
-      transform: translateY(-50%) rotate(45deg);
-    }
-    
-    footer {
-      background: var(--dark-purple);
-      color: white;
-      padding: 60px 24px 30px;
-      text-align: center;
-    }
-    
-    .footer-content {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 40px;
-      max-width: 1200px;
-      margin: 0 auto 40px;
-      text-align: left;
-    }
-    
-    .footer-section h4 {
-      margin-bottom: 20px;
-      color: white;
-      font-size: 18px;
-      font-weight: 600;
-    }
-    
-    .footer-section a {
-      display: block;
-      color: rgba(255, 255, 255, 0.7);
-      text-decoration: none;
-      margin-bottom: 12px;
-      font-size: 14px;
-      transition: color 0.3s;
-    }
-    
-    .footer-section a:hover {
-      color: white;
-    }
-    
     @media (max-width: 768px) {
-      .hero h1 {
-        font-size: 36px;
-      }
-      
-      .hero p {
-        font-size: 16px;
-      }
-      
-      .hero-content {
-        flex-direction: column;
-        text-align: center;
-        gap: 40px;
-      }
-      
-      .hero-text {
-        text-align: center;
-      }
-      
-      .hero-buttons {
-        justify-content: center;
-      }
-      
-      .hero-image img {
-        max-width: 80%;
-      }
-      
-      .nav-container {
-        flex-direction: column;
-        gap: 16px;
-      }
-      
-      nav a {
-        margin: 0 12px;
-      }
-      
-      .pricing-card.featured {
-        transform: scale(1);
-      }
-      
-      .pricing-card.featured:hover {
-        transform: translateY(-8px);
-      }
+      nav, .nav-right { display: none; }
+      .hamburger { display: flex; }
+      .features-grid { grid-template-columns: 1fr; }
+      .security-grid { grid-template-columns: 1fr; }
+      .support-grid { grid-template-columns: repeat(2,1fr); }
+      .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .celebrity-images { grid-template-columns: 1fr 1fr; }
+      .celeb-img.tall img { min-height: 250px; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+      .stat-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.07); }
+      .stat-item:last-child { border-bottom: none; }
+    }
+    @media (max-width: 480px) {
+      .hero-buttons, .cta-buttons { flex-direction: column; }
+      .stats-inner { grid-template-columns: repeat(2,1fr); }
+      .support-grid { grid-template-columns: 1fr; }
+      .trust-logos { gap: 28px; }
     }
   </style>
 </head>
 <body>
-  <!-- Header -->
-  <header>
-    <div class="nav-container">
-      <div class="logo">
-        <img src="/logo.png" alt="Bank of the Brave Logo">
-        Bank of the Brave
-      </div>
-      <nav>
-        <a href="#features">Features</a>
-        <a href="#security">Security</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#support">Support</a>
-      </nav>
-      <div class="auth-buttons">
-        <button class="btn-login" onclick="window.location.href='/login.html'">Login</button>
-        <button class="btn-signup" onclick="window.location.href='/signup.html'">Sign Up</button>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" onclick="closeMobileMenu()">&#215;</button>
+  <a href="#features" onclick="closeMobileMenu()">Features</a>
+  <a href="#celebrity" onclick="closeMobileMenu()">Who We Serve</a>
+  <a href="#security" onclick="closeMobileMenu()">Security</a>
+  <a href="#pricing" onclick="closeMobileMenu()">Pricing</a>
+  <a href="#support" onclick="closeMobileMenu()">Support</a>
+  <a href="/login.html" style="color:var(--gold)">Login</a>
+  <a href="/signup.html" style="color:var(--gold);font-weight:700">Open Account</a>
+</div>
+
+<!-- HEADER -->
+<header id="mainHeader">
+  <div class="nav-container">
+    <a href="/landing.html" class="logo">
+      <img src="/logo.png" alt="Bank of the Brave">
+      <div class="logo-text">Bank of the Brave<span class="logo-sub">Private Banking</span></div>
+    </a>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#celebrity">Who We Serve</a>
+      <a href="#security">Security</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#support">Support</a>
+    </nav>
+    <div class="nav-right">
+      <button class="btn-nav-login" onclick="window.location.href='/login.html'">Login</button>
+      <button class="btn-nav-cta" onclick="window.location.href='/signup.html'">Open Account</button>
+    </div>
+    <div class="hamburger" onclick="openMobileMenu()"><span></span><span></span><span></span></div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-content fade-up">
+    <img src="/logo.png" alt="Bank of the Brave Logo" class="hero-huge-logo">
+    <div class="hero-badge">Used by Celebrities Worldwide</div>
+    <div class="hero-tagline">Private Banking at Its Best</div>
+    <h1>Banking Reserved for<br>Those Who <em>Demand</em> More</h1>
+    <p>The exclusive private banking platform trusted by A-list entertainers, professional athletes, Fortune 500 executives, and global celebrities. Absolute discretion. Unparalleled service. Prestige banking — redefined.</p>
+    <div class="hero-buttons">
+      <a href="/signup.html" class="btn-gold">Open Your Account</a>
+      <a href="#celebrity" class="btn-outline-white">Who Banks With Us</a>
+    </div>
+  </div>
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item fade-up">
+      <div class="stat-number">$4.2B+</div>
+      <div class="stat-label">Assets Under Management</div>
+    </div>
+    <div class="stat-item fade-up">
+      <div class="stat-number">18,000+</div>
+      <div class="stat-label">Elite Clients Worldwide</div>
+    </div>
+    <div class="stat-item fade-up">
+      <div class="stat-number">190+</div>
+      <div class="stat-label">Countries Served</div>
+    </div>
+    <div class="stat-item fade-up">
+      <div class="stat-number">99.99%</div>
+      <div class="stat-label">Platform Uptime</div>
+    </div>
+  </div>
+</div>
+
+<!-- TRUST BAR -->
+<div class="trust-section">
+  <div class="trust-inner">
+    <p class="trust-label">Trusted by leaders across entertainment, sports, tech and business</p>
+    <div class="trust-logos">
+      <div class="trust-logo-item">ENTERTAINMENT</div>
+      <div class="trust-logo-item">SPORTS</div>
+      <div class="trust-logo-item">TECHNOLOGY</div>
+      <div class="trust-logo-item">FASHION</div>
+      <div class="trust-logo-item">MEDIA</div>
+      <div class="trust-logo-item">REAL ESTATE</div>
+    </div>
+  </div>
+</div>
+
+<!-- CELEBRITY SECTION -->
+<section class="celebrity-section" id="celebrity">
+  <div class="celebrity-inner">
+    <div class="celebrity-text fade-up">
+      <span class="eyebrow">Who We Serve</span>
+      <h2>Where the World's<br><em>Most Influential</em><br>People Bank</h2>
+      <p>Bank of the Brave is the private banking institution of choice for A-list entertainers, professional athletes, Fortune 500 executives, and global celebrities seeking absolute discretion and unparalleled service.</p>
+      <p>Our clients expect — and receive — banking experiences as extraordinary as their lives. Dedicated relationship managers, 24/7 concierge, and bespoke financial solutions built around your unique wealth profile.</p>
+      <div class="celebrity-badges">
+        <span class="celebrity-badge">Entertainers</span>
+        <span class="celebrity-badge">Athletes</span>
+        <span class="celebrity-badge">Executives</span>
+        <span class="celebrity-badge">Musicians</span>
+        <span class="celebrity-badge">Influencers</span>
       </div>
     </div>
-  </header>
-
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-content">
-      <div class="hero-text">
-        <h1>Secure Private Banking for HNWIs</h1>
-        <p>Access world-class banking services with enterprise-grade security, multi-currency support, and dedicated wealth management.</p>
-        <p style="font-size: 18px; font-weight: 600; color: var(--accent-teal); margin-top: 16px;">
-          Used by celebrities worldwide • Private banking at its best
-        </p>
-        <div class="hero-buttons">
-          <a href="/signup.html" class="btn-primary">Get Started</a>
-          <a href="#features" class="btn-secondary">Learn More</a>
-        </div>
+    <div class="celebrity-images fade-up">
+      <div class="celeb-img tall">
+        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&q=80&auto=format&fit=crop" alt="Successful professional" loading="lazy">
       </div>
-      <div class="hero-image">
-        <img src="/monie.avif" alt="Happy woman with money">
+      <div class="celeb-img">
+        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80&auto=format&fit=crop" alt="Elite client" loading="lazy">
+      </div>
+      <div class="celeb-img">
+        <img src="https://images.unsplash.com/photo-1560472355-536de3962603?w=600&q=80&auto=format&fit=crop" alt="Luxury lifestyle" loading="lazy">
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Features Section -->
-  <section class="features" id="features">
-    <div class="container">
-      <h2 class="section-title">Premium Banking Features</h2>
-      <p class="section-subtitle">Everything you need for modern private banking</p>
-      
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-              <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-              <path d="M2 10h20"></path>
-              <path d="M12 10v10"></path>
-              <path d="M2 14h20"></path>
-            </svg>
-          </div>
-          <h3>Multi-Currency Accounts</h3>
-          <p>Hold and manage USD, EUR, GBP, and BTC in one platform with real-time exchange rates.</p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-              <rect x="1" y="4" width="22" height="16" rx="2"></rect>
-              <path d="M1 10h22"></path>
-              <circle cx="6" cy="15" r="1"></circle>
-              <circle cx="18" cy="15" r="1"></circle>
-            </svg>
-          </div>
-          <h3>Instant Card Issuance</h3>
-          <p>Get virtual cards instantly or order physical cards. Full control over limits and security.</p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <path d="M2 12h20"></path>
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-              <path d="M12 2v20"></path>
-            </svg>
-          </div>
-          <h3>International Transfers</h3>
-          <p>Send money globally via SWIFT, SEPA, or ACH with competitive rates and fast settlement.</p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-            </svg>
-          </div>
-          <h3>Loans & Credit</h3>
-          <p>Access collateralized loans, investment deposits, and revolving credit lines with flexible terms.</p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-              <line x1="18" y1="20" x2="18" y2="10"></line>
-              <line x1="12" y1="20" x2="12" y2="4"></line>
-              <line x1="6" y1="20" x2="6" y2="14"></line>
-            </svg>
-          </div>
-          <h3>Portfolio Management</h3>
-          <p>Track investments, fixed deposits, and assets with real-time analytics and reporting.</p>
-        </div>
-        
-        <div class="feature-card">
-          <div class="feature-icon">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
-          </div>
-          <h3>Dedicated Relationship Manager</h3>
-          <p>Direct access to your personal wealth advisor for consulting and portfolio guidance.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Stats Section -->
-  <section class="stats">
-    <div class="stats-grid">
-      <div class="stat-item">
-        <h3>$2.5B+</h3>
-        <p>Assets Under Management</p>
-      </div>
-      <div class="stat-item">
-        <h3>50K+</h3>
-        <p>Active Clients</p>
-      </div>
-      <div class="stat-item">
-        <h3>150+</h3>
-        <p>Countries Supported</p>
-      </div>
-      <div class="stat-item">
-        <h3>99.9%</h3>
-        <p>Uptime Guarantee</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- How It Works Section -->
-  <section class="how-it-works">
-    <div class="container">
-      <h2 class="section-title">How It Works</h2>
-      <p class="section-subtitle">Get started in just 3 simple steps</p>
-      
-      <div class="steps-grid">
-        <div class="step-item">
-          <div class="step-number">1</div>
-          <h4>Create Account</h4>
-          <p>Sign up in minutes with our streamlined registration process. Complete KYC verification securely online.</p>
-        </div>
-        
-        <div class="step-item">
-          <div class="step-number">2</div>
-          <h4>Fund Your Account</h4>
-          <p>Deposit funds via bank transfer, wire, or supported payment methods. Minimum deposit starts at $500.</p>
-        </div>
-        
-        <div class="step-item">
-          <div class="step-number">3</div>
-          <h4>Start Banking</h4>
-          <p>Access your dashboard, issue cards, make transfers, and manage your portfolio from anywhere.</p>
+<!-- TESTIMONIALS -->
+<section class="testimonials" id="testimonials">
+  <p class="section-eyebrow">Client Stories</p>
+  <h2 class="section-title">What Our Elite Clients Say</h2>
+  <p class="section-subtitle">Hear from the world's leading professionals about their Bank of the Brave experience.</p>
+  <div class="testimonials-grid">
+    <div class="testimonial-card fade-up">
+      <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+      <p class="testimonial-text">"Bank of the Brave handles my international finances with a level of discretion and sophistication that no other institution has matched. My relationship manager is available around the clock — truly private banking at its finest."</p>
+      <div class="testimonial-author">
+        <img class="author-avatar" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80&auto=format&fit=crop" alt="Marcus A." loading="lazy">
+        <div>
+          <div class="author-name">Marcus A.</div>
+          <div class="author-title">International Recording Artist</div>
         </div>
       </div>
     </div>
-  </section>
-
-  <!-- Testimonials Section -->
-  <section class="testimonials">
-    <div class="container">
-      <h2 class="section-title">What Our Clients Say</h2>
-      <p class="section-subtitle">Trusted by high-net-worth individuals worldwide</p>
-      
-      <div class="testimonials-grid">
-        <div class="testimonial-card">
-          <p class="testimonial-quote">"Bank of the Brave has transformed how I manage my international finances. The multi-currency accounts and instant transfers are game-changers for my business."</p>
-          <div class="testimonial-author">
-            <div class="author-avatar">JM</div>
-            <div class="author-info">
-              <h5>James Mitchell</h5>
-              <p>Entrepreneur, New York</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="testimonial-card">
-          <p class="testimonial-quote">"The security features give me peace of mind. I've tried many digital banks, but Bank of the Brave offers the best combination of security and usability."</p>
-          <div class="testimonial-author">
-            <div class="author-avatar">SC</div>
-            <div class="author-info">
-              <h5>Sarah Chen</h5>
-              <p>Investor, Singapore</p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="testimonial-card">
-          <p class="testimonial-quote">"Exceptional customer service and dedicated relationship manager. They truly understand the needs of high-net-worth clients."</p>
-          <div class="testimonial-author">
-            <div class="author-avatar">RK</div>
-            <div class="author-info">
-              <h5>Robert Klein</h5>
-              <p>Business Owner, London</p>
-            </div>
-          </div>
+    <div class="testimonial-card fade-up">
+      <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+      <p class="testimonial-text">"Managing assets across 12 countries used to be a nightmare. Bank of the Brave consolidated everything into one seamless platform. The multi-currency accounts and same-day transfers have been a game changer for my business."</p>
+      <div class="testimonial-author">
+        <img class="author-avatar" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80&auto=format&fit=crop" alt="Sophia R." loading="lazy">
+        <div>
+          <div class="author-name">Sophia R.</div>
+          <div class="author-title">Global Fashion Entrepreneur</div>
         </div>
       </div>
     </div>
-  </section>
-
-  <!-- FAQ Section -->
-  <section class="faq">
-    <div class="container">
-      <h2 class="section-title">Frequently Asked Questions</h2>
-      <p class="section-subtitle">Find answers to common questions</p>
-      
-      <div class="faq-grid">
-        <div class="faq-item" onclick="toggleFaq(this)">
-          <div class="faq-question">
-            What is the minimum deposit requirement?
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </div>
-          <div class="faq-answer">The minimum deposit to activate your account is $500. For Premium accounts, we recommend a minimum balance of $5,000 to access all features.</div>
-        </div>
-        
-        <div class="faq-item" onclick="toggleFaq(this)">
-          <div class="faq-question">
-            How long does KYC verification take?
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </div>
-          <div class="faq-answer">KYC verification typically takes 1-2 business days. Our automated system processes most applications within 24 hours.</div>
-        </div>
-        
-        <div class="faq-item" onclick="toggleFaq(this)">
-          <div class="faq-question">
-            What currencies are supported?
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </div>
-          <div class="faq-answer">We support USD, EUR, GBP, and BTC. Premium members can access additional currencies including JPY, CHF, and CAD.</div>
-        </div>
-        
-        <div class="faq-item" onclick="toggleFaq(this)">
-          <div class="faq-question">
-            Are my funds insured?
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </div>
-          <div class="faq-answer">Yes, client funds are held in segregated accounts with partner banks and are protected by FDIC/FSCS insurance up to applicable limits.</div>
-        </div>
-        
-        <div class="faq-item" onclick="toggleFaq(this)">
-          <div class="faq-question">
-            Can I access my account from anywhere?
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </div>
-          <div class="faq-answer">Yes, our platform is accessible globally via web and mobile apps. You can manage your finances from anywhere in the world.</div>
-        </div>
-        
-        <div class="faq-item" onclick="toggleFaq(this)">
-          <div class="faq-question">
-            What happens if my balance exceeds $20,000?
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </div>
-          <div class="faq-answer">Starter accounts have a $20,000 balance limit. If your balance exceeds this amount via deposits, transfers, or admin additions, your account will be frozen until you upgrade to Premium.</div>
-        </div>
-        
-        <div class="faq-item" onclick="toggleFaq(this)">
-          <div class="faq-question">
-            How do I upgrade to Premium?
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </div>
-          <div class="faq-answer">Upgrade to Premium for a one-time fee of $1,000. You can upgrade via deposits, transfers, or by contacting support. Premium removes balance limits and unfreezes frozen accounts.</div>
-        </div>
-        
-        <div class="faq-item" onclick="toggleFaq(this)">
-          <div class="faq-question">
-            How do I unfreeze my account?
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </div>
-          <div class="faq-answer">To unfreeze your account, upgrade to Premium ($1,000 one-time). Contact support for assistance with the upgrade process. Once upgraded, your account will be unfrozen and balance limits removed.</div>
+    <div class="testimonial-card fade-up">
+      <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+      <p class="testimonial-text">"As a professional athlete I needed a banking partner who truly understood my income structure and lifestyle. Bank of the Brave's private banking team crafted a strategy that has grown my wealth significantly. Exceptional."</p>
+      <div class="testimonial-author">
+        <img class="author-avatar" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&q=80&auto=format&fit=crop" alt="Jordan T." loading="lazy">
+        <div>
+          <div class="author-name">Jordan T.</div>
+          <div class="author-title">Professional Athlete</div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Trust Badges Section -->
-  <section class="trust-badges">
-    <div class="container">
-      <p>Trusted by leading organizations and compliant with international standards</p>
-      <div class="badges-grid">
-        <div class="badge-item">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+<!-- IMAGE BREAK -->
+<div class="image-break">
+  <img src="https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=1800&q=80&auto=format&fit=crop" alt="Luxury private banking" loading="lazy">
+  <div class="image-break-overlay">
+    <div class="gold-line"></div>
+    <h2>"Private Banking at Its Best"</h2>
+    <p>Used by celebrities worldwide — because excellence is never an accident.</p>
+    <div class="gold-line"></div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="features-inner">
+    <p class="section-eyebrow">What We Offer</p>
+    <h2 class="section-title">Premium Banking, Redefined</h2>
+    <p class="section-subtitle">Every feature built for the discerning needs of high-net-worth individuals.</p>
+    <div class="features-grid">
+      <div class="feature-card fade-up">
+        <div class="feature-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10A15.3 15.3 0 0 1 12 2z"/>
           </svg>
-          SOC 2 Compliant
         </div>
-        <div class="badge-item">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        <h3>Multi-Currency Accounts</h3>
+        <p>Hold, manage, and exchange USD, EUR, GBP, CHF, and BTC in one unified dashboard with institutional-grade rates.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>
           </svg>
-          256-bit Encryption
         </div>
-        <div class="badge-item">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="2" y1="12" x2="22" y2="12"></line>
-            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        <h3>Elite Card Issuance</h3>
+        <p>Receive your signature metallic card instantly. Physical or virtual, with custom spending limits and real-time controls.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
           </svg>
-            Global Coverage
         </div>
-        <div class="badge-item">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        <h3>Global Transfers</h3>
+        <p>Send millions globally via SWIFT, SEPA, and ACH within hours. Competitive FX with full transparency on every transaction.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
           </svg>
-            Regulated
         </div>
+        <h3>Investment and Loans</h3>
+        <p>Access collateralized loans, structured deposits, and flexible credit lines tailored to your asset portfolio.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+        </div>
+        <h3>Wealth Analytics</h3>
+        <p>Real-time dashboards showing your complete financial picture — investments, FX exposure, and growth metrics.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <h3>Dedicated Private Manager</h3>
+        <p>A personal wealth advisor who knows your name, your goals, and answers your calls — not a chatbot.</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Security Section -->
-  <section class="security" id="security">
-    <div class="container">
-      <h2 class="section-title">Bank-Grade Security</h2>
-      <p class="section-subtitle">Your funds and data are protected by enterprise-grade security measures</p>
-      
-      <div class="security-grid">
-        <div class="security-item">
-          <h4>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-            </svg>
-            End-to-End Encryption
-          </h4>
-          <p>All data encrypted with TLS 1.3 in transit and AES-256 at rest.</p>
+<!-- SECURITY -->
+<section class="security" id="security">
+  <div class="security-inner">
+    <p class="section-eyebrow">Fort Knox Security</p>
+    <h2 class="section-title">Military-Grade Protection</h2>
+    <p class="section-subtitle">Your wealth is protected by the most advanced security infrastructure in private banking.</p>
+    <div class="security-grid">
+      <div class="security-card fade-up">
+        <div class="sec-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </div>
-        
-        <div class="security-item">
-          <h4>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-              <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
-            </svg>
-            Multi-Factor Authentication
-          </h4>
-          <p>TOTP, hardware tokens, and biometric authentication options available.</p>
+        <h4>End-to-End Encryption</h4>
+        <p>All data encrypted with TLS 1.3 in transit and AES-256 at rest. Your information is never exposed.</p>
+      </div>
+      <div class="security-card fade-up">
+        <div class="sec-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
-        
-        <div class="security-item">
-          <h4>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-              <polyline points="10 9 9 9 8 9"></polyline>
-            </svg>
-            KYC/AML Compliance
-          </h4>
-          <p>Full identity verification with liveness detection and document validation.</p>
+        <h4>Multi-Factor Authentication</h4>
+        <p>TOTP codes, hardware security keys, and biometric face ID — multiple layers on every login.</p>
+      </div>
+      <div class="security-card fade-up">
+        <div class="sec-icon">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
         </div>
-        
-        <div class="security-item">
-          <h4>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="16" x2="12" y2="12"></line>
-              <line x1="12" y1="8" x2="12.01" y2="8"></line>
-            </svg>
-            Real-Time Monitoring
-          </h4>
-          <p>Automated fraud detection with velocity checks and anomaly detection.</p>
+        <h4>KYC / AML Compliance</h4>
+        <p>Full identity verification, liveness detection, and document validation to keep your funds safe.</p>
+      </div>
+      <div class="security-card fade-up">
+        <div class="sec-icon">
+          <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         </div>
-        
-        <div class="security-item">
-          <h4>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-              <polyline points="10 9 9 9 8 9"></polyline>
-            </svg>
-            Immutable Audit Trail
-          </h4>
-          <p>Every transaction logged with IP, timestamp, and full state tracking.</p>
+        <h4>Real-Time Fraud Detection</h4>
+        <p>AI-powered anomaly detection flags suspicious activity before it becomes a problem.</p>
+      </div>
+      <div class="security-card fade-up">
+        <div class="sec-icon">
+          <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         </div>
-        
-        <div class="security-item">
-          <h4>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-            </svg>
-            Compliance Ready
-          </h4>
-          <p>SOC 2 compliant infrastructure with multi-factor admin approvals.</p>
+        <h4>Immutable Audit Trail</h4>
+        <p>Every transaction recorded with timestamp, IP, and device fingerprint — full accountability.</p>
+      </div>
+      <div class="security-card fade-up">
+        <div class="sec-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         </div>
+        <h4>SOC 2 Compliant</h4>
+        <p>Infrastructure audited to SOC 2 Type II standards with multi-factor admin authorization on all operations.</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Pricing Section -->
-  <section class="pricing" id="pricing">
-    <div class="container">
-      <h2 class="section-title">Simple, Transparent Pricing</h2>
-      <p class="section-subtitle">Choose the plan that works for you</p>
-      
-      <div class="pricing-cards">
-        <div class="pricing-card">
-          <h3>Starter</h3>
-          <div class="price">Free<span class="price-period">/month</span></div>
-          <ul class="features-list">
-            <li>1 USD account</li>
-            <li>Virtual debit card</li>
-            <li>Internal transfers</li>
-            <li>Basic support</li>
-            <li>Account statements</li>
-            <li>Balance limit: $20,000</li>
-          </ul>
-          <button class="btn-primary" onclick="window.location.href='/signup.html'">Get Started</button>
-        </div>
-        
-        <div class="pricing-card featured">
-          <h3>Premium</h3>
-          <div class="price">$1,000<span class="price-period">/one-time</span></div>
-          <ul class="features-list">
-            <li>Unlimited accounts</li>
-            <li>Physical + virtual cards</li>
-            <li>International transfers</li>
-            <li>Priority support</li>
-            <li>Advanced analytics</li>
-            <li>Loan products</li>
-            <li>No balance limits</li>
-            <li>Unfreeze frozen accounts</li>
-          </ul>
-          <button class="btn-primary" onclick="window.location.href='/signup.html'">Upgrade to Premium</button>
-        </div>
-        
-        <div class="pricing-card">
-          <h3>Private Banking</h3>
-          <div class="price">Custom<span class="price-period">/month</span></div>
-          <ul class="features-list">
-            <li>All Premium features</li>
-            <li>Dedicated RM</li>
-            <li>Portfolio management</li>
-            <li>Custom structuring</li>
-            <li>24/7 concierge</li>
-          </ul>
-          <button class="btn-primary" onclick="alert('Contact sales team')">Request Demo</button>
-        </div>
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="pricing-inner">
+    <p class="section-eyebrow">Membership Tiers</p>
+    <h2 class="section-title">Choose Your Level of Excellence</h2>
+    <p class="section-subtitle">Transparent pricing with no hidden fees — because excellence deserves clarity.</p>
+    <div class="pricing-grid">
+      <div class="pricing-card fade-up">
+        <p class="pricing-tier">Starter</p>
+        <div class="pricing-price">Free</div>
+        <p class="pricing-period">No monthly fee, forever</p>
+        <ul class="pricing-features">
+          <li>1 USD multi-currency account</li>
+          <li>Virtual debit card</li>
+          <li>Internal transfers</li>
+          <li>Account statements</li>
+          <li>Standard support</li>
+        </ul>
+        <button class="btn-pricing btn-pricing-outline" onclick="window.location.href='/signup.html'">Get Started Free</button>
+      </div>
+      <div class="pricing-card featured fade-up">
+        <div class="pricing-badge">Most Popular</div>
+        <p class="pricing-tier">Premium</p>
+        <div class="pricing-price"><span class="currency">$</span>29</div>
+        <p class="pricing-period">per month</p>
+        <ul class="pricing-features">
+          <li>Unlimited multi-currency accounts</li>
+          <li>Physical and virtual elite cards</li>
+          <li>International SWIFT transfers</li>
+          <li>Priority 24/7 support</li>
+          <li>Advanced wealth analytics</li>
+          <li>Loan and credit products</li>
+        </ul>
+        <button class="btn-pricing btn-pricing-gold" onclick="window.location.href='/signup.html'">Start 30-Day Trial</button>
+      </div>
+      <div class="pricing-card fade-up">
+        <p class="pricing-tier">Private Banking</p>
+        <div class="pricing-price">Custom</div>
+        <p class="pricing-period">Bespoke arrangement</p>
+        <ul class="pricing-features">
+          <li>All Premium features</li>
+          <li>Dedicated Relationship Manager</li>
+          <li>Portfolio wealth management</li>
+          <li>Custom financial structuring</li>
+          <li>24/7 concierge service</li>
+          <li>Celebrity discretion protocols</li>
+        </ul>
+        <button class="btn-pricing btn-pricing-outline" onclick="window.location.href='/signup.html'">Request a Consultation</button>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Account Freeze Warning Section -->
-  <section class="security">
-    <div class="container">
-      <h2 class="section-title">Important: Account Balance Limits</h2>
-      <p class="section-subtitle">Starter accounts have a $20,000 balance limit</p>
-      
-      <div class="security-grid">
-        <div class="security-item">
-          <h4>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="12"></line>
-              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-            Balance Limit
-          </h4>
-          <p>Starter accounts are limited to $20,000 total balance. Exceeding this limit will freeze your account.</p>
+<!-- SUPPORT -->
+<section class="support" id="support">
+  <div class="support-inner">
+    <p class="section-eyebrow">World-Class Support</p>
+    <h2 class="section-title">Always Here for You</h2>
+    <p class="section-subtitle">Our elite support team is at your service — anytime, anywhere in the world.</p>
+    <div class="support-grid">
+      <div class="support-card fade-up">
+        <div class="support-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         </div>
-        
-        <div class="security-item">
-          <h4>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-            </svg>
-            Account Freeze
-          </h4>
-          <p>If your balance exceeds $20,000 via transfers or deposits, your account will be frozen until you upgrade to Premium.</p>
+        <h4>Live Chat</h4>
+        <p>Instant connection to a real human advisor — no bots, no queues for premium members.</p>
+      </div>
+      <div class="support-card fade-up">
+        <div class="support-icon">
+          <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
         </div>
-        
-        <div class="security-item">
-          <h4>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-            </svg>
-            Upgrade to Unfreeze
-          </h4>
-          <p>Upgrade to Premium ($1,000 one-time) to unfreeze your account and remove all balance limits.</p>
+        <h4>Private Email Line</h4>
+        <p>Dedicated email channel with responses within 2 hours, 24/7 for all members.</p>
+      </div>
+      <div class="support-card fade-up">
+        <div class="support-icon">
+          <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
         </div>
-        
-        <div class="security-item">
-          <h4>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-              <polygon points="23 7 16 12 23 17 23 7"></polygon>
-              <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
-            </svg>
-            Contact Support
-          </h4>
-          <p>If your account is frozen, contact support to assist with the upgrade process and account unfreezing.</p>
+        <h4>Knowledge Base</h4>
+        <p>Comprehensive guides, FAQs, and how-to articles for every feature and process.</p>
+      </div>
+      <div class="support-card fade-up">
+        <div class="support-icon">
+          <svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
         </div>
+        <h4>Video Tutorials</h4>
+        <p>Step-by-step walkthrough videos covering every platform feature in full detail.</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Support Section -->
-  <section class="security" id="support">
-    <div class="container">
-      <h2 class="section-title">Need Help?</h2>
-      <p class="section-subtitle">We're here to support you every step of the way</p>
-      
-      <div class="security-grid">
-        <div class="security-item">
-          <h4>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-            </svg>
-            Live Chat
-          </h4>
-          <p>Get instant help from our support team during business hours.</p>
-        </div>
-        
-        <div class="security-item">
-          <h4>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-              <polyline points="22,6 12,13 2,6"></polyline>
-            </svg>
-            Email Support
-          </h4>
-          <p>Contact our support team at support@bankofthebrave.com</p>
-        </div>
-        
-        <div class="security-item">
-          <h4>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-            </svg>
-            Knowledge Base
-          </h4>
-          <p>Browse our comprehensive FAQ and user guides.</p>
-        </div>
-        
-        <div class="security-item">
-          <h4>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-purple)" stroke-width="2">
-              <polygon points="23 7 16 12 23 17 23 7"></polygon>
-              <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
-            </svg>
-            Video Tutorials
-          </h4>
-          <p>Step-by-step video guides for all major features.</p>
-        </div>
-      </div>
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-bg"></div>
+  <div class="cta-content">
+    <div class="gold-line"></div>
+    <h2>Ready to Bank Like a Celebrity?</h2>
+    <p>Join thousands of the world's most successful individuals who trust Bank of the Brave with their wealth. Private banking at its absolute best — starts today.</p>
+    <div class="cta-buttons">
+      <a href="/signup.html" class="btn-gold">Open Your Account</a>
+      <a href="/login.html" class="btn-outline-white">Sign In</a>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Footer -->
-  <footer>
-    <div class="footer-content">
-      <div class="footer-section">
-        <h4>Product</h4>
-        <a href="#features">Features</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#">Mobile App</a>
-        <a href="#">API Docs</a>
-      </div>
-      
-      <div class="footer-section">
-        <h4>Company</h4>
-        <a href="#">About Us</a>
-        <a href="#">Blog</a>
-        <a href="#">Careers</a>
-        <a href="#">Press</a>
-      </div>
-      
-      <div class="footer-section">
-        <h4>Legal</h4>
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Service</a>
-        <a href="#">Security</a>
-        <a href="#">Compliance</a>
-      </div>
-      
-      <div class="footer-section">
-        <h4>Support</h4>
-        <a href="#">Help Center</a>
-        <a href="#">Contact Us</a>
-        <a href="#">Status Page</a>
-        <a href="#">Community</a>
-      </div>
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand-name">Bank of the Brave</div>
+      <div class="footer-brand-sub">Private Banking</div>
+      <p class="footer-brand">The world's most exclusive private banking platform. Trusted by celebrities, athletes, executives, and HNWIs in over 190 countries.</p>
+      <em class="footer-gold-text">"Private Banking at Its Best"</em>
     </div>
-    
-    <div style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 24px;">
-      <p>&copy; 2026 Bank of the Brave. All rights reserved.</p>
-      <p style="font-size: 13px; margin-top: 12px; color: rgba(255,255,255,0.6);">
-        Bank of the Brave is a digital banking platform. All transactions are subject to compliance with applicable regulations.
-      </p>
+    <div class="footer-col">
+      <h5>Product</h5>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#">Mobile App</a>
+      <a href="#">API Access</a>
     </div>
-  </footer>
+    <div class="footer-col">
+      <h5>Company</h5>
+      <a href="#">About Us</a>
+      <a href="#">Careers</a>
+      <a href="#">Press and Media</a>
+      <a href="#">Blog</a>
+    </div>
+    <div class="footer-col">
+      <h5>Legal</h5>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Security</a>
+      <a href="#">Compliance</a>
+      <a href="#">Cookie Policy</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&#169; 2026 Bank of the Brave. All rights reserved. Used by celebrities worldwide.</p>
+    <div class="footer-bottom-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Security</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+</footer>
 
-  <script>
-    function toggleFaq(element) {
-      element.classList.toggle('active');
+<script>
+  // Sticky nav
+  const header = document.getElementById('mainHeader');
+  window.addEventListener('scroll', () => {
+    header.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Parallax hero bg
+  const heroBg = document.getElementById('heroBg');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY < window.innerHeight) {
+      heroBg.style.transform = 'translateY(' + (window.scrollY * 0.22) + 'px)';
     }
-  </script>
+  });
+
+  // Fade-up on scroll
+  const fadeObs = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 100);
+        fadeObs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-up').forEach(el => fadeObs.observe(el));
+
+  // Mobile menu
+  function openMobileMenu() {
+    document.getElementById('mobileMenu').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeMobileMenu() {
+    document.getElementById('mobileMenu').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', e => {
+      const id = link.getAttribute('href');
+      const target = document.querySelector(id);
+      if (target) {
+        e.preventDefault();
+        window.scrollTo({ top: target.offsetTop - 80, behavior: 'smooth' });
+      }
+    });
+  });
+</script>
 </body>
 </html>
