@@ -336,20 +336,22 @@
         </button>
       </div>
       <div class="table-wrapper">
-        <table>
+        <table style="min-width: 1200px;">
           <thead>
             <tr>
-              <th>User</th>
+              <th>User ID</th>
+              <th>Full Name</th>
               <th>Email</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th>KYC Status</th>
-              <th>Premium</th>
+              <th>Phone</th>
+              <th>Acc Status</th>
+              <th>KYC</th>
+              <th>Reg Date</th>
+              <th>Last Login</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody id="usersTableBody">
-            <tr><td colspan="7" style="text-align:center;color:#999;">Loading users...</td></tr>
+            <tr><td colspan="9" style="text-align:center;color:#999;">Loading users...</td></tr>
           </tbody>
         </table>
       </div>
@@ -611,6 +613,45 @@
   </div>
 </div>
 
+<!-- User Profile Modal -->
+<div class="modal-overlay" id="userProfileModal">
+  <div class="modal" style="max-width: 600px;">
+    <div class="modal-header">
+      <div class="modal-title">USER PROFILE</div>
+      <button class="modal-close" onclick="closeModal('userProfileModal')">&times;</button>
+    </div>
+    <div id="userProfileContent">
+      <div style="text-align:center;color:#999;padding:20px;">Loading profile...</div>
+    </div>
+  </div>
+</div>
+
+<!-- Deposit Details Modal -->
+<div class="modal-overlay" id="depositDetailsModal">
+  <div class="modal" style="max-width: 500px;">
+    <div class="modal-header">
+      <div class="modal-title" id="depositDetailsTitle">DEPOSIT DETAILS</div>
+      <button class="modal-close" onclick="closeModal('depositDetailsModal')">&times;</button>
+    </div>
+    <div id="depositDetailsContent">
+      <!-- Deposit details populated here -->
+    </div>
+  </div>
+</div>
+
+<!-- KYC Details Modal -->
+<div class="modal-overlay" id="kycDetailsModal">
+  <div class="modal" style="max-width: 600px;">
+    <div class="modal-header">
+      <div class="modal-title">KYC VERIFICATION</div>
+      <button class="modal-close" onclick="closeModal('kycDetailsModal')">&times;</button>
+    </div>
+    <div id="kycDetailsContent">
+      <!-- KYC details populated here -->
+    </div>
+  </div>
+</div>
+
 <script>
 const API_URL = '/api';
 let selectedUserId = null;
@@ -674,7 +715,7 @@ async function loadUsers() {
     const tbody = document.getElementById('usersTableBody');
     
     if (data.users.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;">No users found</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#999;">No users found</td></tr>';
       return;
     }
 
@@ -683,25 +724,23 @@ async function loadUsers() {
       const safeUserName = userName.replace(/'/g, "\\'");
       return `
       <tr>
+        <td style="font-family:monospace;font-size:12px;">${user._id.substring(0,8)}...</td>
         <td>
           <div class="user-row">
             <div class="user-avatar">${((user.firstName||'?')[0]+(user.lastName||'')[0]).toUpperCase()}</div>
             <div class="user-info">
               <h4>${user.firstName} ${user.lastName}</h4>
-              <p>${user._id}</p>
             </div>
           </div>
         </td>
         <td>${user.email}</td>
-        <td><span class="badge badge-info">${user.role}</span></td>
+        <td>${user.phoneNumber || 'N/A'}</td>
         <td><span class="badge ${user.accountStatus === 'active' ? 'badge-success' : user.accountStatus === 'frozen' ? 'badge-danger' : 'badge-warning'}">${user.accountStatus}</span></td>
         <td><span class="badge ${user.kycStatus === 'verified' ? 'badge-success' : user.kycStatus === 'pending' ? 'badge-warning' : 'badge-danger'}">${user.kycStatus}</span></td>
-        <td><span class="badge ${user.isPremium ? 'badge-gold' : 'badge-info'}">${user.isPremium ? 'Yes' : 'No'}</span></td>
+        <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+        <td>${user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}</td>
         <td>
-          <button class="btn btn-sm btn-gold" onclick="openAddBalanceModal('${user._id}', '${safeUserName}')">Add Balance</button>
-          <button class="btn btn-sm btn-outline" onclick="openPremiumModal('${user._id}', '${safeUserName}', ${user.isPremium})">Premium</button>
-          <button class="btn btn-sm btn-outline" onclick="openFreezeModal('${user._id}', '${safeUserName}', '${user.accountStatus}')">Freeze</button>
-          <button class="btn btn-sm btn-gold" onclick="openCreditModal('${user._id}', '${safeUserName}')">Credit</button>
+          <button class="btn btn-sm btn-gold" onclick="openUserProfile('${user._id}')">Manage User</button>
         </td>
       </tr>
     `;
@@ -752,7 +791,10 @@ async function loadDeposits() {
       return;
     }
 
-    tbody.innerHTML = data.deposits.map(deposit => `
+    tbody.innerHTML = data.deposits.map(deposit => {
+      // Store deposit object in window for easy access in modal
+      window[`deposit_${deposit._id}`] = deposit;
+      return `
       <tr>
         <td>${deposit.userId ? deposit.userId.email : 'Unknown'}</td>
         <td>$${deposit.amount.toLocaleString()}</td>
@@ -760,13 +802,11 @@ async function loadDeposits() {
         <td><span class="badge ${deposit.status === 'approved' ? 'badge-success' : deposit.status === 'pending' ? 'badge-warning' : 'badge-danger'}">${deposit.status}</span></td>
         <td>${new Date(deposit.createdAt).toLocaleDateString()}</td>
         <td>
-          ${deposit.status === 'pending' ? `
-            <button class="btn btn-sm btn-gold" onclick="approveDeposit('${deposit._id}')">Approve</button>
-            <button class="btn btn-sm btn-danger" onclick="rejectDeposit('${deposit._id}')">Reject</button>
-          ` : '<span class="badge badge-info">Processed</span>'}
+          <button class="btn btn-sm btn-outline" onclick="openDepositDetails('${deposit._id}')">View Details</button>
         </td>
       </tr>
-    `).join('');
+      `;
+    }).join('');
   } catch (e) { console.error(e); }
 }
 
@@ -814,7 +854,9 @@ async function loadKYC() {
       return;
     }
 
-    tbody.innerHTML = pendingKYC.map(user => `
+    tbody.innerHTML = pendingKYC.map(user => {
+      window[`kycUser_${user._id}`] = user;
+      return `
       <tr>
         <td>
           <div class="user-row">
@@ -826,13 +868,13 @@ async function loadKYC() {
           </div>
         </td>
         <td><span class="badge badge-warning">${user.kycStatus}</span></td>
-        <td>${user.kyc.verificationDate ? new Date(user.kyc.verificationDate).toLocaleDateString() : 'Not set'}</td>
+        <td>${user.kyc && user.kyc.verificationDate ? new Date(user.kyc.verificationDate).toLocaleDateString() : 'Not set'}</td>
         <td>
-          <button class="btn btn-sm btn-gold" onclick="approveKYC('${user._id}')">Approve</button>
-          <button class="btn btn-sm btn-danger" onclick="rejectKYC('${user._id}')">Reject</button>
+          <button class="btn btn-sm btn-gold" onclick="openKYCDetails('${user._id}')">Review</button>
         </td>
       </tr>
-    `).join('');
+      `;
+    }).join('');
   } catch (e) { console.error(e); }
 }
 
@@ -902,6 +944,142 @@ function closeModal(modalId) {
   document.getElementById(modalId).classList.remove('show');
   selectedUserId = null;
   selectedUserName = null;
+}
+
+async function openUserProfile(userId) {
+  const content = document.getElementById('userProfileContent');
+  content.innerHTML = '<div style="text-align:center;padding:20px;">Loading profile...</div>';
+  document.getElementById('userProfileModal').classList.add('show');
+  
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`/api/admin/users/${userId}`, { headers: { 'Authorization': 'Bearer ' + token } });
+    if (!response.ok) throw new Error('Failed to fetch user');
+    const data = await response.json();
+    const user = data.user;
+    
+    selectedUserId = user._id;
+    const safeName = `${user.firstName} ${user.lastName}`.replace(/'/g, "\\'");
+    
+    // Get account info (assuming first account for simplicity)
+    const acc = (user.accounts && user.accounts.length > 0) ? user.accounts[0] : null;
+    const accStr = acc ? `${acc.accountType.toUpperCase()} - $${acc.balance.toLocaleString()}` : 'No accounts';
+    
+    content.innerHTML = `
+      <div style="margin-bottom:20px;border-bottom:1px solid #eee;padding-bottom:15px;">
+        <h3 style="margin-bottom:5px;">${user.firstName} ${user.lastName}</h3>
+        <p style="color:#666;font-size:14px;margin-bottom:5px;">${user.email} | ${user.phoneNumber || 'No phone'}</p>
+        <p style="color:#666;font-size:14px;margin-bottom:5px;">Account: <strong>${accStr}</strong></p>
+        <div style="display:flex;gap:10px;margin-top:10px;">
+          <span class="badge ${user.kycStatus === 'verified' ? 'badge-success' : 'badge-warning'}">KYC: ${user.kycStatus}</span>
+          <span class="badge ${user.accountStatus === 'active' ? 'badge-success' : 'badge-danger'}">Status: ${user.accountStatus}</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
+        <button class="btn btn-outline" onclick="openAddBalanceModal('${user._id}', '${safeName}')">Add Balance</button>
+        <button class="btn ${user.accountStatus === 'active' ? 'btn-danger' : 'btn-success'}" onclick="openFreezeModal('${user._id}', '${safeName}', '${user.accountStatus}')">${user.accountStatus === 'active' ? 'Freeze Account' : 'Unfreeze Account'}</button>
+        <button class="btn btn-outline" onclick="alert('View Transactions coming soon')">View Transactions</button>
+        <button class="btn btn-outline" onclick="openPremiumModal('${user._id}', '${safeName}', ${user.isPremium})">Manage Premium</button>
+      </div>
+    `;
+  } catch(e) {
+    content.innerHTML = `<div style="color:var(--danger);padding:20px;">Error: ${e.message}</div>`;
+  }
+}
+
+function openDepositDetails(depositId) {
+  const content = document.getElementById('depositDetailsContent');
+  const deposit = window[`deposit_${depositId}`];
+  if (!deposit) return alert('Deposit data missing');
+  
+  document.getElementById('depositDetailsTitle').textContent = `DEPOSIT #${depositId.substring(0,8).toUpperCase()}`;
+  document.getElementById('depositDetailsModal').classList.add('show');
+  
+  const isPending = deposit.status === 'pending';
+  const userName = deposit.userId ? (deposit.userId.email || 'Unknown') : 'Unknown';
+  
+  content.innerHTML = `
+    <div style="margin-bottom:15px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:15px;">
+        <div><strong>User:</strong><br>${userName}</div>
+        <div><strong>Amount:</strong><br>$${deposit.amount.toLocaleString()} ${deposit.currency || 'USD'}</div>
+        <div><strong>Method:</strong><br>${deposit.depositMethod.toUpperCase()}</div>
+        <div><strong>Reference:</strong><br>${deposit.referenceId || 'N/A'}</div>
+        <div><strong>Submitted:</strong><br>${new Date(deposit.createdAt).toLocaleString()}</div>
+        <div><strong>Status:</strong><br><span class="badge ${deposit.status === 'pending' ? 'badge-warning' : (deposit.status === 'approved' ? 'badge-success' : 'badge-danger')}">${deposit.status}</span></div>
+      </div>
+      <hr style="border:none;border-top:1px solid #eee;margin:15px 0;">
+      <div style="margin-bottom:15px;">
+        <strong>Proof of Payment:</strong>
+        <div style="margin-top:10px;text-align:center;background:#fafafa;padding:15px;border:1px solid #eee;border-radius:8px;">
+          ${deposit.hasScreenshot 
+            ? `<img src="/api/deposits/${depositId}/screenshot" style="max-width:100%;max-height:300px;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.1); cursor:pointer;" onclick="window.open(this.src, '_blank')" title="Click to enlarge" alt="Screenshot" onerror="this.outerHTML='<span style=\\'color:#999\\'>Image not available</span>'"/>` 
+            : `<span style="color:#999;font-style:italic;">No screenshot uploaded</span>`
+          }
+        </div>
+      </div>
+      
+      ${isPending ? `
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+          <button class="btn btn-danger" onclick="rejectDeposit('${depositId}');closeModal('depositDetailsModal')">Reject Deposit</button>
+          <button class="btn btn-gold" onclick="approveDeposit('${depositId}');closeModal('depositDetailsModal')">Approve Deposit</button>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function openKYCDetails(userId) {
+  const content = document.getElementById('kycDetailsContent');
+  const user = window[`kycUser_${userId}`];
+  if (!user) return alert('User data missing');
+  
+  document.getElementById('kycDetailsModal').classList.add('show');
+  
+  const kyc = user.kyc || {};
+  
+  content.innerHTML = `
+    <div style="margin-bottom:15px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:15px;">
+        <div><strong>Full Name:</strong><br>${user.firstName} ${user.lastName}</div>
+        <div><strong>Date of Birth:</strong><br>${kyc.dateOfBirth ? new Date(kyc.dateOfBirth).toLocaleDateString() : 'N/A'}</div>
+        <div><strong>Email:</strong><br>${user.email}</div>
+        <div><strong>Phone:</strong><br>${user.phoneNumber || 'N/A'}</div>
+        <div><strong>ID Type:</strong><br>${(kyc.idType || 'N/A').toUpperCase()}</div>
+        <div><strong>SSN:</strong><br>${kyc.ssn || 'N/A'}</div>
+      </div>
+      
+      <div style="margin-top:15px;">
+        <strong>Address Information:</strong>
+        <p style="margin-top:5px;background:#f9f9f9;padding:10px;border-radius:6px;font-size:14px;">
+          ${kyc.address || 'N/A'}<br>
+          ${kyc.city || ''}, ${kyc.state || ''} ${kyc.zipCode || ''}<br>
+          ${kyc.country || ''}
+        </p>
+      </div>
+
+      <div style="margin-top:15px;display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+        <div>
+          <strong>ID Document:</strong>
+          <div style="margin-top:10px;text-align:center;background:#fafafa;padding:15px;border:1px solid #eee;border-radius:8px;">
+            <span style="color:#999;font-style:italic;">No image provided</span>
+          </div>
+        </div>
+        <div>
+          <strong>Selfie:</strong>
+          <div style="margin-top:10px;text-align:center;background:#fafafa;padding:15px;border:1px solid #eee;border-radius:8px;">
+            <span style="color:#999;font-style:italic;">No image provided</span>
+          </div>
+        </div>
+      </div>
+      
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+        <button class="btn btn-outline" onclick="rejectKYC('${userId}');closeModal('kycDetailsModal')">Request Resubmission</button>
+        <button class="btn btn-danger" onclick="rejectKYC('${userId}');closeModal('kycDetailsModal')">Reject</button>
+        <button class="btn btn-gold" onclick="approveKYC('${userId}');closeModal('kycDetailsModal')">Approve</button>
+      </div>
+    </div>
+  `;
 }
 
 // Admin actions
