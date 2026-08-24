@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
   },
   accountStatus: {
     type: String,
-    enum: ['pending_kyc', 'active', 'suspended', 'terminated'],
+    enum: ['pending_kyc', 'active', 'suspended', 'terminated', 'frozen'],
     default: 'pending_kyc',
   },
   kycStatus: {
@@ -76,6 +76,13 @@ const userSchema = new mongoose.Schema({
   hasInitialFunding: {
     type: Boolean,
     default: false,
+  },
+  isPremium: {
+    type: Boolean,
+    default: false,
+  },
+  premiumSince: {
+    type: Date,
   },
   createdAt: {
     type: Date,

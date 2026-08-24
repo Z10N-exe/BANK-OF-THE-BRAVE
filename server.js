@@ -63,6 +63,7 @@ app.use('/api/loans', require('./routes/loans'));
 app.use('/api/cards', require('./routes/cards'));
 app.use('/api/deposits', require('./routes/deposits'));
 app.use('/api/withdrawals', require('./routes/withdrawals'));
+app.use('/api/notifications', require('./routes/notifications'));
 
 // Simple health check for debugging
 app.get('/health', (req, res) => {

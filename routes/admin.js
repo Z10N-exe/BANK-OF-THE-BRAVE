@@ -5,6 +5,8 @@ const Account = require('../models/Account');
 const Transaction = require('../models/Transaction');
 const Loan = require('../models/Loan');
 const AuditLog = require('../models/AuditLog');
+const Notification = require('../models/Notification');
+const Withdrawal = require('../models/Withdrawal');
 const { authenticateToken, authorizeRole, authorizeRoles } = require('../middleware/auth');
 const { body, validationResult } = require('express-validator');
 
@@ -605,6 +607,561 @@ router.post('/direct-deposit', authenticateToken, authorizeRole('admin'), [
     });
   } catch (error) {
     console.error('Direct deposit error:', error);
+    res.status(500).json({ error: 'Server error: ' + error.message });
+  }
+});
+
+// ============== ADMIN: CREATE CREDIT ACCOUNT ==============
+router.post('/create-credit-account', authenticateToken, authorizeRole('admin'), [
+  body('userId').isMongoId().withMessage('Valid user ID required'),
+  body('creditLimit').isNumeric().custom(v => v > 0).withMessage('Credit limit must be greater than 0'),
+  body('currency').optional().isIn(['USD', 'EUR', 'GBP', 'BTC']).withMessage('Valid currency required'),
+  body('notes').optional().isString(),
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { userId, creditLimit, currency, notes } = req.body;
+
+    // Verify user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Create credit account
+    const creditAccount = new Account({
+      userId,
+      accountType: 'credit',
+      currency: currency || 'USD',
+      balance: 0,
+      creditLimit: parseFloat(creditLimit),
+      accountStatus: 'active',
+      cardIssued: false,
+      cardType: 'none',
+      cardStatus: 'active',
+      dailySpendLimit: 5000,
+      atmLimit: 1000,
+      onlinePaymentsEnabled: true,
+    });
+
+    await creditAccount.save();
+
+    // Add to user's accounts
+    user.accounts.push(creditAccount._id);
+    await user.save();
+
+    // Audit log
+    await AuditLog.create({
+      adminId: req.user.id,
+      userId: userId,
+      action: `Created credit account with limit $${creditLimit}`,
+      actionType: 'account_creation',
+      resourceId: creditAccount._id,
+      resourceType: 'account',
+      ipAddress: req.ip,
+      status: 'success',
+      details: notes,
+    });
+
+    // Send notification to user
+    await Notification.create({
+      userId,
+      type: 'success',
+      title: 'Credit Account Created',
+      message: `Your credit account has been created with a limit of $${creditLimit}. You can now access credit facilities.`,
+      priority: 'high',
+      actionUrl: '/accounts',
+      actionLabel: 'View Accounts',
+      createdBy: req.user.id,
+    });
+
+    res.json({
+      message: 'Credit account created successfully',
+      account: creditAccount,
+    });
+  } catch (error) {
+    console.error('Create credit account error:', error);
+    res.status(500).json({ error: 'Server error: ' + error.message });
+  }
+});
+
+// ============== ADMIN: UPGRADE USER TO PREMIUM ==============
+router.post('/upgrade-premium', authenticateToken, authorizeRole('admin'), [
+  body('userId').isMongoId().withMessage('Valid user ID required'),
+  body('isPremium').isBoolean().withMessage('Premium status must be boolean'),
+  body('notes').optional().isString(),
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { userId, isPremium, notes } = req.body;
+
+    // Verify user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const previousStatus = user.isPremium;
+    user.isPremium = isPremium;
+    
+    if (isPremium && !user.premiumSince) {
+      user.premiumSince = new Date();
+    } else if (!isPremium) {
+      user.premiumSince = null;
+    }
+
+    await user.save();
+
+    // Audit log
+    await AuditLog.create({
+      adminId: req.user.id,
+      userId: userId,
+      action: `User premium status changed to ${isPremium}`,
+      actionType: 'user_upgrade',
+      resourceId: user._id,
+      resourceType: 'user',
+      changes: {
+        before: { isPremium: previousStatus },
+        after: { isPremium: user.isPremium },
+      },
+      ipAddress: req.ip,
+      status: 'success',
+      details: notes,
+    });
+
+    // Send notification to user
+    await Notification.create({
+      userId,
+      type: isPremium ? 'success' : 'info',
+      title: isPremium ? 'Premium Upgrade Activated' : 'Premium Status Removed',
+      message: isPremium 
+        ? 'Congratulations! Your account has been upgraded to Premium status. Enjoy exclusive benefits and features.'
+        : 'Your Premium status has been removed. Standard features and limits now apply.',
+      priority: 'high',
+      actionUrl: '/settings',
+      actionLabel: 'View Benefits',
+      createdBy: req.user.id,
+    });
+
+    res.json({
+      message: `User premium status ${isPremium ? 'upgraded' : 'downgraded'} successfully`,
+      user: {
+        id: user._id,
+        email: user.email,
+        isPremium: user.isPremium,
+        premiumSince: user.premiumSince,
+      },
+    });
+  } catch (error) {
+    console.error('Premium upgrade error:', error);
+    res.status(500).json({ error: 'Server error: ' + error.message });
+  }
+});
+
+// ============== ADMIN: MANAGE USER PAYMENT METHODS ==============
+router.post('/manage-payment-methods', authenticateToken, authorizeRole('admin'), [
+  body('userId').isMongoId().withMessage('Valid user ID required'),
+  body('accountId').isMongoId().withMessage('Valid account ID required'),
+  body('cashApp').optional().isBoolean(),
+  body('venmo').optional().isBoolean(),
+  body('bankTransfer').optional().isBoolean(),
+  body('notes').optional().isString(),
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { userId, accountId, cashApp, venmo, bankTransfer, notes } = req.body;
+
+    // Verify user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Verify account exists and belongs to user
+    const account = await Account.findById(accountId);
+    if (!account) {
+      return res.status(404).json({ error: 'Account not found' });
+    }
+
+    if (account.userId.toString() !== userId) {
+      return res.status(400).json({ error: 'Account does not belong to this user' });
+    }
+
+    const previousMethods = account.depositMethods || {};
+
+    // Update payment methods
+    if (cashApp !== undefined) account.depositMethods.cashApp = cashApp;
+    if (venmo !== undefined) account.depositMethods.venmo = venmo;
+    if (bankTransfer !== undefined) account.depositMethods.bankTransfer = bankTransfer;
+
+    await account.save();
+
+    // Audit log
+    await AuditLog.create({
+      adminId: req.user.id,
+      userId: userId,
+      action: 'Updated payment methods',
+      actionType: 'payment_method_update',
+      resourceId: accountId,
+      resourceType: 'account',
+      changes: {
+        before: { depositMethods: previousMethods },
+        after: { depositMethods: account.depositMethods },
+      },
+      ipAddress: req.ip,
+      status: 'success',
+      details: notes,
+    });
+
+    // Send notification to user
+    const enabledMethods = [];
+    if (account.depositMethods.cashApp) enabledMethods.push('CashApp');
+    if (account.depositMethods.venmo) enabledMethods.push('Venmo');
+    if (account.depositMethods.bankTransfer) enabledMethods.push('Bank Transfer');
+
+    await Notification.create({
+      userId,
+      type: 'info',
+      title: 'Payment Methods Updated',
+      message: `Your payment methods have been updated. Available methods: ${enabledMethods.join(', ') || 'None'}`,
+      priority: 'medium',
+      actionUrl: '/funding',
+      actionLabel: 'Manage Funding',
+      createdBy: req.user.id,
+    });
+
+    res.json({
+      message: 'Payment methods updated successfully',
+      account: {
+        id: account._id,
+        depositMethods: account.depositMethods,
+      },
+    });
+  } catch (error) {
+    console.error('Payment methods error:', error);
+    res.status(500).json({ error: 'Server error: ' + error.message });
+  }
+});
+
+// ============== ADMIN: SEND NOTIFICATION TO USER ==============
+router.post('/send-notification', authenticateToken, authorizeRole('admin'), [
+  body('userId').isMongoId().withMessage('Valid user ID required'),
+  body('type').isIn(['info', 'success', 'warning', 'error', 'system', 'account', 'transaction', 'kyc', 'security']).withMessage('Valid notification type required'),
+  body('title').isString().notEmpty().withMessage('Title required'),
+  body('message').isString().notEmpty().withMessage('Message required'),
+  body('priority').optional().isIn(['low', 'medium', 'high', 'urgent']).withMessage('Valid priority required'),
+  body('actionUrl').optional().isString(),
+  body('actionLabel').optional().isString(),
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { userId, type, title, message, priority, actionUrl, actionLabel } = req.body;
+
+    // Verify user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Create notification
+    const notification = new Notification({
+      userId,
+      type,
+      title,
+      message,
+      priority: priority || 'medium',
+      actionUrl,
+      actionLabel,
+      createdBy: req.user.id,
+    });
+
+    await notification.save();
+
+    // Audit log
+    await AuditLog.create({
+      adminId: req.user.id,
+      userId: userId,
+      action: `Sent notification: ${title}`,
+      actionType: 'notification_sent',
+      resourceId: notification._id,
+      resourceType: 'notification',
+      ipAddress: req.ip,
+      status: 'success',
+      details: { type, title, message },
+    });
+
+    res.json({
+      message: 'Notification sent successfully',
+      notification,
+    });
+  } catch (error) {
+    console.error('Send notification error:', error);
+    res.status(500).json({ error: 'Server error: ' + error.message });
+  }
+});
+
+// ============== ADMIN: GET ALL ACCOUNTS WITH BALANCES ==============
+router.get('/accounts/all', authenticateToken, authorizeRole('admin'), async (req, res) => {
+  try {
+    const { status, accountType, limit = 100, skip = 0 } = req.query;
+
+    const filters = {};
+    if (status) filters.accountStatus = status;
+    if (accountType) filters.accountType = accountType;
+
+    const accounts = await Account.find(filters)
+      .populate('userId', 'email firstName lastName role accountStatus')
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit))
+      .skip(parseInt(skip));
+
+    const total = await Account.countDocuments(filters);
+
+    res.json({
+      total,
+      accounts,
+      limit: parseInt(limit),
+      skip: parseInt(skip),
+    });
+  } catch (error) {
+    console.error('Get accounts error:', error);
+    res.status(500).json({ error: 'Server error: ' + error.message });
+  }
+});
+
+// ============== ADMIN: FREEZE ACCOUNT ==============
+router.post('/freeze-account', authenticateToken, authorizeRole('admin'), [
+  body('userId').isMongoId().withMessage('Valid user ID required'),
+  body('accountId').optional().isMongoId().withMessage('Valid account ID required'),
+  body('freeze').isBoolean().withMessage('Freeze status must be boolean'),
+  body('reason').isString().notEmpty().withMessage('Reason required'),
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { userId, accountId, freeze, reason } = req.body;
+
+    // Verify user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const previousUserStatus = user.accountStatus;
+    
+    // Freeze/unfreeze user account
+    if (freeze) {
+      user.accountStatus = 'frozen';
+    } else {
+      if (user.accountStatus === 'frozen') {
+        user.accountStatus = 'active';
+      }
+    }
+    await user.save();
+
+    // If specific account provided, freeze/unfreeze it too
+    let account = null;
+    if (accountId) {
+      account = await Account.findById(accountId);
+      if (account && account.userId.toString() === userId) {
+        const previousAccountStatus = account.accountStatus;
+        account.accountStatus = freeze ? 'frozen' : 'active';
+        await account.save();
+
+        // Audit log for account
+        await AuditLog.create({
+          adminId: req.user.id,
+          userId: userId,
+          action: `Account ${freeze ? 'frozen' : 'unfrozen'}`,
+          actionType: 'account_freeze',
+          resourceId: accountId,
+          resourceType: 'account',
+          changes: {
+            before: { accountStatus: previousAccountStatus },
+            after: { accountStatus: account.accountStatus },
+          },
+          ipAddress: req.ip,
+          status: 'success',
+          details: reason,
+        });
+      }
+    }
+
+    // Audit log for user
+    await AuditLog.create({
+      adminId: req.user.id,
+      userId: userId,
+      action: `User account ${freeze ? 'frozen' : 'unfrozen'}`,
+      actionType: 'account_freeze',
+      resourceId: user._id,
+      resourceType: 'user',
+      changes: {
+        before: { accountStatus: previousUserStatus },
+        after: { accountStatus: user.accountStatus },
+      },
+      ipAddress: req.ip,
+      status: 'success',
+      details: reason,
+    });
+
+    // Send notification to user
+    await Notification.create({
+      userId,
+      type: freeze ? 'error' : 'success',
+      title: freeze ? 'Account Frozen' : 'Account Unfrozen',
+      message: freeze 
+        ? `Your account has been frozen. Reason: ${reason}. Please contact support for assistance.`
+        : 'Your account has been unfrozen. You can now access all services.',
+      priority: 'urgent',
+      actionUrl: '/dashboard',
+      actionLabel: 'View Dashboard',
+      createdBy: req.user.id,
+    });
+
+    res.json({
+      message: `User account ${freeze ? 'frozen' : 'unfrozen'} successfully`,
+      user: {
+        id: user._id,
+        email: user.email,
+        accountStatus: user.accountStatus,
+      },
+      account: account ? {
+        id: account._id,
+        accountStatus: account.accountStatus,
+      } : null,
+    });
+  } catch (error) {
+    console.error('Freeze account error:', error);
+    res.status(500).json({ error: 'Server error: ' + error.message });
+  }
+});
+
+// ============== ADMIN: APPROVE WITHDRAWAL ==============
+router.post('/approve-withdrawal', authenticateToken, authorizeRole('admin'), [
+  body('withdrawalId').isMongoId().withMessage('Valid withdrawal ID required'),
+  body('action').isIn(['approve', 'reject']).withMessage('Action must be approve or reject'),
+  body('adminNotes').optional().isString(),
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { withdrawalId, action, adminNotes } = req.body;
+
+    const withdrawal = await Withdrawal.findById(withdrawalId);
+    if (!withdrawal) {
+      return res.status(404).json({ error: 'Withdrawal not found' });
+    }
+
+    if (withdrawal.status !== 'pending') {
+      return res.status(400).json({ error: 'Withdrawal already processed' });
+    }
+
+    const account = await Account.findById(withdrawal.accountId);
+    if (!account) {
+      return res.status(404).json({ error: 'Account not found' });
+    }
+
+    if (action === 'approve') {
+      withdrawal.status = 'completed';
+      withdrawal.approvedBy = req.user.id;
+      withdrawal.approvedAt = new Date();
+      withdrawal.completedAt = new Date();
+      if (adminNotes) withdrawal.adminNotes = adminNotes;
+
+      // Create transaction record
+      await Transaction.create({
+        fromAccountId: withdrawal.accountId,
+        toAccountId: null,
+        amount: withdrawal.amount,
+        currency: withdrawal.currency,
+        transactionType: 'withdrawal',
+        description: `${withdrawal.withdrawalMethod.toUpperCase()} Withdrawal`,
+        status: 'completed',
+        fee: 0,
+        exchangeRate: 1,
+      });
+
+      // Send notification to user
+      await Notification.create({
+        userId: withdrawal.userId,
+        type: 'success',
+        title: 'Withdrawal Approved',
+        message: `Your withdrawal of $${withdrawal.amount} via ${withdrawal.withdrawalMethod} has been approved and processed.`,
+        priority: 'high',
+        actionUrl: '/transactions',
+        actionLabel: 'View Transactions',
+        createdBy: req.user.id,
+      });
+    } else {
+      // Reject - refund to account
+      withdrawal.status = 'rejected';
+      withdrawal.rejectedBy = req.user.id;
+      withdrawal.rejectedAt = new Date();
+      withdrawal.rejectionReason = adminNotes || 'Rejected by admin';
+      withdrawal.refundedAmount = withdrawal.amount;
+      withdrawal.refundedAt = new Date();
+
+      // Refund to account
+      account.balance += withdrawal.amount;
+      await account.save();
+
+      // Send notification to user
+      await Notification.create({
+        userId: withdrawal.userId,
+        type: 'error',
+        title: 'Withdrawal Rejected',
+        message: `Your withdrawal of $${withdrawal.amount} has been rejected. Reason: ${withdrawal.rejectionReason}. Funds have been refunded to your account.`,
+        priority: 'high',
+        actionUrl: '/transactions',
+        actionLabel: 'View Transactions',
+        createdBy: req.user.id,
+      });
+    }
+
+    await withdrawal.save();
+
+    // Audit log
+    await AuditLog.create({
+      adminId: req.user.id,
+      userId: withdrawal.userId,
+      action: `Withdrawal ${action}ed`,
+      actionType: 'withdrawal_approval',
+      resourceId: withdrawalId,
+      resourceType: 'withdrawal',
+      ipAddress: req.ip,
+      status: 'success',
+      details: adminNotes,
+    });
+
+    res.json({
+      message: `Withdrawal ${action}ed successfully`,
+      withdrawal,
+      accountBalance: account.balance,
+    });
+  } catch (error) {
+    console.error('Approve withdrawal error:', error);
     res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });

@@ -8,7 +8,7 @@ const accountSchema = new mongoose.Schema({
   },
   accountType: {
     type: String,
-    enum: ['checking', 'savings', 'investment', 'loan'],
+    enum: ['checking', 'savings', 'investment', 'loan', 'credit'],
     default: 'checking',
   },
   currency: {
@@ -17,6 +17,10 @@ const accountSchema = new mongoose.Schema({
     default: 'USD',
   },
   balance: {
+    type: Number,
+    default: 0,
+  },
+  creditLimit: {
     type: Number,
     default: 0,
   },
@@ -33,6 +37,11 @@ const accountSchema = new mongoose.Schema({
     default: 'none',
   },
   cardStatus: {
+    type: String,
+    enum: ['active', 'frozen', 'terminated'],
+    default: 'active',
+  },
+  accountStatus: {
     type: String,
     enum: ['active', 'frozen', 'terminated'],
     default: 'active',
