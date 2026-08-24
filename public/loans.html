@@ -216,7 +216,7 @@
       <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       Dashboard
     </a>
-    <a href="/accounts.html" class="sidebar-link active">
+    <a href="/accounts.html" class="sidebar-link">
       <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
       Accounts
     </a>
@@ -232,7 +232,7 @@
       <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       Deposit / Withdraw
     </a>
-    <a href="/loans.html" class="sidebar-link">
+    <a href="/loans.html" class="sidebar-link active">
       <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
       Loans
     </a>
@@ -266,7 +266,7 @@
       <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Menu">
         <span></span><span></span><span></span>
       </button>
-      <span class="topbar-title">My Accounts</span>
+      <span class="topbar-title">Loans & Credit</span>
     </div>
     <div class="topbar-right">
       <span class="topbar-badge">Private Banking</span>
@@ -309,9 +309,9 @@
   </style>
 
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('active')">Active Loans</button>
-    <button class="tab" onclick="switchTab('pending')">Pending Applications</button>
-    <button class="tab" onclick="switchTab('apply')">Apply for Loan</button>
+    <button class="tab active" onclick="switchTab('active', event)">Active Loans</button>
+    <button class="tab" onclick="switchTab('pending', event)">Pending Applications</button>
+    <button class="tab" onclick="switchTab('apply', event)">Apply for Loan</button>
   </div>
 
   <div id="activeTab" class="tab-content active">
@@ -447,11 +447,11 @@
     const API_URL = '/api';
     let idMeVerified = false;
 
-    function switchTab(tab) {
+    function switchTab(tab, event) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       
-      event.target.classList.add('active');
+      if (event) event.target.classList.add('active');
       document.getElementById(tab + 'Tab').classList.add('active');
 
       if (tab === 'active') loadActiveLoans();
@@ -466,7 +466,16 @@
         const data = await response.json();
         const loans = data.loans.filter(l => l.status === 'active') || [];
         const grid = document.getElementById('activeLoansGrid');
-        if (loans.length === 0) return;
+        
+        if (loans.length === 0) {
+          grid.innerHTML = `
+            <div class="empty-state" style="grid-column: 1/-1;">
+              <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <h3>No active loans</h3>
+              <p>You do not have any active loans at this time.</p>
+            </div>`;
+          return;
+        }
 
         grid.innerHTML = loans.map(loan => {
           const progressPercent = ((loan.amount - loan.remainingBalance) / loan.amount * 100).toFixed(0);
@@ -499,7 +508,16 @@
         const data = await response.json();
         const loans = data.loans.filter(l => l.status === 'pending') || [];
         const grid = document.getElementById('pendingLoansGrid');
-        if (loans.length === 0) return;
+        
+        if (loans.length === 0) {
+          grid.innerHTML = `
+            <div class="empty-state" style="grid-column: 1/-1;">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+              <h3>No pending applications</h3>
+              <p>You have no loan applications under review.</p>
+            </div>`;
+          return;
+        }
 
         grid.innerHTML = loans.map(loan => `
           <div class="loan-card">
@@ -539,6 +557,12 @@
       const standardSection = document.getElementById('standardLoanFields');
       const irsSection = document.getElementById('irsSection');
       const previewBox = document.getElementById('loanPreviewBox');
+
+      // Update interest rate based on loan type
+      let rate = 12.5;
+      if (type === 'collateralized') rate = 8.5;
+      else if (type === 'irs_advance') rate = 0;
+      document.getElementById('previewRate').textContent = rate;
 
       if (type === 'irs_advance') {
         standardSection.style.display = 'none';
@@ -593,32 +617,59 @@
         const acc = document.getElementById('irsDisbursementAccount').value;
         if (!acc) return alert('Please select a disbursement account.');
         
-        // Mock successful submission for IRS advance
+        const loanData = {
+          loanType: type,
+          amount: parseFloat(document.getElementById('irsRefundAmount').value),
+          term: 6, // IRS advances typically shorter term
+          disbursementAccountId: acc,
+        };
+
         showLoader();
-        setTimeout(() => {
+        try {
+          const response = await fetch('/api/loans/apply', {
+            method: 'POST',
+            headers: { 
+              'Authorization': 'Bearer ' + token,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(loanData)
+          });
+
           hideLoader();
-          alert('IRS Tax Refund Advance application submitted successfully!');
-          resetLoanForm();
-          switchTab('pending');
-        }, 1000);
+          const data = await response.json();
+          if (response.ok) {
+            alert('IRS Tax Refund Advance application submitted successfully!');
+            resetLoanForm();
+            switchTab('pending', null);
+          } else {
+            alert(data.error || 'Error submitting application');
+          }
+        } catch (error) {
+          hideLoader();
+          alert('Error: ' + error.message);
+        }
         return;
       }
 
       try {
-        const formData = new FormData();
-        formData.append('loanType', type);
-        formData.append('amount', parseFloat(document.getElementById('loanAmount').value));
-        formData.append('term', parseInt(document.getElementById('loanTerm').value));
-        formData.append('disbursementAccountId', document.getElementById('disbursementAccount').value);
+        const loanData = {
+          loanType: type,
+          amount: parseFloat(document.getElementById('loanAmount').value),
+          term: parseInt(document.getElementById('loanTerm').value),
+          disbursementAccountId: document.getElementById('disbursementAccount').value,
+        };
         if (type === 'collateralized') {
-          formData.append('linkedCreditCardId', document.getElementById('linkedCard').value);
+          loanData.linkedCreditCardId = document.getElementById('linkedCard').value;
         }
 
         showLoader();
         const response = await fetch('/api/loans/apply', {
           method: 'POST',
-          headers: { 'Authorization': 'Bearer ' + token },
-          body: formData // Using formData since the original endpoint expects it
+          headers: { 
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(loanData)
         });
 
         hideLoader();
@@ -626,7 +677,7 @@
         if (response.ok) {
           alert('Loan application submitted successfully!');
           resetLoanForm();
-          switchTab('pending');
+          switchTab('pending', null);
         } else {
           alert(data.error || 'Error submitting application');
         }
@@ -676,30 +727,14 @@
     document.getElementById('mobileOverlay').classList.remove('show');
   }
 
+// Initialize loans page
 (async () => {
   const tok = localStorage.getItem('token');
   showLoader();
   try {
-    const r = await fetch('/api/accounts', { headers: { Authorization: 'Bearer ' + tok } });
-    if (r.ok) {
-      const d = await r.json();
-      const accs = d.accounts || [];
-      const el = document.getElementById('accountsList');
-      if (accs.length === 0) return;
-      el.innerHTML = accs.map(a => `
-        <div class="account-card">
-          <div>
-            <div class="account-type">${a.currency || 'USD'} Account</div>
-            <div class="account-number">**** **** ${(a.accountNumber||'').slice(-4) || '0000'}</div>
-            <div class="account-balance">$${(a.balance||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
-            <div class="account-currency">${a.currency || 'USD'} • <span class="badge badge-success">Active</span></div>
-          </div>
-          <div class="account-actions">
-            <a href="/transfers.html" class="btn btn-gold" style="font-size:13px;padding:10px 18px;">Transfer</a>
-            <a href="/funding.html" class="btn btn-outline" style="font-size:13px;padding:10px 18px;">Deposit</a>
-          </div>
-        </div>`).join('');
-    }
+    // Load active loans on page load
+    await loadActiveLoans();
+    await loadPendingLoans();
   } catch(e) { console.error(e); }
   hideLoader();
 })();

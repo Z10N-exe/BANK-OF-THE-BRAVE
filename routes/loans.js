@@ -62,16 +62,6 @@ router.post('/apply', authenticateToken, [
   }
 });
 
-// Get single loan
-router.get('/:loanId', authenticateToken, async (req, res) => {
-  try {
-    const loan = await Loan.findById(req.params.loanId);
-    if (!loan) return res.status(404).json({ error: 'Loan not found' });
-    if (loan.userId.toString() !== req.user.id && req.user.role !== 'admin') return res.status(403).json({ error: 'Access denied' });
-    res.json({ loan });
-  } catch (error) { res.status(500).json({ error: 'Server error: ' + error.message }); }
-});
-
 // Admin: get all loans
 router.get('/admin/all', authenticateToken, authorizeRoles(['admin']), async (req, res) => {
   try {
@@ -80,6 +70,16 @@ router.get('/admin/all', authenticateToken, authorizeRoles(['admin']), async (re
     if (status) filters.status = status;
     const loans = await Loan.find(filters).populate('userId','email firstName lastName').sort({ createdAt: -1 });
     res.json({ total: loans.length, loans });
+  } catch (error) { res.status(500).json({ error: 'Server error: ' + error.message }); }
+});
+
+// Get single loan
+router.get('/:loanId', authenticateToken, async (req, res) => {
+  try {
+    const loan = await Loan.findById(req.params.loanId);
+    if (!loan) return res.status(404).json({ error: 'Loan not found' });
+    if (loan.userId.toString() !== req.user.id && req.user.role !== 'admin') return res.status(403).json({ error: 'Access denied' });
+    res.json({ loan });
   } catch (error) { res.status(500).json({ error: 'Server error: ' + error.message }); }
 });
 
