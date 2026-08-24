@@ -678,7 +678,10 @@ async function loadUsers() {
       return;
     }
 
-    tbody.innerHTML = data.users.map(user => `
+    tbody.innerHTML = data.users.map(user => {
+      const userName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+      const safeUserName = userName.replace(/'/g, "\\'");
+      return `
       <tr>
         <td>
           <div class="user-row">
@@ -695,13 +698,14 @@ async function loadUsers() {
         <td><span class="badge ${user.kycStatus === 'verified' ? 'badge-success' : user.kycStatus === 'pending' ? 'badge-warning' : 'badge-danger'}">${user.kycStatus}</span></td>
         <td><span class="badge ${user.isPremium ? 'badge-gold' : 'badge-info'}">${user.isPremium ? 'Yes' : 'No'}</span></td>
         <td>
-          <button class="btn btn-sm btn-gold" onclick="openAddBalanceModal('${user._id}', '${user.firstName} ${user.lastName}')">Add Balance</button>
-          <button class="btn btn-sm btn-outline" onclick="openPremiumModal('${user._id}', '${user.firstName} ${user.lastName}', ${user.isPremium})">Premium</button>
-          <button class="btn btn-sm btn-outline" onclick="openFreezeModal('${user._id}', '${user.firstName} ${user.lastName}', '${user.accountStatus}')">Freeze</button>
-          <button class="btn btn-sm btn-gold" onclick="openCreditModal('${user._id}', '${user.firstName} ${user.lastName}')">Credit</button>
+          <button class="btn btn-sm btn-gold" onclick="openAddBalanceModal('${user._id}', '${safeUserName}')">Add Balance</button>
+          <button class="btn btn-sm btn-outline" onclick="openPremiumModal('${user._id}', '${safeUserName}', ${user.isPremium})">Premium</button>
+          <button class="btn btn-sm btn-outline" onclick="openFreezeModal('${user._id}', '${safeUserName}', '${user.accountStatus}')">Freeze</button>
+          <button class="btn btn-sm btn-gold" onclick="openCreditModal('${user._id}', '${safeUserName}')">Credit</button>
         </td>
       </tr>
-    `).join('');
+    `;
+    }).join('');
   } catch (e) { console.error(e); }
 }
 
