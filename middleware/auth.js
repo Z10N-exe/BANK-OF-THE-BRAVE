@@ -17,18 +17,33 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
+// Variadic form: authorizeRole('admin', 'compliance')
 const authorizeRole = (...allowedRoles) => {
+  // Flatten in case an array is passed: authorizeRoles(['admin'])
+  const flat = allowedRoles.flat();
   return (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({ error: 'User not authenticated' });
     }
-
-    if (!allowedRoles.includes(req.user.role)) {
+    if (!flat.includes(req.user.role)) {
       return res.status(403).json({ error: 'Insufficient permissions' });
     }
-
     next();
   };
 };
 
-module.exports = { authenticateToken, authorizeRole, authorizeRoles: authorizeRole };
+// authorizeRoles(['admin']) OR authorizeRoles('admin') — both work
+const authorizeRoles = (rolesOrFirst, ...rest) => {
+  const flat = [].concat(rolesOrFirst, ...rest).flat();
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+    if (!flat.includes(req.user.role)) {
+      return res.status(403).json({ error: 'Insufficient permissions' });
+    }
+    next();
+  };
+};
+
+module.exports = { authenticateToken, authorizeRole, authorizeRoles };

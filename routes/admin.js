@@ -31,20 +31,26 @@ router.get('/users/:userId', authenticateToken, authorizeRole('admin', 'complian
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Log access
-    await AuditLog.create({
-      adminId: req.user.id,
-      userId: req.params.userId,
-      action: `Viewed user details`,
-      actionType: 'data_access',
-      resourceId: user._id,
-      resourceType: 'user',
-      ipAddress: req.ip,
-      status: 'success',
-    });
+    // Log access (non-fatal — don't let a log failure break the response)
+    try {
+      await AuditLog.create({
+        adminId: req.user.id || null,
+        userId: req.params.userId,
+        action: 'Viewed user details',
+        actionType: 'data_access',
+        resourceId: user._id,
+        resourceType: 'user',
+        ipAddress: req.ip,
+        status: 'success',
+      });
+    } catch (logErr) { /* silently ignore audit log failures */ }
 
-    res.json({ user });
+    // Also fetch accounts separately so populate always works
+    const accounts = await Account.find({ userId: user._id });
+
+    res.json({ user, accounts });
   } catch (error) {
+    console.error('Get user error:', error);
     res.status(500).json({ error: 'Server error: ' + error.message });
   }
 });

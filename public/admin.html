@@ -1035,36 +1035,42 @@ async function openUserProfile(userId) {
   try {
     const token = localStorage.getItem('token');
     const response = await fetch(`/api/admin/users/${userId}`, { headers: { 'Authorization': 'Bearer ' + token } });
-    if (!response.ok) throw new Error('Failed to fetch user');
+    if (!response.ok) {
+      const errData = await response.json();
+      throw new Error(errData.error || 'Failed to fetch user');
+    }
     const data = await response.json();
     const user = data.user;
+    const accounts = data.accounts || user.accounts || [];
     
     selectedUserId = user._id;
     const safeName = `${user.firstName} ${user.lastName}`.replace(/'/g, "\\'");
     
-    // Get account info (assuming first account for simplicity)
-    const acc = (user.accounts && user.accounts.length > 0) ? user.accounts[0] : null;
-    const accStr = acc ? `${acc.accountType.toUpperCase()} - $${acc.balance.toLocaleString()}` : 'No accounts';
+    const phone = user.phone || user.phoneNumber || 'No phone';
+    const accStr = accounts.length > 0
+      ? accounts.map(a => `${(a.accountType||'').toUpperCase()} — $${(a.balance||0).toLocaleString()}`).join('<br>')
+      : 'No accounts found';
     
     content.innerHTML = `
       <div style="margin-bottom:20px;border-bottom:1px solid #eee;padding-bottom:15px;">
         <h3 style="margin-bottom:5px;">${user.firstName} ${user.lastName}</h3>
-        <p style="color:#666;font-size:14px;margin-bottom:5px;">${user.email} | ${user.phoneNumber || 'No phone'}</p>
-        <p style="color:#666;font-size:14px;margin-bottom:5px;">Account: <strong>${accStr}</strong></p>
-        <div style="display:flex;gap:10px;margin-top:10px;">
+        <p style="color:#666;font-size:14px;margin-bottom:5px;">${user.email} | ${phone}</p>
+        <p style="color:#666;font-size:14px;margin-bottom:10px;">Account(s): <strong>${accStr}</strong></p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
           <span class="badge ${user.kycStatus === 'verified' ? 'badge-success' : 'badge-warning'}">KYC: ${user.kycStatus}</span>
           <span class="badge ${user.accountStatus === 'active' ? 'badge-success' : 'badge-danger'}">Status: ${user.accountStatus}</span>
+          <span class="badge ${user.isPremium ? 'badge-gold' : 'badge-info'}">${user.isPremium ? 'Premium' : 'Standard'}</span>
         </div>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
         <button class="btn btn-outline" onclick="openAddBalanceModal('${user._id}', '${safeName}')">Add Balance</button>
-        <button class="btn ${user.accountStatus === 'active' ? 'btn-danger' : 'btn-success'}" onclick="openFreezeModal('${user._id}', '${safeName}', '${user.accountStatus}')">${user.accountStatus === 'active' ? 'Freeze Account' : 'Unfreeze Account'}</button>
-        <button class="btn btn-outline" onclick="alert('View Transactions coming soon')">View Transactions</button>
+        <button class="btn ${user.accountStatus === 'active' ? 'btn-danger' : 'btn-gold'}" onclick="openFreezeModal('${user._id}', '${safeName}', '${user.accountStatus}')">${user.accountStatus === 'active' ? 'Freeze Account' : 'Unfreeze Account'}</button>
         <button class="btn btn-outline" onclick="openPremiumModal('${user._id}', '${safeName}', ${user.isPremium})">Manage Premium</button>
+        <button class="btn btn-outline" onclick="openCreditModal('${user._id}', '${safeName}')">Add Credit Acct</button>
       </div>
     `;
   } catch(e) {
-    content.innerHTML = `<div style="color:var(--danger);padding:20px;">Error: ${e.message}</div>`;
+    content.innerHTML = `<div style="color:var(--danger);padding:20px;">Error loading profile: ${e.message}</div>`;
   }
 }
 
