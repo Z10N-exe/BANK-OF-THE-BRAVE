@@ -1178,4 +1178,29 @@ router.post('/approve-withdrawal', authenticateToken, authorizeRole('admin'), [
   }
 });
 
+// ============== ADMIN: UPDATE DEPOSIT SETTINGS (INSTRUCTIONS) ==============
+router.put('/deposit-settings', authenticateToken, authorizeRole('admin'), async (req, res) => {
+  try {
+    const DepositSettings = require('../models/DepositSettings');
+    let settings = await DepositSettings.findOne();
+    if (!settings) {
+      settings = new DepositSettings();
+    }
+    
+    const { depositMethods } = req.body;
+    if (depositMethods) {
+      settings.depositMethods = depositMethods;
+    }
+    
+    settings.updatedBy = req.user.id;
+    settings.updatedAt = new Date();
+    await settings.save();
+    
+    res.json({ message: 'Deposit settings updated successfully', settings });
+  } catch (error) {
+    console.error('Update deposit settings error:', error);
+    res.status(500).json({ error: 'Server error: ' + error.message });
+  }
+});
+
 module.exports = router;

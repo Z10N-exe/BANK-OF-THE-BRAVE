@@ -321,6 +321,7 @@
     <button class="tab" onclick="switchTab('deposits', event)">Deposits</button>
     <button class="tab" onclick="switchTab('withdrawals', event)">Withdrawals</button>
     <button class="tab" onclick="switchTab('kyc', event)">KYC</button>
+    <button class="tab" onclick="switchTab('settings', event)">Payment Settings</button>
   </div>
 
   <div id="usersTab" class="tab-content active">
@@ -480,6 +481,24 @@
             <tr><td colspan="4" style="text-align:center;color:#999;">Loading KYC applications...</td></tr>
           </tbody>
         </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="settingsTab" class="tab-content">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Payment Instructions</div>
+          <div class="card-subtitle">Set where users should send their deposits</div>
+        </div>
+        <button class="btn btn-gold" onclick="savePaymentSettings()">
+          <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Save Settings
+        </button>
+      </div>
+      <div id="settingsFormContainer" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <!-- Settings loaded via JS -->
       </div>
     </div>
   </div>
@@ -669,6 +688,68 @@ function switchTab(tab, event) {
   else if (tab === 'deposits') loadDeposits();
   else if (tab === 'withdrawals') loadWithdrawals();
   else if (tab === 'kyc') loadKYC();
+  else if (tab === 'settings') loadSettings();
+}
+
+let currentDepositSettings = null;
+
+async function loadSettings() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('/api/deposits/settings', { headers: { 'Authorization': 'Bearer ' + token } });
+    const data = await response.json();
+    currentDepositSettings = data.depositMethods || {};
+    
+    const container = document.getElementById('settingsFormContainer');
+    container.innerHTML = Object.keys(currentDepositSettings).map(method => {
+      const info = currentDepositSettings[method];
+      const title = method.replace('_', ' ').toUpperCase();
+      return `
+        <div style="background:#f9f9f9;padding:15px;border-radius:10px;border:1px solid #eee;">
+          <h4 style="margin-bottom:10px;color:var(--navy);">${title}</h4>
+          <div class="form-group" style="margin-bottom:10px;">
+            <label class="form-label" style="display:flex;align-items:center;gap:8px;">
+              <input type="checkbox" id="enable_${method}" ${info.enabled ? 'checked' : ''}>
+              Enabled
+            </label>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Payment Instructions (Shown to user)</label>
+            <input type="text" class="form-control" id="instr_${method}" value="${info.paymentInstructions || ''}" placeholder="e.g. $AdminCashApp">
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (e) { console.error(e); }
+}
+
+async function savePaymentSettings() {
+  try {
+    if (!currentDepositSettings) return;
+    
+    const methods = Object.keys(currentDepositSettings);
+    methods.forEach(method => {
+      currentDepositSettings[method].enabled = document.getElementById(`enable_${method}`).checked;
+      currentDepositSettings[method].paymentInstructions = document.getElementById(`instr_${method}`).value;
+    });
+    
+    const token = localStorage.getItem('token');
+    const response = await fetch('/api/admin/deposit-settings', {
+      method: 'PUT',
+      headers: { 
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ depositMethods: currentDepositSettings })
+    });
+    
+    if (response.ok) {
+      alert('Payment settings saved successfully!');
+    } else {
+      const data = await response.json();
+      alert(data.error || 'Failed to save settings');
+    }
+  } catch(e) { alert('Error: ' + e.message); }
 }
 
 async function loadStats() {

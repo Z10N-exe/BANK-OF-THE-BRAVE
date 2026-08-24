@@ -296,7 +296,7 @@
       </div>
       <div class="form-group">
         <label class="form-label">Payment Method</label>
-        <select class="form-control" id="depositMethod">
+        <select class="form-control" id="depositMethod" onchange="updatePaymentInstructions()">
           <option value="bank_transfer">Bank Transfer</option>
           <option value="wire_transfer">Wire Transfer</option>
           <option value="cashapp">CashApp</option>
@@ -306,6 +306,12 @@
           <option value="crypto">Cryptocurrency</option>
         </select>
       </div>
+      
+      <div id="paymentInstructionsBox" style="display:none; background:#f4f7fa; padding:16px; border-left:4px solid var(--gold); border-radius:4px; margin-bottom:20px; font-size:14px; color:var(--navy); line-height:1.5;">
+        <strong>How to pay:</strong><br>
+        <span id="paymentInstructionsText">Loading instructions...</span>
+      </div>
+      
       <div class="form-group">
         <label class="form-label">Reference / Transaction ID</label>
         <input type="text" class="form-control" id="depositRef" placeholder="Optional reference">
@@ -389,19 +395,52 @@ function showTab(tab,btn){
   document.querySelectorAll('.funding-tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
 }
+let cachedDepositSettings = {};
+
+function updatePaymentInstructions() {
+  const method = document.getElementById('depositMethod').value;
+  const box = document.getElementById('paymentInstructionsBox');
+  const textEl = document.getElementById('paymentInstructionsText');
+  
+  if (cachedDepositSettings[method]) {
+    const info = cachedDepositSettings[method];
+    if (info.enabled) {
+      box.style.display = 'block';
+      textEl.textContent = info.paymentInstructions || 'Please contact support for payment details.';
+    } else {
+      box.style.display = 'block';
+      textEl.innerHTML = '<span style="color:var(--danger)">This payment method is currently disabled.</span>';
+    }
+  } else {
+    box.style.display = 'none';
+  }
+}
+
 (async () => {
   const tok = localStorage.getItem('token');
   showLoader();
   try {
-    const r = await fetch('/api/accounts', { headers: { Authorization: 'Bearer ' + tok } });
-    if (r.ok) {
-      const d = await r.json();
+    const [accRes, setRes] = await Promise.all([
+      fetch('/api/accounts', { headers: { Authorization: 'Bearer ' + tok } }),
+      fetch('/api/deposits/settings', { headers: { Authorization: 'Bearer ' + tok } })
+    ]);
+    
+    if (accRes.ok) {
+      const d = await accRes.json();
       const accs = d.accounts || [];
       const opts = accs.map(a => `<option value="${a._id}">${a.currency} — $${(a.balance||0).toFixed(2)}</option>`).join('');
       document.getElementById('depositAccount').innerHTML = opts;
       document.getElementById('withdrawAccount').innerHTML = opts;
     }
-  } catch(e) {}
+    
+    if (setRes.ok) {
+      const setD = await setRes.json();
+      if (setD.depositMethods) {
+        cachedDepositSettings = setD.depositMethods;
+        updatePaymentInstructions();
+      }
+    }
+  } catch(e) { console.error(e); }
   hideLoader();
 })();
 function showFundAlert(id,msg,type){const a=document.getElementById(id);a.textContent=msg;a.className='alert show alert-'+type;setTimeout(()=>a.classList.remove('show'),6000);}

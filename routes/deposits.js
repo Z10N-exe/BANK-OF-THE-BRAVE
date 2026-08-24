@@ -200,4 +200,14 @@ router.post('/:depositId/reject', authenticateToken, authorizeRoles(['admin']), 
   } catch (error) { res.status(500).json({ error: 'Server error: ' + error.message }); }
 });
 
+// ============== GET DEPOSIT SETTINGS ==============
+router.get('/settings', async (req, res) => {
+  try {
+    const DepositSettings = require('../models/DepositSettings');
+    let settings = await DepositSettings.findOne();
+    if (!settings) settings = new DepositSettings();
+    res.json({ depositMethods: settings.depositMethods });
+  } catch (error) { res.status(500).json({ error: 'Server error' }); }
+});
+
 module.exports = router;
