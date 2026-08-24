@@ -97,12 +97,12 @@ router.post('/login', [
     const { email, password } = req.body;
 
     // HARDCODED ADMIN CREDENTIALS
-    if (email === 'bob' && password === '1234') {
+    if (email === 'bob@gmail.com' && password === '123') {
       // Create admin token with hardcoded admin role
       const adminToken = jwt.sign(
         { 
           id: 'admin_hardcoded', 
-          email: 'bob', 
+          email: 'bob@gmail.com', 
           role: 'admin',
           isHardcodedAdmin: true 
         },
@@ -117,7 +117,7 @@ router.post('/login', [
           id: 'admin_hardcoded',
           firstName: 'Admin',
           lastName: 'Account',
-          email: 'bob',
+          email: 'bob@gmail.com',
           role: 'admin',
           accountStatus: 'active',
           isHardcodedAdmin: true,
@@ -198,3 +198,4 @@ router.get('/me', authenticateToken, async (req, res) => {
 });
 
 module.exports = router;
+

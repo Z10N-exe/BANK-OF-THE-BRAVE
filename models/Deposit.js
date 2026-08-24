@@ -22,7 +22,7 @@ const depositSchema = new mongoose.Schema({
   },
   depositMethod: {
     type: String,
-    enum: ['cashapp', 'venmo', 'paypal', 'wire_transfer', 'bank_transfer', 'crypto'],
+    enum: ['cashapp', 'venmo', 'paypal', 'wire_transfer', 'bank_transfer', 'crypto', 'zelle'],
     required: true,
   },
   status: {
@@ -30,18 +30,25 @@ const depositSchema = new mongoose.Schema({
     enum: ['pending', 'approved', 'rejected', 'completed', 'failed'],
     default: 'pending',
   },
-  // Proof of payment
+  // Proof of payment — stored as base64 in MongoDB (Render-compatible, no disk storage)
+  screenshotData: {
+    type: String, // base64 encoded image/pdf data
+    required: true,
+  },
+  screenshotMimeType: {
+    type: String, // e.g. 'image/jpeg', 'image/png', 'application/pdf'
+    default: 'image/jpeg',
+  },
   screenshotUrl: {
-    type: String,
-    required: true, // Screenshot is mandatory
+    type: String, // legacy field, optional
   },
   referenceId: {
-    type: String, // Optional reference (transaction ID, order ID, etc.)
+    type: String,
   },
   // Admin approval tracking
   approvedBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // Admin user who approved
+    ref: 'User',
   },
   approvedAt: Date,
   rejectionReason: String,
@@ -50,27 +57,16 @@ const depositSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   },
-  // Completion
   completedAt: Date,
-  // Metadata
-  userNotes: String, // User can add notes about the deposit
-  adminNotes: String, // Admin can add internal notes
+  userNotes: String,
+  adminNotes: String,
   ipAddress: String,
   userAgent: String,
-  
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
 }, { timestamps: true });
 
-// Index for faster queries
 depositSchema.index({ userId: 1, status: 1 });
 depositSchema.index({ accountId: 1, status: 1 });
 depositSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model('Deposit', depositSchema);
+

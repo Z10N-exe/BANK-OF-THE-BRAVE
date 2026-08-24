@@ -187,6 +187,18 @@
 .card-expiry { text-align:right; font-size:11px; color:rgba(255,255,255,0.5); }
 .card-expiry strong { display:block; color:white; font-size:14px; font-family:monospace; letter-spacing:2px; }
 .cards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:24px; }
+
+  @media (max-width: 900px) {
+    .account-card { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .card-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .page-banner { padding: 24px 20px; }
+    .banner-icon { display: none; }
+    .stat-card { padding: 16px; }
+    .action-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .action-btn { padding: 16px 12px; }
+    .table-wrapper { width: 100%; overflow-x: auto; }
+  }
+
 </style>
 </head><body>
 

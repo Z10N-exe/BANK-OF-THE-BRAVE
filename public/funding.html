@@ -178,6 +178,18 @@
 .funding-tabs { display:flex; gap:4px; background:#f5f5f5; border-radius:12px; padding:4px; margin-bottom:28px; width:fit-content; }
 .funding-tab { padding:10px 24px; border-radius:9px; font-size:14px; font-weight:600; cursor:pointer; border:none; background:transparent; color:#888; font-family:"Inter",sans-serif; transition:all 0.25s; }
 .funding-tab.active { background:white; color:var(--navy); box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+
+  @media (max-width: 900px) {
+    .account-card { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .card-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .page-banner { padding: 24px 20px; }
+    .banner-icon { display: none; }
+    .stat-card { padding: 16px; }
+    .action-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .action-btn { padding: 16px 12px; }
+    .table-wrapper { width: 100%; overflow-x: auto; }
+  }
+
 </style>
 </head><body>
 
@@ -269,7 +281,7 @@
   <div id="depositPanel" class="card" style="max-width:520px;">
     <div class="card-header"><div class="card-title">Deposit Funds</div></div>
     <div id="depositAlert" class="alert"></div>
-    <form id="depositForm">
+    <form id="depositForm" enctype="multipart/form-data">
       <div class="form-group">
         <label class="form-label">To Account</label>
         <select class="form-control" id="depositAccount"><option value="">Select account...</option></select>
@@ -282,13 +294,27 @@
         <label class="form-label">Payment Method</label>
         <select class="form-control" id="depositMethod">
           <option value="bank_transfer">Bank Transfer</option>
-          <option value="wire">Wire Transfer</option>
+          <option value="wire_transfer">Wire Transfer</option>
+          <option value="cashapp">CashApp</option>
+          <option value="venmo">Venmo</option>
+          <option value="zelle">Zelle</option>
+          <option value="paypal">PayPal</option>
           <option value="crypto">Cryptocurrency</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Reference</label>
+        <label class="form-label">Reference / Transaction ID</label>
         <input type="text" class="form-control" id="depositRef" placeholder="Optional reference">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Payment Screenshot <span style="color:var(--danger);">*</span></label>
+        <div id="screenshotDropZone" style="border:2px dashed #ddd;border-radius:10px;padding:20px;text-align:center;cursor:pointer;background:#fafafa;transition:all 0.3s;" onclick="document.getElementById('depositScreenshot').click()">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:8px;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <div style="font-size:13px;font-weight:600;color:#555;">Click to upload payment screenshot</div>
+          <div style="font-size:11px;color:#aaa;margin-top:4px;">JPG, PNG, WebP or PDF · Max 8MB</div>
+          <div id="screenshotFileName" style="font-size:12px;color:var(--gold-dark);margin-top:8px;font-weight:600;"></div>
+        </div>
+        <input type="file" id="depositScreenshot" accept="image/jpeg,image/png,image/webp,application/pdf" style="display:none;" onchange="handleScreenshotChange(this)">
       </div>
       <button type="submit" class="btn btn-gold" style="width:100%;justify-content:center;">Submit Deposit Request</button>
     </form>
@@ -373,26 +399,69 @@ function showTab(tab,btn){
   hideLoader();
 })();
 function showFundAlert(id,msg,type){const a=document.getElementById(id);a.textContent=msg;a.className='alert show alert-'+type;setTimeout(()=>a.classList.remove('show'),6000);}
-document.getElementById('depositForm').addEventListener('submit',async e=>{
-  e.preventDefault();showLoader();
-  try{
-    const tok=localStorage.getItem('token');
-    const r=await fetch('/api/funding/deposit',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({accountId:document.getElementById('depositAccount').value,amount:parseFloat(document.getElementById('depositAmount').value),method:document.getElementById('depositMethod').value,reference:document.getElementById('depositRef').value})});
-    const d=await r.json();
-    if(r.ok){showFundAlert('depositAlert','Deposit request submitted!','success');document.getElementById('depositForm').reset();}
-    else{showFundAlert('depositAlert',d.error||'Deposit failed.','error');}
-  }catch(e){showFundAlert('depositAlert','An error occurred.','error');}
+
+function handleScreenshotChange(input) {
+  const file = input.files ? input.files[0] : null;
+  const fn = document.getElementById('screenshotFileName');
+  const dz = document.getElementById('screenshotDropZone');
+  if (file) {
+    fn.textContent = '✓ ' + file.name;
+    dz.style.borderColor = 'var(--gold)';
+    dz.style.background = 'rgba(201,168,76,0.05)';
+  } else {
+    fn.textContent = '';
+    dz.style.borderColor = '#ddd';
+    dz.style.background = '#fafafa';
+  }
+}
+
+document.getElementById('depositForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const screenshotFile = document.getElementById('depositScreenshot').files[0];
+  if (!screenshotFile) {
+    showFundAlert('depositAlert', 'Please upload a payment screenshot before submitting.', 'error');
+    return;
+  }
+  showLoader();
+  try {
+    const tok = localStorage.getItem('token');
+    const fd = new FormData();
+    fd.append('accountId', document.getElementById('depositAccount').value);
+    fd.append('amount', document.getElementById('depositAmount').value);
+    fd.append('depositMethod', document.getElementById('depositMethod').value);
+    fd.append('referenceId', document.getElementById('depositRef').value);
+    fd.append('screenshot', screenshotFile);
+    const r = await fetch('/api/deposits/initiate', { method: 'POST', headers: { Authorization: 'Bearer ' + tok }, body: fd });
+    const d = await r.json();
+    if (r.ok) {
+      showFundAlert('depositAlert', 'Deposit request submitted! Awaiting admin approval.', 'success');
+      document.getElementById('depositForm').reset();
+      handleScreenshotChange({ files: [] });
+    } else {
+      showFundAlert('depositAlert', d.error || (d.errors && d.errors[0]?.msg) || 'Deposit failed.', 'error');
+    }
+  } catch(e) { showFundAlert('depositAlert', 'An error occurred. Please try again.', 'error'); }
   hideLoader();
 });
-document.getElementById('withdrawForm').addEventListener('submit',async e=>{
-  e.preventDefault();showLoader();
-  try{
-    const tok=localStorage.getItem('token');
-    const r=await fetch('/api/funding/withdraw',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({accountId:document.getElementById('withdrawAccount').value,amount:parseFloat(document.getElementById('withdrawAmount').value),method:document.getElementById('withdrawMethod').value,bankAccount:document.getElementById('withdrawBankAccount').value})});
-    const d=await r.json();
-    if(r.ok){showFundAlert('withdrawAlert','Withdrawal request submitted!','success');document.getElementById('withdrawForm').reset();}
-    else{showFundAlert('withdrawAlert',d.error||'Withdrawal failed.','error');}
-  }catch(e){showFundAlert('withdrawAlert','An error occurred.','error');}
+
+document.getElementById('withdrawForm').addEventListener('submit', async e => {
+  e.preventDefault(); showLoader();
+  try {
+    const tok = localStorage.getItem('token');
+    const r = await fetch('/api/withdrawals/request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok },
+      body: JSON.stringify({
+        accountId: document.getElementById('withdrawAccount').value,
+        amount: parseFloat(document.getElementById('withdrawAmount').value),
+        withdrawalMethod: document.getElementById('withdrawMethod').value,
+        destinationInfo: { bankAccount: document.getElementById('withdrawBankAccount').value }
+      })
+    });
+    const d = await r.json();
+    if (r.ok) { showFundAlert('withdrawAlert', 'Withdrawal request submitted! Funds held pending admin approval.', 'success'); document.getElementById('withdrawForm').reset(); }
+    else { showFundAlert('withdrawAlert', d.error || (d.errors && d.errors[0]?.msg) || 'Withdrawal failed.', 'error'); }
+  } catch(e) { showFundAlert('withdrawAlert', 'An error occurred.', 'error'); }
   hideLoader();
 });
 </script>

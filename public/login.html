@@ -37,7 +37,7 @@
   .loader-logo { width:100px; height:100px; animation:pulse 1.5s ease-in-out infinite; }
   @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
   .loader-text { font-size:13px; color:var(--gold-dark); font-weight:600; letter-spacing:1px; }
-  @media (max-width:700px) { body { grid-template-columns:1fr; } .left-panel { padding:40px 24px; } .left-logo { width:120px; height:120px; } .right-panel { padding:24px 16px; } .form-box { padding:32px 24px; } }
+  @media (max-width:700px) { body { grid-template-columns:1fr; } .left-panel{display:none;} .left-panel { padding:40px 24px; } .left-logo { width:120px; height:120px; } .right-panel { padding:24px 16px; } .form-box { padding:32px 24px; } }
 </style>
 </head><body>
 <div class="loader-overlay" id="loader"><img src="/logo.png" class="loader-logo" alt="Loading"><div class="loader-text">Signing you in...</div></div>

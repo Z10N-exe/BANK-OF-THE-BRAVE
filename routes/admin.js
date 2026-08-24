@@ -5,7 +5,7 @@ const Account = require('../models/Account');
 const Transaction = require('../models/Transaction');
 const Loan = require('../models/Loan');
 const AuditLog = require('../models/AuditLog');
-const { authenticateToken, authorizeRole } = require('../middleware/auth');
+const { authenticateToken, authorizeRole, authorizeRoles } = require('../middleware/auth');
 const { body, validationResult } = require('express-validator');
 
 // Get all users (Compliance/Super Admin only)

@@ -174,6 +174,18 @@
   }
   .hamburger-btn { background: none; border: none; cursor: pointer; padding: 8px; }
   .hamburger-btn span { display: block; width: 22px; height: 2px; background: var(--navy); border-radius: 2px; margin: 4px 0; transition: all 0.3s; }
+
+  @media (max-width: 900px) {
+    .account-card { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .card-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .page-banner { padding: 24px 20px; }
+    .banner-icon { display: none; }
+    .stat-card { padding: 16px; }
+    .action-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .action-btn { padding: 16px 12px; }
+    .table-wrapper { width: 100%; overflow-x: auto; }
+  }
+
 </style>
 </head><body>
 
@@ -293,6 +305,30 @@
     </div>
   </div>
 
+  <!-- KYC Alert Banner (only shown to unverified users) -->
+  <div id="kycBanner" style="display:none; background:linear-gradient(135deg,#C9A84C,#E8C97A); border-radius:14px; padding:18px 24px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0A0F2E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <div>
+        <div style="font-weight:700;color:#0A0F2E;font-size:15px;">KYC Verification Required</div>
+        <div style="font-size:13px;color:#2a2a2a;">Please verify your identity to unlock all banking features.</div>
+      </div>
+    </div>
+    <a href="/kyc.html" style="background:#0A0F2E;color:#C9A84C;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px;white-space:nowrap;">Verify Now →</a>
+  </div>
+
+  <!-- Premium Banner (only shown to non-pro users) -->
+  <div id="premiumBanner" style="display:none; background:linear-gradient(135deg,#0A0F2E,#141B45); border-radius:14px; padding:18px 24px; margin-bottom:20px; flex-direction:row; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; border:1px solid rgba(201,168,76,0.3);">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <div>
+        <div style="font-weight:700;color:white;font-size:15px;">Upgrade to Pro — $1,000</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.65);">Pay in daily installments of $250 over 4 days. Unlock premium features.</div>
+      </div>
+    </div>
+    <a href="/settings.html" style="background:linear-gradient(135deg,#C9A84C,#E8C97A);color:#0A0F2E;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:700;font-size:13px;white-space:nowrap;">Get Premium ✦</a>
+  </div>
+
   <h3 style="font-family:'Playfair Display',serif;font-size:17px;color:var(--navy);margin-bottom:16px;font-weight:700;">Quick Actions</h3>
   <div class="action-grid">
     <a href="/transfers.html" class="action-btn">
@@ -375,11 +411,22 @@
   const usr = JSON.parse(localStorage.getItem('user') || '{}');
   const name = (usr.firstName || 'Valued Client');
   document.getElementById('welcomeHeading').textContent = 'Welcome back, ' + name;
+  // KYC Status display
   if (usr.kycStatus) {
     const ks = document.getElementById('kycStatus');
     ks.innerHTML = usr.kycStatus === 'verified'
-      ? '<span class="badge badge-success">Verified</span>'
-      : '<span class="badge badge-warning">' + usr.kycStatus + '</span>';
+      ? '<span class="badge badge-success">Verified ✓</span>'
+      : '<span class="badge badge-warning">' + (usr.kycStatus || 'Pending') + '</span>';
+  }
+  // Show KYC banner only if NOT verified
+  if (usr.kycStatus && usr.kycStatus !== 'verified') {
+    const kb = document.getElementById('kycBanner');
+    if (kb) kb.style.display = 'flex';
+  }
+  // Show Premium banner only if user role is not 'pro' and not admin
+  if (usr.role !== 'pro' && usr.role !== 'admin') {
+    const pb = document.getElementById('premiumBanner');
+    if (pb) pb.style.display = 'flex';
   }
   showLoader();
   try {

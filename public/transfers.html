@@ -177,6 +177,18 @@
 
 .transfer-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
 @media(max-width:800px){.transfer-grid{grid-template-columns:1fr;}}
+
+  @media (max-width: 900px) {
+    .account-card { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .card-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .page-banner { padding: 24px 20px; }
+    .banner-icon { display: none; }
+    .stat-card { padding: 16px; }
+    .action-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .action-btn { padding: 16px 12px; }
+    .table-wrapper { width: 100%; overflow-x: auto; }
+  }
+
 </style>
 </head><body>
 
@@ -384,7 +396,10 @@ document.getElementById('transferForm').addEventListener('submit', async e => {
       type: document.getElementById('transferType').value,
       note: document.getElementById('transferNote').value
     };
-    const r = await fetch('/api/transfers', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify(body) });
+    const endpoint = body.type === 'wire' ? '/api/transactions/wire-transfer' : '/api/transactions/internal-transfer';
+    if (body.type === 'wire') { body.beneficiary = { name: body.recipientName, account: body.recipientAccount }; }
+    else { body.toAccountId = body.recipientAccount; }
+    const r = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: JSON.stringify(body) });
     const d = await r.json();
     if (r.ok) { showAlert('Transfer submitted successfully!', 'success'); document.getElementById('transferForm').reset(); }
     else { showAlert(d.error || 'Transfer failed.', 'error'); }

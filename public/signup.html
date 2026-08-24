@@ -39,7 +39,7 @@
   .loader-logo { width:100px; height:100px; animation:pulse 1.5s ease-in-out infinite; }
   @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
   .loader-text { font-size:13px; color:var(--gold-dark); font-weight:600; }
-  @media (max-width:700px) { body{grid-template-columns:1fr;} .left-panel{padding:32px 20px;} .left-logo{width:110px;height:110px;} .right-panel{padding:20px 14px;} .form-box{padding:28px 18px;} .form-grid{grid-template-columns:1fr;} }
+  @media (max-width:700px) { body{grid-template-columns:1fr;} .left-panel{display:none;} .left-panel{padding:32px 20px;} .left-logo{width:110px;height:110px;} .right-panel{padding:20px 14px;} .form-box{padding:28px 18px;} .form-grid{grid-template-columns:1fr;} }
 </style>
 </head><body>
 <div class="loader-overlay" id="loader"><img src="/logo.png" class="loader-logo" alt="Loading"><div class="loader-text">Creating your account...</div></div>
