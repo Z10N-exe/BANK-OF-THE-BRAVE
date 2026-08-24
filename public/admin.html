@@ -486,6 +486,41 @@
 </div></div>
 
 <!-- Modals -->
+<div class="modal-overlay" id="addBalanceModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add Balance to Account</div>
+      <button class="modal-close" onclick="closeModal('addBalanceModal')">&times;</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">User</label>
+      <input type="text" class="form-control" id="addBalanceUserName" readonly>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Account</label>
+      <select class="form-control" id="addBalanceAccount">
+        <option value="">Select account...</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Amount</label>
+      <input type="number" class="form-control" id="addBalanceAmount" placeholder="1000" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Sender Name</label>
+      <input type="text" class="form-control" id="addBalanceSender" placeholder="e.g., John Smith, Company Name" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <textarea class="form-control" id="addBalanceNotes" rows="3"></textarea>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closeModal('addBalanceModal')">Cancel</button>
+      <button class="btn btn-gold" onclick="submitAddBalance()">Add Balance</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="premiumModal">
   <div class="modal">
     <div class="modal-header">
@@ -660,6 +695,7 @@ async function loadUsers() {
         <td><span class="badge ${user.kycStatus === 'verified' ? 'badge-success' : user.kycStatus === 'pending' ? 'badge-warning' : 'badge-danger'}">${user.kycStatus}</span></td>
         <td><span class="badge ${user.isPremium ? 'badge-gold' : 'badge-info'}">${user.isPremium ? 'Yes' : 'No'}</span></td>
         <td>
+          <button class="btn btn-sm btn-gold" onclick="openAddBalanceModal('${user._id}', '${user.firstName} ${user.lastName}')">Add Balance</button>
           <button class="btn btn-sm btn-outline" onclick="openPremiumModal('${user._id}', '${user.firstName} ${user.lastName}', ${user.isPremium})">Premium</button>
           <button class="btn btn-sm btn-outline" onclick="openFreezeModal('${user._id}', '${user.firstName} ${user.lastName}', '${user.accountStatus}')">Freeze</button>
           <button class="btn btn-sm btn-gold" onclick="openCreditModal('${user._id}', '${user.firstName} ${user.lastName}')">Credit</button>
@@ -681,7 +717,9 @@ async function loadAccounts() {
       return;
     }
 
-    tbody.innerHTML = data.accounts.map(account => `
+    tbody.innerHTML = data.accounts.map(account => {
+      const userName = account.userId ? `${account.userId.firstName || ''} ${account.userId.lastName || ''}`.trim() : 'Unknown';
+      return `
       <tr>
         <td><span class="badge badge-info">${account.accountType.toUpperCase()}</span></td>
         <td>$${account.balance.toLocaleString()}</td>
@@ -689,10 +727,12 @@ async function loadAccounts() {
         <td>${account.userId ? account.userId.email : 'Unknown'}</td>
         <td><span class="badge ${account.accountStatus === 'active' ? 'badge-success' : 'badge-danger'}">${account.accountStatus}</span></td>
         <td>
+          <button class="btn btn-sm btn-gold" onclick="openAddBalanceModal('${account.userId._id}', '${userName.replace(/'/g, "\\'")}')">Add Balance</button>
           <button class="btn btn-sm btn-outline" onclick="alert('Details coming soon')">Details</button>
         </td>
       </tr>
-    `).join('');
+    `;
+    }).join('');
   } catch (e) { console.error(e); }
 }
 
@@ -793,6 +833,39 @@ async function loadKYC() {
 }
 
 // Modal functions
+function openAddBalanceModal(userId, userName) {
+  selectedUserId = userId;
+  selectedUserName = userName;
+  document.getElementById('addBalanceUserName').value = userName;
+  document.getElementById('addBalanceAccount').innerHTML = '<option value="">Select account...</option>';
+  document.getElementById('addBalanceAmount').value = '';
+  document.getElementById('addBalanceSender').value = '';
+  document.getElementById('addBalanceNotes').value = '';
+  
+  // Load user accounts
+  loadUserAccountsForBalance(userId);
+  document.getElementById('addBalanceModal').classList.add('show');
+}
+
+async function loadUserAccountsForBalance(userId) {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('/api/accounts', { headers: { 'Authorization': 'Bearer ' + token } });
+    const data = await response.json();
+    const userAccounts = data.accounts.filter(a => a.userId === userId);
+    
+    const select = document.getElementById('addBalanceAccount');
+    userAccounts.forEach(acc => {
+      const option = document.createElement('option');
+      option.value = acc._id;
+      option.textContent = `${acc.accountType.toUpperCase()} - ${acc.currency} (Balance: $${acc.balance.toLocaleString()})`;
+      select.appendChild(option);
+    });
+  } catch (e) {
+    console.error('Error loading accounts:', e);
+  }
+}
+
 function openPremiumModal(userId, userName, isPremium) {
   selectedUserId = userId;
   selectedUserName = userName;
@@ -828,6 +901,46 @@ function closeModal(modalId) {
 }
 
 // Admin actions
+async function submitAddBalance() {
+  try {
+    const token = localStorage.getItem('token');
+    const accountId = document.getElementById('addBalanceAccount').value;
+    const amount = parseFloat(document.getElementById('addBalanceAmount').value);
+    const fromName = document.getElementById('addBalanceSender').value;
+    const adminNotes = document.getElementById('addBalanceNotes').value;
+
+    if (!accountId) return alert('Please select an account');
+    if (!amount || amount <= 0) return alert('Please enter a valid amount');
+    if (!fromName) return alert('Please enter the sender name');
+
+    const response = await fetch('/api/admin/direct-deposit', {
+      method: 'POST',
+      headers: { 
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        userId: selectedUserId,
+        accountId: accountId,
+        amount: amount,
+        fromName: fromName,
+        adminNotes: adminNotes
+      })
+    });
+
+    if (response.ok) {
+      alert('Balance added successfully!');
+      closeModal('addBalanceModal');
+      loadAccounts();
+    } else {
+      const data = await response.json();
+      alert(data.error || 'Error adding balance');
+    }
+  } catch (e) {
+    alert('Error: ' + e.message);
+  }
+}
+
 async function submitPremiumChange() {
   try {
     const token = localStorage.getItem('token');

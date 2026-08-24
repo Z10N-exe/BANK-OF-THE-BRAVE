@@ -591,6 +591,18 @@ router.post('/direct-deposit', authenticateToken, authorizeRole('admin'), [
       },
     });
 
+    // Send notification to user
+    await Notification.create({
+      userId,
+      type: 'success',
+      title: 'Balance Added',
+      message: `$${depositAmount} has been added to your account from ${fromName}. ${adminNotes ? 'Note: ' + adminNotes : ''}`,
+      priority: 'high',
+      actionUrl: '/accounts',
+      actionLabel: 'View Accounts',
+      createdBy: req.user.id,
+    });
+
     res.json({
       message: `Direct deposit of $${depositAmount} from ${fromName} completed successfully`,
       transaction: {
