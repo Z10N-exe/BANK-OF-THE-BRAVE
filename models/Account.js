@@ -1,5 +1,13 @@
 const mongoose = require('mongoose');
 
+async function generateAccountNumber(Account) {
+  let accountNumber;
+  do {
+    accountNumber = Array.from({ length: 10 }, () => Math.floor(Math.random() * 10)).join('');
+  } while (await Account.exists({ accountNumber }));
+  return accountNumber;
+}
+
 const accountSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -84,5 +92,12 @@ const accountSchema = new mongoose.Schema({
     default: Date.now,
   },
 }, { timestamps: true });
+
+accountSchema.pre('validate', async function (next) {
+  if (!this.accountNumber) {
+    this.accountNumber = await generateAccountNumber(this.constructor);
+  }
+  next();
+});
 
 module.exports = mongoose.model('Account', accountSchema);

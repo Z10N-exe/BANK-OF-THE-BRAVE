@@ -14,7 +14,17 @@ router.get('/', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const accounts = await Account.find({ _id: { $in: user.accounts } });
+    const accounts = await Account.find({ userId: user._id });
+
+    // Repair the user link and generate identifiers for legacy accounts.
+    const accountIds = accounts.map(account => account._id);
+    if (accounts.some(account => !account.accountNumber)) {
+      await Promise.all(accounts.map(account => account.save()));
+    }
+    if (user.accounts.length !== accountIds.length || !user.accounts.every(id => accountIds.some(accountId => accountId.equals(id)))) {
+      user.accounts = accountIds;
+      await user.save();
+    }
     res.json({ accounts });
   } catch (error) {
     res.status(500).json({ error: 'Server error: ' + error.message });

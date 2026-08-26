@@ -25,7 +25,7 @@ uploadDirs.forEach(dir => {
 });
 
 // Multer setup for KYC file uploads
-const kycStorage = multer.diskStorage({
+const kycDiskStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = path.join(__dirname, '../uploads/kyc');
     try {
@@ -46,7 +46,7 @@ const kycStorage = multer.diskStorage({
 });
 
 const kycUpload = multer({
-  storage: kycStorage,
+  storage: process.env.VERCEL === '1' ? multer.memoryStorage() : kycDiskStorage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
   fileFilter: (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|pdf/;
@@ -92,16 +92,23 @@ router.post('/submit', authenticateToken, kycUpload.fields([
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Store file paths relative to public directory
-    const idDocPath = `/uploads/kyc/${path.basename(req.files.idDocument[0].filename)}`;
-    const selfiePath = `/uploads/kyc/${path.basename(req.files.selfie[0].filename)}`;
+    const idDocumentFile = req.files.idDocument[0];
+    const selfieFile = req.files.selfie[0];
+    const idDocPath = process.env.VERCEL === '1'
+      ? `data:${idDocumentFile.mimetype};base64,${idDocumentFile.buffer.toString('base64')}`
+      : `/uploads/kyc/${path.basename(idDocumentFile.filename)}`;
+    const selfiePath = process.env.VERCEL === '1'
+      ? `data:${selfieFile.mimetype};base64,${selfieFile.buffer.toString('base64')}`
+      : `/uploads/kyc/${path.basename(selfieFile.filename)}`;
 
     // Update KYC data
     user.kyc = {
       ssn,
       idDocument: idDocPath,
+      idDocumentData: null,
       idType,
       selfieUrl: selfiePath,
+      selfieData: null,
       dateOfBirth: new Date(dateOfBirth),
       address,
       city,
@@ -164,8 +171,9 @@ router.get('/status', authenticateToken, async (req, res) => {
 router.get('/admin/documents/:userId', authenticateToken, async (req, res) => {
   try {
     // Check if user is admin
-    const adminUser = await User.findById(req.user.id);
-    if (!['admin', 'compliance'].includes(adminUser.role)) {
+    const isHardcodedAdmin = req.user.isHardcodedAdmin === true;
+    const adminUser = isHardcodedAdmin ? null : await User.findById(req.user.id);
+    if (!isHardcodedAdmin && (!adminUser || !['admin', 'compliance'].includes(adminUser.role))) {
       return res.status(403).json({ error: 'Admin access required' });
     }
 

@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const User = require('../models/User');
 const Account = require('../models/Account');
 const Transaction = require('../models/Transaction');
@@ -9,6 +10,8 @@ const Notification = require('../models/Notification');
 const Withdrawal = require('../models/Withdrawal');
 const { authenticateToken, authorizeRole, authorizeRoles } = require('../middleware/auth');
 const { body, validationResult } = require('express-validator');
+
+const getAuditAdminId = (user) => mongoose.isValidObjectId(user?.id) ? user.id : undefined;
 
 // Get all users (Compliance/Super Admin only)
 router.get('/users', authenticateToken, authorizeRole('admin', 'compliance'), async (req, res) => {
@@ -34,7 +37,7 @@ router.get('/users/:userId', authenticateToken, authorizeRole('admin', 'complian
     // Log access (non-fatal — don't let a log failure break the response)
     try {
       await AuditLog.create({
-        adminId: req.user.id || null,
+        adminId: getAuditAdminId(req.user),
         userId: req.params.userId,
         action: 'Viewed user details',
         actionType: 'data_access',
@@ -95,7 +98,7 @@ router.post('/balance-adjustment', authenticateToken, authorizeRole('admin'), [
 
     // Log audit
     await AuditLog.create({
-      adminId: req.user.id,
+      adminId: getAuditAdminId(req.user),
       userId: userId,
       action: `Balance ${type === 'credit' ? 'credited' : 'debited'} $${amount}`,
       actionType: 'balance_adjustment',
@@ -154,7 +157,7 @@ router.post('/kyc-verification', authenticateToken, authorizeRole('admin', 'comp
 
     // Log audit
     await AuditLog.create({
-      adminId: req.user.id,
+      adminId: getAuditAdminId(req.user),
       userId: userId,
       action: `KYC ${status}`,
       actionType: 'kyc_verification',
@@ -208,7 +211,7 @@ router.post('/account-status', authenticateToken, authorizeRole('admin', 'compli
 
     // Log audit
     await AuditLog.create({
-      adminId: req.user.id,
+      adminId: getAuditAdminId(req.user),
       userId: userId,
       action: `Account status changed to ${status}`,
       actionType: 'account_suspension',
@@ -270,7 +273,7 @@ router.post('/transaction-approval', authenticateToken, authorizeRole('admin', '
     if (action === 'approve') {
       // Add approval signature
       transaction.approvals.push({
-        adminId: req.user.id,
+        adminId: getAuditAdminId(req.user),
         timestamp: new Date(),
         notes: notes,
       });
@@ -291,7 +294,7 @@ router.post('/transaction-approval', authenticateToken, authorizeRole('admin', '
 
     // Log audit
     await AuditLog.create({
-      adminId: req.user.id,
+      adminId: getAuditAdminId(req.user),
       action: `Transaction ${action}`,
       actionType: 'transaction_approval',
       resourceId: transactionId,
@@ -340,7 +343,7 @@ router.post('/loan-approval', authenticateToken, authorizeRole('admin', 'wealth_
 
     // Log audit
     await AuditLog.create({
-      adminId: req.user.id,
+      adminId: getAuditAdminId(req.user),
       userId: loan.userId,
       action: `Loan ${action}`,
       actionType: 'transaction_approval',
@@ -674,7 +677,7 @@ router.post('/create-credit-account', authenticateToken, authorizeRole('admin'),
 
     // Audit log
     await AuditLog.create({
-      adminId: req.user.id,
+      adminId: getAuditAdminId(req.user),
       userId: userId,
       action: `Created credit account with limit $${creditLimit}`,
       actionType: 'account_creation',
@@ -740,7 +743,7 @@ router.post('/upgrade-premium', authenticateToken, authorizeRole('admin'), [
 
     // Audit log
     await AuditLog.create({
-      adminId: req.user.id,
+      adminId: getAuditAdminId(req.user),
       userId: userId,
       action: `User premium status changed to ${isPremium}`,
       actionType: 'user_upgrade',
@@ -828,7 +831,7 @@ router.post('/manage-payment-methods', authenticateToken, authorizeRole('admin')
 
     // Audit log
     await AuditLog.create({
-      adminId: req.user.id,
+      adminId: getAuditAdminId(req.user),
       userId: userId,
       action: 'Updated payment methods',
       actionType: 'payment_method_update',
@@ -913,7 +916,7 @@ router.post('/send-notification', authenticateToken, authorizeRole('admin'), [
 
     // Audit log
     await AuditLog.create({
-      adminId: req.user.id,
+      adminId: getAuditAdminId(req.user),
       userId: userId,
       action: `Sent notification: ${title}`,
       actionType: 'notification_sent',
@@ -1007,7 +1010,7 @@ router.post('/freeze-account', authenticateToken, authorizeRole('admin'), [
 
         // Audit log for account
         await AuditLog.create({
-          adminId: req.user.id,
+          adminId: getAuditAdminId(req.user),
           userId: userId,
           action: `Account ${freeze ? 'frozen' : 'unfrozen'}`,
           actionType: 'account_freeze',
@@ -1026,7 +1029,7 @@ router.post('/freeze-account', authenticateToken, authorizeRole('admin'), [
 
     // Audit log for user
     await AuditLog.create({
-      adminId: req.user.id,
+      adminId: getAuditAdminId(req.user),
       userId: userId,
       action: `User account ${freeze ? 'frozen' : 'unfrozen'}`,
       actionType: 'account_freeze',
@@ -1162,7 +1165,7 @@ router.post('/approve-withdrawal', authenticateToken, authorizeRole('admin'), [
 
     // Audit log
     await AuditLog.create({
-      adminId: req.user.id,
+      adminId: getAuditAdminId(req.user),
       userId: withdrawal.userId,
       action: `Withdrawal ${action}ed`,
       actionType: 'withdrawal_approval',

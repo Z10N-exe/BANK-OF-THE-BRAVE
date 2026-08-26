@@ -43,8 +43,10 @@ const userSchema = new mongoose.Schema({
   kyc: {
     ssn: String,
     idDocument: String, // URL or file path
+    idDocumentData: String,
     idType: String, // driver's license, passport, etc.
     selfieUrl: String,
+    selfieData: String,
     dateOfBirth: Date,
     address: String,
     city: String,

@@ -342,7 +342,7 @@
         <div class="account-card">
           <div>
             <div class="account-type">${a.currency || 'USD'} Account</div>
-            <div class="account-number">**** **** ${(a.accountNumber||'').slice(-4) || '0000'}</div>
+            <div class="account-number">Account number: ${a.accountNumber || 'Generating...'}</div>
             <div class="account-balance">$${(a.balance||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
             <div class="account-currency">${a.currency || 'USD'} • <span class="badge badge-success">Active</span></div>
           </div>

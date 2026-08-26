@@ -375,6 +375,7 @@
         <table>
           <thead>
             <tr>
+              <th>Account Number</th>
               <th>Account Type</th>
               <th>Balance</th>
               <th>Currency</th>
@@ -384,7 +385,7 @@
             </tr>
           </thead>
           <tbody id="accountsTableBody">
-            <tr><td colspan="6" style="text-align:center;color:#999;">Loading accounts...</td></tr>
+            <tr><td colspan="7" style="text-align:center;color:#999;">Loading accounts...</td></tr>
           </tbody>
         </table>
       </div>
@@ -837,7 +838,7 @@ async function loadAccounts() {
     const tbody = document.getElementById('accountsTableBody');
     
     if (data.accounts.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#999;">No accounts found</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;">No accounts found</td></tr>';
       return;
     }
 
@@ -845,6 +846,7 @@ async function loadAccounts() {
       const userName = account.userId ? `${account.userId.firstName || ''} ${account.userId.lastName || ''}`.trim() : 'Unknown';
       return `
       <tr>
+        <td>${account.accountNumber || 'Generating...'}</td>
         <td><span class="badge badge-info">${account.accountType.toUpperCase()}</span></td>
         <td>$${account.balance.toLocaleString()}</td>
         <td>${account.currency}</td>
@@ -1149,13 +1151,19 @@ function openKYCDetails(userId) {
         <div>
           <strong>ID Document:</strong>
           <div style="margin-top:10px;text-align:center;background:#fafafa;padding:15px;border:1px solid #eee;border-radius:8px;">
-            <span style="color:#999;font-style:italic;">No image provided</span>
+            ${kyc.idDocument
+              ? (kyc.idDocument.startsWith('data:application/pdf')
+                ? `<a href="${kyc.idDocument}" target="_blank" rel="noopener">Open ID document</a>`
+                : `<a href="${kyc.idDocument}" target="_blank" rel="noopener"><img src="${kyc.idDocument}" alt="ID document" style="max-width:100%;max-height:300px;border-radius:4px;object-fit:contain;" onerror="this.parentElement.innerHTML='<span style=\'color:#999;font-style:italic;\'>Document unavailable</span>'"></a>`)
+              : '<span style="color:#999;font-style:italic;">No document provided</span>'}
           </div>
         </div>
         <div>
           <strong>Selfie:</strong>
           <div style="margin-top:10px;text-align:center;background:#fafafa;padding:15px;border:1px solid #eee;border-radius:8px;">
-            <span style="color:#999;font-style:italic;">No image provided</span>
+            ${kyc.selfie
+              ? `<a href="${kyc.selfie}" target="_blank" rel="noopener"><img src="${kyc.selfie}" alt="KYC selfie" style="max-width:100%;max-height:300px;border-radius:4px;object-fit:contain;" onerror="this.parentElement.innerHTML='<span style=\'color:#999;font-style:italic;\'>Image unavailable</span>'"></a>`
+              : '<span style="color:#999;font-style:italic;">No selfie provided</span>'}
           </div>
         </div>
       </div>
