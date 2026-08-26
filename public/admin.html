@@ -1206,22 +1206,27 @@ function openDepositDetails(depositId) {
   `;
 }
 
-function openKYCDetails(userId) {
+async function openKYCDetails(userId) {
   const content = document.getElementById('kycDetailsContent');
   const user = window[`kycUser_${userId}`];
   if (!user) return alert('User data missing');
   
   document.getElementById('kycDetailsModal').classList.add('show');
   
-  const kyc = user.kyc || {};
+  let details = user;
+  try {
+    const response = await fetch(`/api/kyc/admin/documents/${userId}`, { headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') } });
+    if (response.ok) details = await response.json();
+  } catch (error) { console.error('Unable to load complete KYC details:', error); }
+  const kyc = details.kyc || {};
   
   content.innerHTML = `
     <div style="margin-bottom:15px;">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:15px;">
-        <div><strong>Full Name:</strong><br>${user.firstName} ${user.lastName}</div>
+        <div><strong>Full Name:</strong><br>${details.userName || `${user.firstName} ${user.lastName}`}</div>
         <div><strong>Date of Birth:</strong><br>${kyc.dateOfBirth ? new Date(kyc.dateOfBirth).toLocaleDateString() : 'N/A'}</div>
-        <div><strong>Email:</strong><br>${user.email}</div>
-        <div><strong>Phone:</strong><br>${user.phoneNumber || 'N/A'}</div>
+        <div><strong>Email:</strong><br>${details.email || user.email}</div>
+        <div><strong>Phone:</strong><br>${user.phone || user.phoneNumber || 'N/A'}</div>
         <div><strong>ID Type:</strong><br>${(kyc.idType || 'N/A').toUpperCase()}</div>
         <div><strong>SSN:</strong><br>${kyc.ssn || 'N/A'}</div>
       </div>

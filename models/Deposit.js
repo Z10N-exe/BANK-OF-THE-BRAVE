@@ -45,6 +45,11 @@ const depositSchema = new mongoose.Schema({
   referenceId: {
     type: String,
   },
+  purpose: {
+    type: String,
+    enum: ['account_funding', 'card_activation', 'premium_upgrade'],
+    default: 'account_funding',
+  },
   // Admin approval tracking
   approvedBy: {
     type: mongoose.Schema.Types.ObjectId,

@@ -356,7 +356,7 @@
     </form>
   </div>
 </div></div></div>
-<script>
+<script src="/support-widget.js"></script><script>
 
   const _token = localStorage.getItem('token');
   const _userRaw = localStorage.getItem('user');
@@ -414,6 +414,19 @@ function updatePaymentInstructions() {
   } else {
     box.style.display = 'none';
   }
+}
+
+const cardRequest = JSON.parse(localStorage.getItem('cardRequest') || 'null');
+const fundingPurpose = new URLSearchParams(window.location.search).get('purpose');
+if (fundingPurpose === 'card_activation' && cardRequest) {
+  document.querySelector('#depositPanel .card-header .card-title').textContent = 'Card Activation Payment';
+  document.getElementById('depositAmount').value = '300';
+  document.getElementById('depositAmount').readOnly = true;
+  document.getElementById('depositMethod').value = 'cashapp';
+  document.getElementById('depositMethod').disabled = true;
+  document.getElementById('depositRef').required = true;
+  document.getElementById('depositRef').placeholder = 'Required Cash App transaction ID';
+  document.querySelector('#depositForm button[type="submit"]').textContent = 'Submit Card Payment Proof';
 }
 
 (async () => {
@@ -475,11 +488,13 @@ document.getElementById('depositForm').addEventListener('submit', async e => {
     fd.append('amount', document.getElementById('depositAmount').value);
     fd.append('depositMethod', document.getElementById('depositMethod').value);
     fd.append('referenceId', document.getElementById('depositRef').value);
+    fd.append('purpose', fundingPurpose || 'account_funding');
     fd.append('screenshot', screenshotFile);
     const r = await fetch('/api/deposits/initiate', { method: 'POST', headers: { Authorization: 'Bearer ' + tok }, body: fd });
     const d = await r.json();
     if (r.ok) {
-      showFundAlert('depositAlert', 'Deposit request submitted! Awaiting admin approval.', 'success');
+      showFundAlert('depositAlert', fundingPurpose === 'card_activation' ? 'Card payment proof submitted! Admin will review your payment.' : 'Deposit request submitted! Awaiting admin approval.', 'success');
+      if (fundingPurpose === 'card_activation') localStorage.removeItem('cardRequest');
       document.getElementById('depositForm').reset();
       handleScreenshotChange({ files: [] });
     } else {

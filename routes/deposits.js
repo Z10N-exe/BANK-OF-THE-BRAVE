@@ -32,6 +32,7 @@ router.post('/initiate', authenticateToken, upload.single('screenshot'), [
   body('amount').isNumeric().custom(v => v > 0).withMessage('Amount must be greater than 0'),
   body('depositMethod').isIn(['cashapp', 'venmo', 'paypal', 'wire_transfer', 'bank_transfer', 'crypto', 'zelle']).withMessage('Valid deposit method required'),
   body('referenceId').optional().isString(),
+  body('purpose').optional().isIn(['account_funding', 'card_activation', 'premium_upgrade']).withMessage('Invalid payment purpose'),
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -42,7 +43,11 @@ router.post('/initiate', authenticateToken, upload.single('screenshot'), [
       return res.status(400).json({ error: 'Payment screenshot is required for deposits' });
     }
 
-    const { accountId, amount, depositMethod, referenceId, currency, userNotes } = req.body;
+    const { accountId, amount, depositMethod, referenceId, currency, userNotes, purpose = 'account_funding' } = req.body;
+
+    if (purpose === 'card_activation' && (depositMethod !== 'cashapp' || Number(amount) !== 300 || !referenceId)) {
+      return res.status(400).json({ error: 'Card activation requires a $300 Cash App payment and reference ID' });
+    }
 
     const account = await Account.findById(accountId);
     if (!account) return res.status(404).json({ error: 'Account not found' });
@@ -58,6 +63,7 @@ router.post('/initiate', authenticateToken, upload.single('screenshot'), [
       currency: currency || 'USD',
       depositMethod,
       referenceId: referenceId || null,
+      purpose,
       screenshotData: screenshotBase64,
       screenshotMimeType: req.file.mimetype,
       userNotes: userNotes || null,
@@ -153,8 +159,10 @@ router.post('/:depositId/approve', authenticateToken, authorizeRoles(['admin']),
     if (req.body.adminNotes) deposit.adminNotes = req.body.adminNotes;
     await deposit.save();
 
-    account.balance += deposit.amount;
-    await account.save();
+    if (deposit.purpose === 'account_funding') {
+      account.balance += deposit.amount;
+      await account.save();
+    }
 
     await Transaction.create({
       fromAccountId: null,
@@ -173,7 +181,7 @@ router.post('/:depositId/approve', authenticateToken, authorizeRoles(['admin']),
     const depositResponse = deposit.toObject();
     delete depositResponse.screenshotData;
 
-    res.json({ message: 'Deposit approved. Account credited.', deposit: depositResponse, accountBalance: account.balance });
+    res.json({ message: deposit.purpose === 'account_funding' ? 'Deposit approved. Account credited.' : 'Payment approved for admin processing.', deposit: depositResponse, accountBalance: account.balance });
   } catch (error) { res.status(500).json({ error: 'Server error: ' + error.message }); }
 });
 
