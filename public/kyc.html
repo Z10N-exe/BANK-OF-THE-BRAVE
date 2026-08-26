@@ -304,6 +304,13 @@
       <div class="error-message" id="error-message"></div>
       <div class="success-message" id="success-message"></div>
 
+      <div id="verifiedState" class="success-message" style="display:none;text-align:center;padding:30px 20px;">
+        <div style="font-size:42px;margin-bottom:10px;">&#10003;</div>
+        <h2 style="color:var(--success);margin-bottom:8px;">Identity Verified</h2>
+        <p>Your KYC verification is complete. No further action is required.</p>
+        <a href="/dashboard.html" class="btn-primary" style="display:inline-block;text-decoration:none;margin-top:18px;">Return to Dashboard</a>
+      </div>
+
       <!-- Step 1: Personal Information -->
       <div id="step1" class="step active">
         <div class="step-title">Step 1: Personal Information</div>
@@ -415,6 +422,25 @@
     const API_URL = '/api';
     let currentStep = 1;
     const totalSteps = 3;
+
+    async function showVerifiedStateIfNeeded() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_URL}/auth/me`, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        if (data.user?.kycStatus === 'verified') {
+          document.querySelectorAll('.step, .progress-bar, #error-message, #success-message').forEach(element => {
+            element.style.display = 'none';
+          });
+          document.getElementById('verifiedState').style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Unable to load KYC status:', error);
+      }
+    }
 
     function updateProgress() {
       const progress = (currentStep / totalSteps) * 100;
@@ -535,6 +561,7 @@
 
     // File input handling
     document.addEventListener('DOMContentLoaded', () => {
+      showVerifiedStateIfNeeded();
       document.getElementById('idDocument').addEventListener('change', (e) => {
         document.getElementById('idFileName').textContent = e.target.files[0]?.name || '';
       });

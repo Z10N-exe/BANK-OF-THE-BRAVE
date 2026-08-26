@@ -979,19 +979,27 @@ function openAddBalanceModal(userId, userName) {
 async function loadUserAccountsForBalance(userId) {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch('/api/accounts', { headers: { 'Authorization': 'Bearer ' + token } });
+    const response = await fetch(`/api/admin/users/${userId}`, { headers: { 'Authorization': 'Bearer ' + token } });
+    if (!response.ok) {
+      throw new Error('Unable to load user accounts');
+    }
     const data = await response.json();
-    const userAccounts = data.accounts.filter(a => a.userId === userId);
+    const userAccounts = data.accounts || [];
     
     const select = document.getElementById('addBalanceAccount');
+    if (userAccounts.length === 0) {
+      select.innerHTML = '<option value="">No accounts available</option>';
+      return;
+    }
     userAccounts.forEach(acc => {
       const option = document.createElement('option');
       option.value = acc._id;
-      option.textContent = `${acc.accountType.toUpperCase()} - ${acc.currency} (Balance: $${acc.balance.toLocaleString()})`;
+      option.textContent = `${acc.accountType.toUpperCase()} - ${acc.currency} - Account ${acc.accountNumber || 'N/A'} (Balance: $${(acc.balance || 0).toLocaleString()})`;
       select.appendChild(option);
     });
   } catch (e) {
     console.error('Error loading accounts:', e);
+    document.getElementById('addBalanceAccount').innerHTML = '<option value="">Unable to load accounts</option>';
   }
 }
 

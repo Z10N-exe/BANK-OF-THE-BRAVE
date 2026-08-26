@@ -310,7 +310,7 @@
   </div>
 
   <!-- KYC Alert Banner (only shown to unverified users) -->
-  <div id="kycBanner" style="display:none; background:linear-gradient(135deg,#C9A84C,#E8C97A); border-radius:14px; padding:18px 24px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+  <div id="kycBanner" style="display:none; background:linear-gradient(135deg,#C9A84C,#E8C97A); border-radius:14px; padding:18px 24px; margin-bottom:20px; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
     <div style="display:flex;align-items:center;gap:12px;">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0A0F2E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       <div>
@@ -414,7 +414,15 @@
 
 (async () => {
   const tok = localStorage.getItem('token');
-  const usr = JSON.parse(localStorage.getItem('user') || '{}');
+  let usr = JSON.parse(localStorage.getItem('user') || '{}');
+  try {
+    const profileResponse = await fetch('/api/auth/me', { headers: { Authorization: 'Bearer ' + tok } });
+    if (profileResponse.ok) {
+      const profileData = await profileResponse.json();
+      usr = profileData.user || usr;
+      localStorage.setItem('user', JSON.stringify(usr));
+    }
+  } catch (e) { console.error('Unable to refresh user profile:', e); }
   const name = (usr.firstName || 'Valued Client');
   document.getElementById('welcomeHeading').textContent = 'Welcome back, ' + name;
   // KYC Status display
