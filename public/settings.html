@@ -301,6 +301,14 @@
     </div>
   </div>
   <div class="card" style="margin-top:24px;">
+    <div class="card-header"><div><div class="card-title">Premium Upgrade</div><div class="card-subtitle">Contact support to arrange your premium upgrade.</div></div></div>
+    <div style="background:#f9f7ef;border:1px solid rgba(201,168,76,0.35);border-radius:10px;padding:18px;">
+      <strong>Premium access: $1,000</strong>
+      <p style="margin:8px 0;color:#666;font-size:14px;">Please contact support for payment instructions and premium activation assistance.</p>
+      <a id="premiumSupportLink" href="https://t.me/BankOfTheBraveSupport" target="_blank" rel="noopener" class="btn btn-gold" style="margin-top:8px;">Contact Support</a>
+    </div>
+  </div>
+  <div class="card" style="margin-top:24px;">
     <div class="card-header"><div class="card-title" style="color:var(--danger);">Danger Zone</div></div>
     <p style="color:#888;font-size:14px;margin-bottom:20px;">These actions are irreversible. Please be certain before proceeding.</p>
     <button class="btn btn-danger" onclick="if(confirm('Are you sure you want to sign out?'))signOut();">Sign Out of All Devices</button>
@@ -344,6 +352,12 @@ document.getElementById('setFirstName').value = usr.firstName || '';
 document.getElementById('setLastName').value = usr.lastName || '';
 document.getElementById('setEmail').value = usr.email || '';
 document.getElementById('setPhone').value = usr.phone || '';
+fetch('/api/deposits/settings').then(response => response.ok ? response.json() : null).then(data => {
+  const supportUrl = data?.settings?.supportTelegramUrl || data?.supportTelegramUrl;
+  if (supportUrl && /^https:\/\/t\.me\/[A-Za-z0-9_+\-]+$/.test(supportUrl)) {
+    document.getElementById('premiumSupportLink').href = supportUrl;
+  }
+}).catch(() => {});
 function showFormAlert(id,msg,type){const a=document.getElementById(id);a.textContent=msg;a.className='alert show alert-'+type;setTimeout(()=>a.classList.remove('show'),6000);}
 document.getElementById('profileForm').addEventListener('submit',async e=>{
   e.preventDefault();showLoader();

@@ -15,13 +15,13 @@ const auditLogSchema = new mongoose.Schema({
   },
   actionType: {
     type: String,
-    enum: ['balance_adjustment', 'account_suspension', 'kyc_verification', 'transaction_approval', 'fee_configuration', 'login', 'logout', 'data_access'],
+    enum: ['balance_adjustment', 'account_suspension', 'account_creation', 'account_freeze', 'kyc_verification', 'transaction_approval', 'fee_configuration', 'settings_update', 'admin_deposit', 'notification_sent', 'withdrawal_approval', 'user_upgrade', 'payment_method_update', 'login', 'logout', 'data_access'],
     required: true,
   },
   resourceId: mongoose.Schema.Types.ObjectId,
   resourceType: {
     type: String,
-    enum: ['user', 'account', 'transaction', 'loan'],
+    enum: ['user', 'account', 'transaction', 'loan', 'notification', 'withdrawal'],
   },
   changes: {
     before: mongoose.Schema.Types.Mixed,

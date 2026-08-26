@@ -112,6 +112,7 @@ router.post('/issue', authenticateToken, [
   body('cardType').isIn(['debit', 'credit']).withMessage('Card type must be debit or credit'),
   body('cardFormat').isIn(['virtual', 'physical']).withMessage('Card format must be virtual or physical'),
   body('cardBrand').isIn(['VISA', 'MASTERCARD', 'AMEX', 'DISCOVER']).withMessage('Valid card brand required'),
+  body('paymentReference').isString().trim().notEmpty().withMessage('Cash App payment reference required'),
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -119,7 +120,7 @@ router.post('/issue', authenticateToken, [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { accountId, cardType, cardFormat, cardBrand } = req.body;
+    const { accountId, cardType, cardFormat, cardBrand, paymentReference } = req.body;
 
     // Verify user owns account
     const account = await Account.findById(accountId);
@@ -155,7 +156,7 @@ router.post('/issue', authenticateToken, [
     const user = await User.findById(req.user.id);
     const cardholderName = `${user.firstName} ${user.lastName}`.toUpperCase();
 
-    // Create card
+    // Create card after confirming the activation fee can be paid.
     const card = new Card({
       userId: req.user.id,
       accountId,
@@ -167,6 +168,8 @@ router.post('/issue', authenticateToken, [
       expiryDate,
       cardholderName,
       last4Digits: last4,
+      activationPaymentMethod: 'cashapp',
+      activationPaymentReference: paymentReference,
       isPrimary: cardType === 'debit', // First debit card is primary
       isDefault: true,
       status: 'active',
@@ -174,29 +177,6 @@ router.post('/issue', authenticateToken, [
     });
 
     await card.save();
-
-    // Deduct $5 card issuance fee
-    const cardFee = 5;
-    account.balance -= cardFee;
-    await account.save();
-
-    // Create transaction record for card fee
-    const feeTransaction = new Transaction({
-      fromAccountId: account._id,
-      toAccountId: null,
-      amount: cardFee,
-      currency: 'USD',
-      transactionType: 'card_fee',
-      description: `Card Issuance Fee - ${cardBrand} ${cardType} Card`,
-      status: 'completed',
-      fee: 0,
-      exchangeRate: 1,
-      metadata: {
-        cardId: card._id,
-        feeType: 'card_issuance'
-      }
-    });
-    await feeTransaction.save();
 
     // Add to account
     if (!account.cards) {
@@ -214,7 +194,9 @@ router.post('/issue', authenticateToken, [
         cardType,
         cardFormat,
         cardBrand,
-        last4: last4
+        last4: last4,
+        paymentMethod: 'cashapp',
+        paymentReference
       }
     );
 
@@ -225,9 +207,11 @@ router.post('/issue', authenticateToken, [
       message: `${cardFormat} ${cardType} card issued successfully`,
       card: cardResponse,
       fee: {
-        amount: 5,
-        description: 'Card Issuance Fee',
-        deductedFrom: 'account_balance'
+        amount: 300,
+        description: 'Card Activation Fee',
+        paymentMethod: 'Cash App',
+        paymentReference,
+        instructions: 'Send $300 via Cash App and keep your payment reference.'
       },
       cardDetails: {
         cardNumber,

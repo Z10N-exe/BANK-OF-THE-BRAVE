@@ -322,6 +322,7 @@
     <button class="tab" onclick="switchTab('withdrawals', event)">Withdrawals</button>
     <button class="tab" onclick="switchTab('kyc', event)">KYC</button>
     <button class="tab" onclick="switchTab('settings', event)">Payment Settings</button>
+    <button class="tab" onclick="switchTab('retirement', event)">Retirement</button>
   </div>
 
   <div id="usersTab" class="tab-content active">
@@ -501,6 +502,16 @@
       <div id="settingsFormContainer" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
         <!-- Settings loaded via JS -->
       </div>
+    </div>
+  </div>
+
+  <div id="retirementTab" class="tab-content">
+    <div class="card">
+      <div class="card-header">
+        <div><div class="card-title">Retirement and Long-Term Savings</div><div class="card-subtitle">Manage plan rates, limits, status, and withdrawal approvals.</div></div>
+        <button class="btn btn-gold" onclick="loadRetirementPlans()">Refresh</button>
+      </div>
+      <div id="retirementPlans" style="display:grid;gap:14px;"><div style="color:#999;text-align:center;padding:20px;">Select Retirement to load plans.</div></div>
     </div>
   </div>
 
@@ -690,6 +701,7 @@ function switchTab(tab, event) {
   else if (tab === 'withdrawals') loadWithdrawals();
   else if (tab === 'kyc') loadKYC();
   else if (tab === 'settings') loadSettings();
+  else if (tab === 'retirement') loadRetirementPlans();
 }
 
 let currentDepositSettings = null;
@@ -699,7 +711,7 @@ async function loadSettings() {
     const token = localStorage.getItem('token');
     const response = await fetch('/api/deposits/settings', { headers: { 'Authorization': 'Bearer ' + token } });
     const data = await response.json();
-    currentDepositSettings = data.depositMethods || {};
+    currentDepositSettings = data.settings?.depositMethods || data.depositMethods || {};
     
     const container = document.getElementById('settingsFormContainer');
     container.innerHTML = Object.keys(currentDepositSettings).map(method => {
@@ -720,7 +732,13 @@ async function loadSettings() {
           </div>
         </div>
       `;
-    }).join('');
+    }).join('') + `
+      <div style="background:#f9f9f9;padding:15px;border-radius:10px;border:1px solid #eee;grid-column:1/-1;">
+        <h4 style="margin-bottom:10px;color:var(--navy);">Support Contact</h4>
+        <label class="form-label">Telegram support link</label>
+        <input type="url" class="form-control" id="supportTelegramUrl" value="${data.settings?.supportTelegramUrl || 'https://t.me/BankOfTheBraveSupport'}" placeholder="https://t.me/YourSupportName">
+        <small style="display:block;margin-top:6px;color:#999;">Must start with https://t.me/</small>
+      </div>`;
   } catch (e) { console.error(e); }
 }
 
@@ -735,13 +753,17 @@ async function savePaymentSettings() {
     });
     
     const token = localStorage.getItem('token');
+    const supportTelegramUrl = document.getElementById('supportTelegramUrl').value.trim();
+    if (!/^https:\/\/t\.me\/[A-Za-z0-9_+\-]+$/.test(supportTelegramUrl)) {
+      return alert('Enter a valid Telegram link starting with https://t.me/');
+    }
     const response = await fetch('/api/admin/deposit-settings', {
-      method: 'PUT',
+      method: 'POST',
       headers: { 
         'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ depositMethods: currentDepositSettings })
+      body: JSON.stringify({ depositMethods: currentDepositSettings, supportTelegramUrl })
     });
     
     if (response.ok) {
@@ -751,6 +773,64 @@ async function savePaymentSettings() {
       alert(data.error || 'Failed to save settings');
     }
   } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function loadRetirementPlans() {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('/api/retirement/admin/all', { headers: { 'Authorization': 'Bearer ' + token } });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Unable to load retirement plans');
+    const container = document.getElementById('retirementPlans');
+    if (!data.accounts.length) {
+      container.innerHTML = '<div style="color:#999;text-align:center;padding:20px;">No retirement plans found.</div>';
+      return;
+    }
+    container.innerHTML = data.accounts.map(account => {
+      const pending = (account.withdrawalRequests || []).filter(request => request.status === 'pending');
+      return `<div style="border:1px solid #eee;border-radius:10px;padding:16px;background:#fafafa;">
+        <strong>${account.planType.replaceAll('_', ' ').toUpperCase()}</strong> - ${account.userId?.email || 'Unknown'}
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:12px;">
+          <label>Status<select id="ret_status_${account._id}" class="form-control"><option ${account.status === 'active' ? 'selected' : ''}>active</option><option ${account.status === 'paused' ? 'selected' : ''}>paused</option><option ${account.status === 'closed' ? 'selected' : ''}>closed</option></select></label>
+          <label>Interest %<input id="ret_rate_${account._id}" class="form-control" type="number" min="0" step="0.1" value="${account.interestRate}"></label>
+          <label>Annual limit<input id="ret_limit_${account._id}" class="form-control" type="number" min="0" value="${account.annualContributionLimit}"></label>
+          <label>Employer match %<input id="ret_match_${account._id}" class="form-control" type="number" min="0" max="100" step="0.1" value="${account.employerMatchPercent}"></label>
+          <button class="btn btn-gold" onclick="updateRetirementPlan('${account._id}')">Save Plan</button>
+        </div>
+        <div style="margin-top:14px;"><strong>Balance:</strong> $${Number(account.balance || 0).toLocaleString()} <strong>Pending withdrawals:</strong> ${pending.length}</div>
+        ${pending.map(request => `<div style="margin-top:10px;padding:10px;background:white;border:1px solid #eee;border-radius:8px;">Withdrawal request: $${Number(request.amount).toLocaleString()} - ${request.reason} <button class="btn btn-gold" style="float:right;padding:6px 10px;font-size:12px;" onclick="reviewRetirementWithdrawal('${account._id}','${request._id}','approved')">Approve</button> <button class="btn btn-danger" style="float:right;padding:6px 10px;font-size:12px;margin-right:6px;" onclick="reviewRetirementWithdrawal('${account._id}','${request._id}','rejected')">Reject</button></div>`).join('')}
+      </div>`;
+    }).join('');
+  } catch (error) { alert(error.message); }
+}
+
+async function updateRetirementPlan(accountId) {
+  const token = localStorage.getItem('token');
+  const response = await fetch('/api/retirement/admin/' + accountId, {
+    method: 'PATCH',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      status: document.getElementById('ret_status_' + accountId).value,
+      interestRate: Number(document.getElementById('ret_rate_' + accountId).value),
+      annualContributionLimit: Number(document.getElementById('ret_limit_' + accountId).value),
+      employerMatchPercent: Number(document.getElementById('ret_match_' + accountId).value),
+    }),
+  });
+  const data = await response.json();
+  if (!response.ok) return alert(data.error || 'Unable to update plan');
+  loadRetirementPlans();
+}
+
+async function reviewRetirementWithdrawal(accountId, requestId, action) {
+  const token = localStorage.getItem('token');
+  const response = await fetch(`/api/retirement/admin/${accountId}/withdrawal/${requestId}`, {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action }),
+  });
+  const data = await response.json();
+  if (!response.ok) return alert(data.error || 'Unable to review withdrawal');
+  loadRetirementPlans();
 }
 
 async function loadStats() {

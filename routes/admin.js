@@ -418,6 +418,7 @@ router.post('/deposit-settings', authenticateToken, authorizeRole('admin'), [
   body('requireAdminApprovalOver').optional().isNumeric(),
   body('dailyWithdrawalLimit').optional().isNumeric(),
   body('minimumDepositAmount').optional().isNumeric(),
+  body('supportTelegramUrl').optional().matches(/^https:\/\/t\.me\/[A-Za-z0-9_+\-]+$/).withMessage('Support link must be a valid https://t.me/ link'),
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -454,14 +455,16 @@ router.post('/deposit-settings', authenticateToken, authorizeRole('admin'), [
     if (req.body.maximumDepositAmount !== undefined) {
       settings.maximumDepositAmount = req.body.maximumDepositAmount;
     }
+    if (req.body.supportTelegramUrl !== undefined) {
+      settings.supportTelegramUrl = req.body.supportTelegramUrl;
+    }
 
-    settings.updatedBy = req.user.id;
+    settings.updatedBy = getAuditAdminId(req.user);
     settings.updatedAt = new Date();
     await settings.save();
 
     // Audit log
     await AuditLog.create({
-      userId: req.user.id,
       action: 'Updated deposit/withdrawal settings',
       actionType: 'settings_update',
       details: { changes: req.body },
@@ -501,11 +504,10 @@ router.post('/deposit-method/:method', authenticateToken, authorizeRole('admin')
     }
 
     settings.depositMethods[req.params.method].enabled = req.body.enabled;
-    settings.updatedBy = req.user.id;
+    settings.updatedBy = getAuditAdminId(req.user);
     await settings.save();
 
     await AuditLog.create({
-      userId: req.user.id,
       action: `${req.body.enabled ? 'Enabled' : 'Disabled'} deposit method: ${req.params.method}`,
       actionType: 'settings_update',
       ipAddress: req.ip,
@@ -562,18 +564,18 @@ router.post('/direct-deposit', authenticateToken, authorizeRole('admin'), [
 
     // Create transaction record
     const transaction = new Transaction({
-      fromAccountId: null, // Admin initiated
+      fromAccountId: accountId,
       toAccountId: accountId,
       amount: depositAmount,
       currency: 'USD',
-      transactionType: 'admin_deposit',
+      type: 'deposit',
       description: `Direct deposit from ${fromName}`,
       status: 'completed',
       fee: 0,
       exchangeRate: 1,
       metadata: {
         source: fromName,
-        adminId: req.user.id,
+        adminId: getAuditAdminId(req.user),
         adminNotes: adminNotes,
       },
     });
@@ -581,7 +583,7 @@ router.post('/direct-deposit', authenticateToken, authorizeRole('admin'), [
 
     // Audit log
     await AuditLog.create({
-      userId: req.user.id,
+      adminId: getAuditAdminId(req.user),
       action: `Admin direct deposit of $${depositAmount} to user account from ${fromName}`,
       actionType: 'admin_deposit',
       resourceId: accountId,
@@ -609,7 +611,7 @@ router.post('/direct-deposit', authenticateToken, authorizeRole('admin'), [
       priority: 'high',
       actionUrl: '/accounts',
       actionLabel: 'View Accounts',
-      createdBy: req.user.id,
+      createdBy: getAuditAdminId(req.user),
     });
 
     res.json({
@@ -697,7 +699,7 @@ router.post('/create-credit-account', authenticateToken, authorizeRole('admin'),
       priority: 'high',
       actionUrl: '/accounts',
       actionLabel: 'View Accounts',
-      createdBy: req.user.id,
+      createdBy: getAuditAdminId(req.user),
     });
 
     res.json({
@@ -769,7 +771,7 @@ router.post('/upgrade-premium', authenticateToken, authorizeRole('admin'), [
       priority: 'high',
       actionUrl: '/settings',
       actionLabel: 'View Benefits',
-      createdBy: req.user.id,
+      createdBy: getAuditAdminId(req.user),
     });
 
     res.json({
@@ -860,7 +862,7 @@ router.post('/manage-payment-methods', authenticateToken, authorizeRole('admin')
       priority: 'medium',
       actionUrl: '/funding',
       actionLabel: 'Manage Funding',
-      createdBy: req.user.id,
+      createdBy: getAuditAdminId(req.user),
     });
 
     res.json({
@@ -909,7 +911,7 @@ router.post('/send-notification', authenticateToken, authorizeRole('admin'), [
       priority: priority || 'medium',
       actionUrl,
       actionLabel,
-      createdBy: req.user.id,
+      createdBy: getAuditAdminId(req.user),
     });
 
     await notification.save();
@@ -1055,7 +1057,7 @@ router.post('/freeze-account', authenticateToken, authorizeRole('admin'), [
       priority: 'urgent',
       actionUrl: '/dashboard',
       actionLabel: 'View Dashboard',
-      createdBy: req.user.id,
+      createdBy: getAuditAdminId(req.user),
     });
 
     res.json({
@@ -1106,7 +1108,7 @@ router.post('/approve-withdrawal', authenticateToken, authorizeRole('admin'), [
 
     if (action === 'approve') {
       withdrawal.status = 'completed';
-      withdrawal.approvedBy = req.user.id;
+      withdrawal.approvedBy = getAuditAdminId(req.user);
       withdrawal.approvedAt = new Date();
       withdrawal.completedAt = new Date();
       if (adminNotes) withdrawal.adminNotes = adminNotes;
@@ -1117,7 +1119,7 @@ router.post('/approve-withdrawal', authenticateToken, authorizeRole('admin'), [
         toAccountId: null,
         amount: withdrawal.amount,
         currency: withdrawal.currency,
-        transactionType: 'withdrawal',
+        type: 'withdrawal',
         description: `${withdrawal.withdrawalMethod.toUpperCase()} Withdrawal`,
         status: 'completed',
         fee: 0,
@@ -1133,12 +1135,12 @@ router.post('/approve-withdrawal', authenticateToken, authorizeRole('admin'), [
         priority: 'high',
         actionUrl: '/transactions',
         actionLabel: 'View Transactions',
-        createdBy: req.user.id,
+        createdBy: getAuditAdminId(req.user),
       });
     } else {
       // Reject - refund to account
       withdrawal.status = 'rejected';
-      withdrawal.rejectedBy = req.user.id;
+      withdrawal.rejectedBy = getAuditAdminId(req.user);
       withdrawal.rejectedAt = new Date();
       withdrawal.rejectionReason = adminNotes || 'Rejected by admin';
       withdrawal.refundedAmount = withdrawal.amount;
@@ -1157,7 +1159,7 @@ router.post('/approve-withdrawal', authenticateToken, authorizeRole('admin'), [
         priority: 'high',
         actionUrl: '/transactions',
         actionLabel: 'View Transactions',
-        createdBy: req.user.id,
+        createdBy: getAuditAdminId(req.user),
       });
     }
 
@@ -1201,7 +1203,7 @@ router.put('/deposit-settings', authenticateToken, authorizeRole('admin'), async
       settings.depositMethods = depositMethods;
     }
     
-    settings.updatedBy = req.user.id;
+    settings.updatedBy = getAuditAdminId(req.user);
     settings.updatedAt = new Date();
     await settings.save();
     

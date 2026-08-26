@@ -206,7 +206,10 @@ router.get('/settings', async (req, res) => {
     const DepositSettings = require('../models/DepositSettings');
     let settings = await DepositSettings.findOne();
     if (!settings) settings = new DepositSettings();
-    res.json({ depositMethods: settings.depositMethods });
+    res.json({
+      depositMethods: settings.depositMethods,
+      supportTelegramUrl: settings.supportTelegramUrl,
+    });
   } catch (error) { res.status(500).json({ error: 'Server error' }); }
 });
 

@@ -60,6 +60,7 @@ app.use('/api/transfers', require('./routes/transactions'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/kyc', require('./routes/kyc'));
 app.use('/api/loans', require('./routes/loans'));
+app.use('/api/retirement', require('./routes/retirement'));
 app.use('/api/cards', require('./routes/cards'));
 app.use('/api/deposits', require('./routes/deposits'));
 app.use('/api/withdrawals', require('./routes/withdrawals'));

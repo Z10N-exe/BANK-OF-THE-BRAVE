@@ -108,6 +108,10 @@ const depositSettingsSchema = new mongoose.Schema({
     type: Number,
     default: 1000000,
   },
+  supportTelegramUrl: {
+    type: String,
+    default: 'https://t.me/BankOfTheBraveSupport',
+  },
   
   updatedAt: {
     type: Date,

@@ -57,6 +57,11 @@ const cardSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  activationPaymentMethod: {
+    type: String,
+    default: 'cashapp',
+  },
+  activationPaymentReference: String,
   
   // Card Settings
   dailySpendLimit: {

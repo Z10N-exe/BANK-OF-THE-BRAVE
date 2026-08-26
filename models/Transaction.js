@@ -4,7 +4,6 @@ const transactionSchema = new mongoose.Schema({
   fromAccountId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Account',
-    required: true,
   },
   toAccountId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -22,7 +21,7 @@ const transactionSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['internal_transfer', 'wire_transfer', 'ach', 'card_transaction', 'deposit', 'withdrawal', 'fx_conversion', 'loan_disbursement'],
+    enum: ['internal_transfer', 'wire_transfer', 'ach', 'card_transaction', 'deposit', 'withdrawal', 'fx_conversion', 'loan_disbursement', 'retirement_contribution'],
     required: true,
   },
   status: {

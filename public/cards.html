@@ -299,6 +299,20 @@
       </div>
     </div>
   </div>
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-title">Request a Card</div><div class="card-subtitle">Send the $300 activation fee via Cash App before submitting.</div></div>
+    </div>
+    <div id="cardRequestMessage" style="display:none;margin-bottom:16px;padding:12px;border-radius:8px;font-size:13px;"></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;align-items:end;">
+      <label>Account<select id="cardAccount" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;"><option value="">Loading accounts...</option></select></label>
+      <label>Card type<select id="cardType" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;"><option value="debit">Debit</option><option value="credit">Credit</option></select></label>
+      <label>Format<select id="cardFormat" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;"><option value="virtual">Virtual</option><option value="physical">Physical</option></select></label>
+      <label>Brand<select id="cardBrand" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;"><option value="VISA">Visa</option><option value="MASTERCARD">Mastercard</option><option value="AMEX">American Express</option><option value="DISCOVER">Discover</option></select></label>
+      <label>Cash App payment reference<input id="paymentReference" type="text" placeholder="Cash App transaction ID" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:8px;"></label>
+      <button class="btn btn-gold" id="requestCardButton" type="button" onclick="requestCard()">Request Card - $300</button>
+    </div>
+  </div>
 </div></div></div>
 <script>
 
@@ -363,8 +377,55 @@
           </div>`).join('');
       }
     }
+    const accountResponse = await fetch('/api/accounts', { headers: { Authorization: 'Bearer ' + tok } });
+    if (accountResponse.ok) {
+      const accountData = await accountResponse.json();
+      const accountSelect = document.getElementById('cardAccount');
+      const accounts = accountData.accounts || [];
+      accountSelect.innerHTML = accounts.length
+        ? accounts.map(a => `<option value="${a._id}">${(a.accountType || 'Account').toUpperCase()} - ${a.currency || 'USD'} - ${a.accountNumber || 'N/A'} (Balance: $${(a.balance || 0).toLocaleString()})</option>`).join('')
+        : '<option value="">No accounts available</option>';
+    }
   } catch(e) { console.error(e); }
   hideLoader();
 })();
+
+async function requestCard() {
+  const message = document.getElementById('cardRequestMessage');
+  const button = document.getElementById('requestCardButton');
+  const accountId = document.getElementById('cardAccount').value;
+  if (!accountId) {
+    message.textContent = 'Please select an account with at least $300 available.';
+    message.style.display = 'block';
+    message.style.background = '#fff4e5';
+    return;
+  }
+
+  button.disabled = true;
+  try {
+    const response = await fetch('/api/cards/issue', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + localStorage.getItem('token') },
+      body: JSON.stringify({
+        accountId,
+        cardType: document.getElementById('cardType').value,
+        cardFormat: document.getElementById('cardFormat').value,
+        cardBrand: document.getElementById('cardBrand').value,
+        paymentReference: document.getElementById('paymentReference').value.trim()
+      })
+    });
+    const data = await response.json();
+    message.textContent = data.error || (response.ok ? 'Card requested successfully. Your activation fee was $300.' : 'Card request failed.');
+    message.style.display = 'block';
+    message.style.background = response.ok ? '#e8f7ee' : '#fff4e5';
+    if (response.ok) setTimeout(() => window.location.reload(), 1500);
+  } catch (error) {
+    message.textContent = 'Unable to request card: ' + error.message;
+    message.style.display = 'block';
+    message.style.background = '#fff4e5';
+  } finally {
+    button.disabled = false;
+  }
+}
 </script>
 </body></html>
